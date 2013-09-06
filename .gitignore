@@ -1,0 +1,10 @@
+/.bundle
+/log/*.log
+/tmp
+
+# IDE meta files
+.project
+.settings
+
+# Temporary editors files
+*~
