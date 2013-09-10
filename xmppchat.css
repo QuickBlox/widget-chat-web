@@ -1,0 +1,97 @@
+/* Global
+==============================*/
+html {
+	height:100%;
+}
+body {
+	position:relative;
+	width:100%;
+	height:100%;
+	font-family:Helvetica, Arial, sans-serif;
+	color:#5a5a5a;
+	line-height:20px;
+}
+a {
+	text-decoration:none;
+}
+
+.inner {
+	width:300px;
+	height:100%;
+	margin:0 auto;
+}
+.block_margin {
+	margin-bottom:30px;
+}
+
+/* Auth
+==============================*/
+#auth .logo {
+	margin-bottom:20px;
+	padding-top:30px;
+	text-align:center;
+}
+	#auth .logo img {
+		width:130px;
+		height:130px;
+	}
+	
+#auth .welcome {
+	margin-bottom:40px;
+	text-align:center;
+}
+
+#auth .button_auth a {
+	display:block;
+	width:210px;
+	height:40px;
+	margin:0 auto;
+	line-height:40px;
+	background-repeat:no-repeat;
+	background-size:100% 100%;
+}
+#auth #QB_auth {
+	background-image:url('images/login_quickblox.png');
+}
+#auth #FB_auth {
+	background-image:url('images/login_facebook.png');
+}
+#auth #TW_auth {
+	background-image:url('images/login_twitter.png');
+}
+#auth .button_auth a:hover {
+	opacity:0.6;
+}
+
+#login {
+	text-align:center;
+}
+	#login input {
+		width:200px;
+		height:25px;
+		line-height:25px;
+		padding:7px 5px;
+		color:#1e1e1e;
+		border:1px solid #dcdee3;
+		font-size:18px;
+		border-radius:5px;
+	}
+	#login button {
+		width:212px;
+		height:40px;
+		color:#fff;
+		background:#429abd;
+		border:1px solid #4887c3;
+		cursor:pointer;
+	}
+	#login button:hover {
+		opacity:0.6;
+	}
+
+#powered {
+	position:absolute;
+	top:0;
+	right:0;
+	padding-right:5px;
+	font-size:11px;
+}

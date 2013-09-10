@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>QuickBlox Web XMPP Chat sample</title>
+	
+	<link rel="stylesheet" href="css/reset.css" />
+	<link rel="stylesheet" href="xmppchat.css" />
+
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script src="js/quickblox.js"></script>
+	<script src="js/strophe.min.js"></script>
+	<script src="js/strophe.muc.js"></script>
+	
+	<script src="config.js"></script>
+	<script src="xmppchat.js"></script>
+	
+	<style>
+		#wrap {
+			position:absolute;
+			top:0;
+			right:0;
+			bottom:0;
+			left:0;
+			width:500px;
+			height:500px;
+			margin:auto;
+			background:url('images/bg-header.png') no-repeat;
+			border:1px solid #cacaca;
+			border-radius:5px;
+		}
+	</style>
+</head>
+<body>
+	<div id="wrap">
+		<div id="auth" class="inner">
+			<div class="block_margin logo"><img src="images/logo.png" alt="QuickBlox logo" /></div>
+			<div class="block_margin welcome">Welcome to<br />QuickBlox Web XMPP Chat</div>
+			
+			<div class="block_margin button_auth"><a href="#" id="QB_auth"></a></div>
+			<div class="block_margin button_auth"><a href="#" id="FB_auth"></a></div>
+			<div class="block_margin button_auth"><a href="#" id="TW_auth"></a></div>
+			
+			<div id="login" style="display:none">
+				<div class="block_margin"><input type="text" placeholder="Login or Email" id="log" /></div>
+				<div class="block_margin"><input type="password" placeholder="Password" id="pass" /></div>
+				<div class="block_margin"><button onclick="auth()">Connect to chat</button></div>
+			</div>
+		</div>
+		
+		<div id="powered">Powered by <a href="http://quickblox.com">QuickBlox</a></div>
+		
+		<div id="chat" style="display:none">
+			<input type="text" id="mes"/>
+			<button onclick="mesage()">Message</button>
+		</div>
+	</div>
+</body>
+</html>
