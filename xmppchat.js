@@ -5,23 +5,18 @@
  *
  */
 
-var login, pass; 
-var connection = null;
+var login, email, pass, connection;
 
-$(document).ready(function() {
-	$('#QB_auth').click(function(){
-		$('.button_auth').hide();
-		$('#login').show();
-		return false;
-	});
-});
+function authQB() {
+	$('#buttons').hide().next().show();
+}
 
-function auth() {
+function sessionCreate() {
+	var tmp = $('#login').val();
+	
+	pass = $('#password').val();
+	
 	QB.init(QBPARAMS.app_id, QBPARAMS.auth_key, QBPARAMS.auth_secret);
-	
-	login = $('#log').val();
-	pass = $('#pass').val();
-	
 	QB.createSession(function(err, result){
 		if (err) {
 			console.log('Something went wrong: ' + err);
@@ -65,6 +60,6 @@ function rawOutput(data) {
     console.log('SENT: ' + data);
 }
 
-function mesage() {
-	connection.muc.message(CHAT.room, null, $('#mes').val(), 'groupchat');
+function sendMesage() {
+	connection.muc.message(CHAT.room, null, $('#message').val(), 'groupchat');
 }

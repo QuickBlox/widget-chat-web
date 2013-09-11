@@ -6,53 +6,39 @@
 	
 	<link rel="stylesheet" href="css/reset.css" />
 	<link rel="stylesheet" href="xmppchat.css" />
-
+	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 	<script src="js/quickblox.js"></script>
-	<script src="js/strophe.min.js"></script>
+	<script src="js/strophe.js"></script>
 	<script src="js/strophe.muc.js"></script>
 	
 	<script src="config.js"></script>
 	<script src="xmppchat.js"></script>
-	
-	<style>
-		#wrap {
-			position:absolute;
-			top:0;
-			right:0;
-			bottom:0;
-			left:0;
-			width:500px;
-			height:500px;
-			margin:auto;
-			background:url('images/bg-header.png') no-repeat;
-			border:1px solid #cacaca;
-			border-radius:5px;
-		}
-	</style>
 </head>
 <body>
 	<div id="wrap">
-		<div id="auth" class="inner">
-			<div class="block_margin logo"><img src="images/logo.png" alt="QuickBlox logo" /></div>
-			<div class="block_margin welcome">Welcome to<br />QuickBlox Web XMPP Chat</div>
+		<div id="auth">
+			<div class="logo"><img src="images/logo.png" alt="QuickBlox logo" /></div>
+			<div class="welcome">Welcome to<br />QuickBlox Web XMPP Chat</div>
 			
-			<div class="block_margin button_auth"><a href="#" id="QB_auth"></a></div>
-			<div class="block_margin button_auth"><a href="#" id="FB_auth"></a></div>
-			<div class="block_margin button_auth"><a href="#" id="TW_auth"></a></div>
-			
-			<div id="login" style="display:none">
-				<div class="block_margin"><input type="text" placeholder="Login or Email" id="log" /></div>
-				<div class="block_margin"><input type="password" placeholder="Password" id="pass" /></div>
-				<div class="block_margin"><button onclick="auth()">Connect to chat</button></div>
+			<div id="buttons">
+				<p><button onclick="authQB()"><img src="images/login_quickblox.png" alt="Sign in with QuickBlox" /></button></p>
+				<p><button onclick="authFB()"><img src="images/login_facebook.png" alt="Sign in with Facebook" /></button></p>
+				<p><button onclick="authTW()"><img src="images/login_twitter.png" alt="Sign in with Twitter" /></button></p>
 			</div>
+			
+			<div id="qb_login_form">
+				<p><input id="login" type="text" placeholder="Login or Email" /></p>
+				<p><input id="password" type="password" placeholder="Password" /></p>
+				<p><button onclick="sessionCreate()">Connect</button></p>
+			</div>
+			
+			<div class="powered">Powered by <a href="http://quickblox.com">QuickBlox</a></div>
 		</div>
 		
-		<div id="powered">Powered by <a href="http://quickblox.com">QuickBlox</a></div>
-		
-		<div id="chat" style="display:none">
-			<input type="text" id="mes"/>
-			<button onclick="mesage()">Message</button>
+		<div id="chat">
+			<input type="text" id="message"/>
+			<button onclick="sendMesage()">Message</button>
 		</div>
 	</div>
 </body>

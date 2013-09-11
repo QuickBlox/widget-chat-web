@@ -11,87 +11,101 @@ body {
 	color:#5a5a5a;
 	line-height:20px;
 }
-a {
+a:hover {
 	text-decoration:none;
 }
-
-.inner {
-	width:300px;
-	height:100%;
-	margin:0 auto;
-}
-.block_margin {
+p {
 	margin-bottom:30px;
 }
-
-/* Auth
-==============================*/
-#auth .logo {
-	margin-bottom:20px;
-	padding-top:30px;
-	text-align:center;
+p:last-child {
+	margin-bottom:0;
 }
-	#auth .logo img {
-		width:130px;
-		height:130px;
-	}
-	
-#auth .welcome {
-	margin-bottom:40px;
-	text-align:center;
+button {
+	padding:0;
+	border:0;
+	background:none;
+	cursor:pointer;
 }
-
-#auth .button_auth a {
-	display:block;
-	width:210px;
-	height:40px;
-	margin:0 auto;
-	line-height:40px;
-	background-repeat:no-repeat;
-	background-size:100% 100%;
-}
-#auth #QB_auth {
-	background-image:url('images/login_quickblox.png');
-}
-#auth #FB_auth {
-	background-image:url('images/login_facebook.png');
-}
-#auth #TW_auth {
-	background-image:url('images/login_twitter.png');
-}
-#auth .button_auth a:hover {
+button:hover {
 	opacity:0.6;
 }
 
-#login {
-	text-align:center;
-}
-	#login input {
-		width:200px;
-		height:25px;
-		line-height:25px;
-		padding:7px 5px;
-		color:#1e1e1e;
-		border:1px solid #dcdee3;
-		font-size:18px;
-		border-radius:5px;
-	}
-	#login button {
-		width:212px;
-		height:40px;
-		color:#fff;
-		background:#429abd;
-		border:1px solid #4887c3;
-		cursor:pointer;
-	}
-	#login button:hover {
-		opacity:0.6;
-	}
-
-#powered {
+/* Wrapper
+==============================*/
+#wrap {
 	position:absolute;
 	top:0;
 	right:0;
-	padding-right:5px;
-	font-size:11px;
+	bottom:0;
+	left:0;
+	width:500px;
+	height:500px;
+	margin:auto;
+	border:1px solid #cacaca;
+	border-radius:5px;
+}
+
+/* Authorization
+==============================*/
+#auth {
+	position:relative;
+	height:100%;
+	text-align:center;
+	background:url('images/bg-header.png') no-repeat;
+}
+	#auth .logo {
+		margin-bottom:20px;
+		padding-top:30px;
+	}
+		#auth .logo img {
+			width:130px;
+			height:130px;
+		}
+	#auth .welcome {
+		margin-bottom:40px;
+	}
+	#auth .powered {
+		position:absolute;
+		top:0;
+		right:5px;
+		font-size:11px;
+	}
+	
+/* Buttons Auth */
+#buttons,
+#qb_login_form {
+	width:210px;
+	margin:0 auto;
+}
+	#buttons button,
+	#qb_login_form button {
+		display:block;
+		width:100%;
+		height:38px;
+	}
+		#buttons button img {
+			width:100%;
+			height:100%;
+		}
+
+/* Login form */
+#qb_login_form {
+	display:none;
+}
+	#qb_login_form input {
+		width:194px;
+		height:22px;
+		padding:7px;
+		border:1px solid #dcdee3;
+	}
+	#qb_login_form button {
+		color:#fff;
+		background:#429abd;
+		border:1px solid #3985a4;
+	}
+
+/* Chat
+==============================*/
+#chat {
+	display:none;
 }
