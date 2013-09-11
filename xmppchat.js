@@ -5,17 +5,38 @@
  *
  */
 
-var login, pass, params, connection;
+var sessionObject, login, pass, params, connection;
+
+$(document).ready(function(){
+	var storage = localStorage['auth'];
+	if (storage) {
+		sessionObject = JSON.parse($.base64.decode(storage));
+		console.log(sessionObject);
+		sessionCreate(sessionObject);
+	}
+	
+	$('.logout').click(function(){
+		localStorage.removeItem('auth');
+		$('#buttons').show().next().hide();
+		$('#auth').show().next().next().hide();
+	});
+});
 
 function authQB() {
-	$('#buttons').hide().next().show();
+	$('#buttons').hide().next().show().find('input').val('');
 }
 
-function sessionCreate() {
-	login = $('#login').val();
-	pass = $('#password').val();
+function sessionCreate(sessionObject) {
 	$('#auth').hide().next().show();
 	$('#wrap').addClass('connect_message');
+	
+	if (sessionObject) {
+		login = sessionObject.login;
+		pass = sessionObject.password;
+	} else {
+		login = $('#login').val();
+		pass = $('#password').val();
+	}
 	
 	if (login.indexOf('@') > 0) {
 		params = {email: login, password: pass}
@@ -39,16 +60,20 @@ function sessionCreate() {
 					$('#wrap').removeClass('connect_message');
 				} else {
 					console.log(result);
-					
 					$('#connecting').hide().next().show();
-					//xmpp(result.id, result.login, pass);
+					$('#wrap').removeClass('connect_message');
+					
+					sessionObject = {type: 0, login: login, password: pass};
+					localStorage['auth'] = $.base64.encode(JSON.stringify(sessionObject));
+					
+					//xmppConnect(result.id, result.login, pass);
 				}
 			});
 		}
 	});
 }
 
-function xmpp(user_id, user_login, pass) {
+function xmppConnect(user_id, user_login, pass) {
 	connection = new Strophe.Connection(CHAT.bosh_url);
 	connection.rawInput = rawInput;
 	connection.rawOutput = rawOutput;
@@ -57,7 +82,7 @@ function xmpp(user_id, user_login, pass) {
 	connection.connect(user_id + "-" + QBPARAMS.app_id + "@" + CHAT.server, pass, function (status) {
 		console.log(status);
 		if (status == 6) {
-			xmpp(user_id, user_login, pass);
+			xmppConnect(user_id, user_login, pass);
 		} else if (status == 5) {
 			connection.muc.join(CHAT.room, user_login);
 		}

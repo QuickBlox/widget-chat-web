@@ -11,6 +11,7 @@
 	<script src="js/quickblox.js"></script>
 	<script src="js/strophe.js"></script>
 	<script src="js/strophe.muc.js"></script>
+	<script src="js/jquery.base64.min.js"></script>
 	
 	<script src="config.js"></script>
 	<script src="xmppchat.js"></script>
@@ -42,8 +43,16 @@
 		</div>
 		
 		<div id="chat">
-			<input type="text" id="message"/>
-			<button onclick="sendMesage()">Message</button>
+			<div class="header">
+				<a href="#" class="logout">Logout</a>
+			</div>
+			<div class="content">
+				
+			</div>
+			<div class="footer">
+				<input type="text" id="message"/>
+				<button onclick="sendMesage()">Message</button>
+			</div>
 		</div>
 	</div>
 </body>
