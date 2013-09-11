@@ -5,31 +5,43 @@
  *
  */
 
-var login, email, pass, connection;
+var login, pass, params, connection;
 
 function authQB() {
 	$('#buttons').hide().next().show();
 }
 
 function sessionCreate() {
-	var tmp = $('#login').val();
-	
+	login = $('#login').val();
 	pass = $('#password').val();
+	$('#auth').hide().next().show();
+	$('#wrap').addClass('connect_message');
+	
+	if (login.indexOf('@') > 0) {
+		params = {email: login, password: pass}
+	} else {
+		params = {login: login, password: pass}
+	}
 	
 	QB.init(QBPARAMS.app_id, QBPARAMS.auth_key, QBPARAMS.auth_secret);
 	QB.createSession(function(err, result){
 		if (err) {
-			console.log('Something went wrong: ' + err);
+			console.log('Something went wrong: ' + err.detail);
+			$('#connecting').hide().prev().show();
+			$('#wrap').removeClass('connect_message');
 		} else {
 			console.log(result);
-			QB.login({login: login, password: pass}, function(err, result){
+			
+			QB.login(params, function(err, result){
 				if (err) {
-					console.log('Something went wrong: ' + err);
+					console.log('Something went wrong: ' + err.detail);
+					$('#connecting').hide().prev().show();
+					$('#wrap').removeClass('connect_message');
 				} else {
 					console.log(result);
-					$('#auth').hide();
-					$('#chat').show();
-					xmpp(result.id, result.login, pass);
+					
+					$('#connecting').hide().next().show();
+					//xmpp(result.id, result.login, pass);
 				}
 			});
 		}

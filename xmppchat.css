@@ -44,6 +44,9 @@ button:hover {
 	border:1px solid #cacaca;
 	border-radius:5px;
 }
+#wrap.connect_message {
+	background:#fbfbfb;
+}
 
 /* Authorization
 ==============================*/
@@ -103,6 +106,20 @@ button:hover {
 		background:#429abd;
 		border:1px solid #3985a4;
 	}
+	
+/* Connecting */
+#connecting {
+	display:none;
+	position:absolute;
+	top:0;
+	right:0;
+	bottom:0;
+	left:0;
+	width:200px;
+	height:70px;
+	margin:auto;
+	text-align:center;
+}
 
 /* Chat
 ==============================*/
