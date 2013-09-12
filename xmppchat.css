@@ -127,15 +127,15 @@ button:hover {
 	display:none;
 	height:100%;
 }
-	#chat .header,
-	#chat .footer {
+	#chat .chat-header,
+	#chat .chat-footer {
 		height:40px;
 		background:#f3f3f3;
 	}
-	#chat .header {
+	#chat .chat-header {
 		border-bottom:1px solid #cacaca;
 	}
-		#chat .header .logout {
+		#chat .chat-header .logout {
 			display:block;
 			float:right;
 			margin:9px;
@@ -146,13 +146,13 @@ button:hover {
 			background:#76112b;
 			border:1px solid #580d20;
 		}
-		#chat .header .logout:hover {
+		#chat .chat-header .logout:hover {
 			opacity:0.6;
 		}
-	#chat .content {
+	#chat .chat-content {
 		height:418px;
 		background:#fff;
 	}
-	#chat .footer {
+	#chat .chat-footer {
 		border-top:1px solid #cacaca;
 	}

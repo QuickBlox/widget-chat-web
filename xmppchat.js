@@ -5,14 +5,14 @@
  *
  */
 
-var sessionObject, login, pass, params, connection;
+var sessionObj, login, pass, params, connection;
 
 $(document).ready(function(){
 	var storage = localStorage['auth'];
 	if (storage) {
-		sessionObject = JSON.parse($.base64.decode(storage));
-		console.log(sessionObject);
-		sessionCreate(sessionObject);
+		sessionObj = JSON.parse($.base64.decode(storage));
+		sessionCreate(sessionObj);
+		console.log(sessionObj);
 	}
 	
 	$('.logout').click(function(){
@@ -63,17 +63,17 @@ function sessionCreate(sessionObject) {
 					$('#connecting').hide().next().show();
 					$('#wrap').removeClass('connect_message');
 					
-					sessionObject = {type: 0, login: login, password: pass};
-					localStorage['auth'] = $.base64.encode(JSON.stringify(sessionObject));
+					sessionObj = {type: 0, login: login, password: pass};
+					localStorage['auth'] = $.base64.encode(JSON.stringify(sessionObj));
 					
-					//xmppConnect(result.id, result.login, pass);
+					xmppConnect(result.id, result.ful_name, pass);
 				}
 			});
 		}
 	});
 }
 
-function xmppConnect(user_id, user_login, pass) {
+function xmppConnect(user_id, user_full_name, pass) {
 	connection = new Strophe.Connection(CHAT.bosh_url);
 	connection.rawInput = rawInput;
 	connection.rawOutput = rawOutput;
@@ -82,9 +82,9 @@ function xmppConnect(user_id, user_login, pass) {
 	connection.connect(user_id + "-" + QBPARAMS.app_id + "@" + CHAT.server, pass, function (status) {
 		console.log(status);
 		if (status == 6) {
-			xmppConnect(user_id, user_login, pass);
+			xmppConnect(user_id, user_full_name, pass);
 		} else if (status == 5) {
-			connection.muc.join(CHAT.room, user_login);
+			connection.muc.join(CHAT.room, user_full_name);
 		}
 	});
 }
