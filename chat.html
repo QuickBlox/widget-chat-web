@@ -12,7 +12,9 @@
 	<script src="js/strophe.js"></script>
 	<script src="js/strophe.muc.js"></script>
 	<script src="js/jquery.base64.min.js"></script>
-	
+	<script src="js/jquery.formatDateTime.js"></script>
+	<script src="js/jquery.scrollTo-min.js"></script>
+
 	<script src="config.js"></script>
 	<script src="xmppchat.js"></script>
 </head>
@@ -44,11 +46,10 @@
 		
 		<div id="chat">
 			<div class="chat-header">
+				<span class="room_name"></span>
 				<a href="#" class="logout">Logout</a>
 			</div>
-			<div class="chat-content">
-				
-			</div>
+			<div class="chat-content"></div>
 			<div class="chat-footer">
 				<input type="text" id="message"/>
 				<button onclick="sendMesage()">Message</button>

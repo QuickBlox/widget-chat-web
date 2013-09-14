@@ -5,7 +5,7 @@
  *
  */
 
-var storage, login, password, params, connection, userJID, roomJID;
+var storage, login, password, params, connection, userJID, roomJID, nick, html;
 
 function authQB() {
 	$('#buttons').hide().next('#qb_login_form').show().find('input').val('');
@@ -44,14 +44,15 @@ function sessionCreate(storage) {
 				} else {
 					console.log(result);
 					
-					xmppConnect(result.id, result.full_name, login, password);
+					nick = result.full_name;
+					xmppConnect(result.id, nick, login, password);
 				}
 			});
 		}
 	});
 }
 
-function xmppConnect(user_id, user_full_name, login, password) {
+function xmppConnect(user_id, nick, login, password) {
 	connection = new Strophe.Connection(CHAT.bosh_url);
 	connection.rawInput = rawInput;
 	connection.rawOutput = rawOutput;
@@ -86,13 +87,17 @@ function xmppConnect(user_id, user_full_name, login, password) {
 			storage = {type: 0, login: login, password: password};
 			localStorage['auth'] = $.base64.encode(JSON.stringify(storage));
 			
-			connection.muc.join(roomJID, user_full_name);
+			connection.muc.join(roomJID, nick, onMessage);
 		  break;
 		case Strophe.Status.DISCONNECTED:
 		  console.log('[Connection] Disconnected');
 		  break;
 		case Strophe.Status.DISCONNECTING:
 		  console.log('[Connection] Disconnecting');
+		  
+		  connection.muc.leave(roomJID, nick);
+		  $('.chat-content').html('');
+			$('#chat, #qb_login_form').hide().prevAll('#auth, #buttons').show();
 		  break;
 		case Strophe.Status.ATTACHED:
 		  console.log('[Connection] Attached');
@@ -102,16 +107,43 @@ function xmppConnect(user_id, user_full_name, login, password) {
 }
 
 function rawInput(data) {
-    console.log('RECV: ' + data);
+  console.log('RECV: ' + data);
 }
 
 function rawOutput(data) {
-    console.log('SENT: ' + data);
+  console.log('SENT: ' + data);
 }
 
-/*function sendMesage() {
-	connection.muc.message(roomJID, null, $('#message').val(), 'groupchat');
-}*/
+function onMessage(stanza, room) {
+	console.log('[XMPP] Message');
+  
+  var message = $(stanza).find('body').context.textContent;
+  var time = $(stanza).find('delay').attr('stamp');
+  var user = $(stanza).attr('from').split('/')[1].replace(/\\20/g, ' ');
+  
+  if (!time) {
+  	time = new Date();
+  } else {
+  	time = new Date(time);
+  }
+  
+	html = '<article class="message-wrap">';
+	html += '<img class="avatar" src="images/default_avatar.gif" alt="avatar" />';
+	html += '<div class="message">';
+	html += '<header><h4>' + user + '</h4></header>';
+	html += '<section>' + message + '</section>';
+	html += '<footer class="time">' + $.formatDateTime('M dd, yy hh:ii:ss', time) + '</footer>';
+	html += '</div></article>';
+	
+	$('.chat-content').append(html);
+	$('.chat-content').scrollTo('.message-wrap:last', 0);
+
+	return true;
+}
+
+function sendMesage() {
+	connection.muc.groupchat(roomJID, $('#message').val());
+}
 
 /*------------------- DOM is ready -------------------------*/
 $(document).ready(function(){
@@ -130,13 +162,14 @@ function connectFailed() {
 function connectSuccess() {
 	$('#connecting').hide().next('#chat').show();
 	$('#wrap').removeClass('connect_message');
+	$('.room_name').text(CHAT.room_name);
 	checkLogout();
 }
 
 function checkLogout() {
 	$('.logout').click(function(event){
 		event.preventDefault();
+		connection.disconnect();
 		localStorage.removeItem('auth');
-		$('#chat, #qb_login_form').hide().prevAll('#auth, #buttons').show();
 	});
 }
