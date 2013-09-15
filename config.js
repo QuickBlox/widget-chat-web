@@ -7,8 +7,7 @@ var QBPARAMS = {
 
 //Chat params
 var CHAT = {
-	room_name   : 'test',
 	server      : 'chat.quickblox.com',
-	muc_server  : 'muc.chat.quickblox.com',
-	bosh_url    : 'http://chat.quickblox.com:5280'
+	bosh_url    : 'http://chat.quickblox.com:5280',
+	roomJID     : '3907_test@muc.chat.quickblox.com'
 }

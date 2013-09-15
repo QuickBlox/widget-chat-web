@@ -45,15 +45,24 @@
 		</div>
 		
 		<div id="chat">
-			<div class="chat-header">
-				<span class="room_name"></span>
+			<header class="chat-header">
+				<h3 class="room_name"></h3>
 				<a href="#" class="logout">Logout</a>
-			</div>
-			<div class="chat-content"></div>
-			<div class="chat-footer">
-				<input type="text" id="message"/>
-				<button onclick="sendMesage()">Message</button>
-			</div>
+			</header>
+			<section class="chat-content">
+				<span class="no_msg">The chat doesn't have any messages</span>
+			</section>
+			<footer class="chat-footer">
+				<div class="send_message">
+					<input type="text" id="message"/>
+					<input class="message_field" type="text" placeholder="Enter message..." />
+					<button onclick="sendMesage()">Send</button>
+				</div>
+				<div class="occupants">
+					<span class="number"></span>
+					<img src="images/icon_users.png" alt="users" />
+				</div>
+			</footer>
 		</div>
 	</div>
 </body>

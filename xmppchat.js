@@ -1,11 +1,12 @@
 /*
  * QuickBlox Web XMPP Chat sample
+ * version 1.0.0
  *
  * Author: Andrey Povelichenko (andrey.povelichenko@quickblox.com)
  *
  */
 
-var storage, login, password, params, connection, userJID, roomJID, nick, html;
+var storage, login, password, params, connection, userJID, html, occupants;
 
 function authQB() {
 	$('#buttons').hide().next('#qb_login_form').show().find('input').val('');
@@ -43,23 +44,21 @@ function sessionCreate(storage) {
 					connectFailed();
 				} else {
 					console.log(result);
-					
-					nick = result.full_name;
-					xmppConnect(result.id, nick, login, password);
+
+					xmppConnect(result.id, result.full_name, login, password);
 				}
 			});
 		}
 	});
 }
 
-function xmppConnect(user_id, nick, login, password) {
+function xmppConnect(user_id, user_full_name, login, password) {
 	connection = new Strophe.Connection(CHAT.bosh_url);
 	connection.rawInput = rawInput;
 	connection.rawOutput = rawOutput;
 	console.log(connection);
 	
 	userJID = user_id + "-" + QBPARAMS.app_id + "@" + CHAT.server;
-	roomJID = QBPARAMS.app_id + "_" + CHAT.room_name + "@" + CHAT.muc_server;
 	
 	connection.connect(userJID, password, function (status) {
 		switch (status) {
@@ -87,7 +86,7 @@ function xmppConnect(user_id, nick, login, password) {
 			storage = {type: 0, login: login, password: password};
 			localStorage['auth'] = $.base64.encode(JSON.stringify(storage));
 			
-			connection.muc.join(roomJID, nick, onMessage);
+			connection.muc.join(CHAT.roomJID, user_full_name, onMessage, onPresence, roster);
 		  break;
 		case Strophe.Status.DISCONNECTED:
 		  console.log('[Connection] Disconnected');
@@ -95,7 +94,7 @@ function xmppConnect(user_id, nick, login, password) {
 		case Strophe.Status.DISCONNECTING:
 		  console.log('[Connection] Disconnecting');
 		  
-		  connection.muc.leave(roomJID, nick);
+		  connection.muc.leave(CHAT.roomJID, user_full_name);
 		  $('.chat-content').html('');
 			$('#chat, #qb_login_form').hide().prevAll('#auth, #buttons').show();
 		  break;
@@ -135,14 +134,41 @@ function onMessage(stanza, room) {
 	html += '<footer class="time">' + $.formatDateTime('M dd, yy hh:ii:ss', time) + '</footer>';
 	html += '</div></article>';
 	
-	$('.chat-content').append(html);
+	$('.no_msg').remove();
+	$('.chat-content').append(html).find('.message-wrap:last').fadeTo(500, 1);
 	$('.chat-content').scrollTo('.message-wrap:last', 0);
 
 	return true;
 }
 
+function onPresence(stanza, room) {
+	console.log('[XMPP] Presence');
+  
+  var infoLeave = $(stanza).attr('type');
+  var user = $(stanza).find('item').attr('nick').replace(/\\20/g, ' ');
+  var messageLength = $('.message-wrap').length;
+  
+  if ((messageLength != 0) && infoLeave && (user != 'admin')) {
+  	$('.chat-content').append('<span class="leave">' + user + ' leave this chat..</span>');
+  	$('.chat-content').scrollTo('.leave:last', 0);
+  } else if ((messageLength != 0) && (user != 'admin')) {
+  	$('.chat-content').append('<span class="joined">' + user + ' joined to chat..</span>');
+  	$('.chat-content').scrollTo('.joined:last', 0);
+  }
+  
+  return true;
+}
+
+function roster(users, room) {
+	occupants = Object.keys(users).length;
+	$('.occupants .number').text(occupants);
+  
+  return true;
+}
+
 function sendMesage() {
-	connection.muc.groupchat(roomJID, $('#message').val());
+	connection.muc.groupchat(CHAT.roomJID, $('.message_field').val());
+	$('.message_field').val('');
 }
 
 /*------------------- DOM is ready -------------------------*/
@@ -162,7 +188,7 @@ function connectFailed() {
 function connectSuccess() {
 	$('#connecting').hide().next('#chat').show();
 	$('#wrap').removeClass('connect_message');
-	$('.room_name').text(CHAT.room_name);
+	$('.room_name').text(CHAT.roomJID.split('@')[0].split('_')[1]);
 	checkLogout();
 }
 

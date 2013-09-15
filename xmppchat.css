@@ -101,7 +101,8 @@ button:hover {
 		padding:7px;
 		border:1px solid #dcdee3;
 	}
-	#qb_login_form button {
+	#qb_login_form button,
+	#chat button {
 		color:#fff;
 		background:#429abd;
 		border:1px solid #3985a4;
@@ -129,24 +130,25 @@ button:hover {
 }
 	#chat .chat-header,
 	#chat .chat-footer {
-		height:40px;
-		background:#fbfbfb;
+		background:#f3f3f3;
 	}
 	#chat .chat-header {
+		height:26px;
+		padding:7px;
 		border-bottom:1px solid #cacaca;
+		border-radius:5px 5px 0 0;
 	}
-		#chat .room_name {
+		#chat .chat-header .room_name {
 			display:block;
 			float:left;
-			margin:0 0 0 15px;
-			line-height:40px;
+			line-height:26px;
 		}
 		#chat .chat-header .logout {
 			display:block;
 			float:right;
-			margin:9px;
 			padding:0 5px;
-			font-size:12px;
+			font-size:13px;
+			line-height:24px;
 			color:#fff;
 			text-decoration:none;
 			background:#76112b;
@@ -156,12 +158,14 @@ button:hover {
 			opacity:0.6;
 		}
 	#chat .chat-content {
+		position:relative;
 		overflow:auto;
-		height:404px;
+		height:411px;
 		padding:7px 7px 0;
 		background:#fff;
 	}
 		#chat .message-wrap {
+			opacity:0;
 			overflow:hidden;
 			margin-bottom:7px;
 			padding:5px;
@@ -185,5 +189,58 @@ button:hover {
 					color:#999;
 				}
 	#chat .chat-footer {
+		overflow:hidden;
 		border-top:1px solid #cacaca;
+		border-radius:0 0 5px 5px;
 	}
+		#chat .chat-footer .send_message {
+			float:left;
+			padding:7px;
+		}
+			#chat .send_message #message {
+				display:none;
+			}
+			#chat .send_message .message_field {
+				float:left;
+				width:300px;
+				margin-right:7px;
+				padding:3px 7px;
+				font-size:15px;
+				height:18px;
+				line-height:18px;
+				background:#fff;
+				border:1px solid #cacaca;
+				border-radius:3px;
+			}
+			#chat .send_message button {
+				float:left;
+				padding:0 10px;
+				height:24px;
+				line-height:23px;
+			}
+		#chat .chat-footer .occupants {
+			float:right;
+			padding:7px 7px 7px 10px;
+			line-height:26px;
+			border-left:1px solid #cacaca;
+		}
+			#chat .occupants img {
+				width:16px;
+				height:16px;
+				position:relative;
+				top:2px;
+			}
+
+.joined,
+.leave {
+	display:block;
+	margin-bottom:7px;
+	font-size:14px;
+	word-break:break-all;
+}			
+.joined {
+	color:#108134;
+}
+.leave {
+	color:#76112b;
+}
