@@ -134,7 +134,6 @@ function onMessage(stanza, room) {
 	html += '<footer class="time">' + $.formatDateTime('M dd, yy hh:ii:ss', time) + '</footer>';
 	html += '</div></article>';
 	
-	$('.no_msg').remove();
 	$('.chat-content').append(html).find('.message-wrap:last').fadeTo(500, 1);
 	$('.chat-content').scrollTo('.message-wrap:last', 0);
 
@@ -167,8 +166,14 @@ function roster(users, room) {
 }
 
 function sendMesage() {
-	connection.muc.groupchat(CHAT.roomJID, $('.message_field').val());
-	$('.message_field').val('');
+	var post = $('.message_field');
+	if (!trim(post.val())) {
+		post.addClass('error');
+	} else {
+		post.removeClass('error');
+		connection.muc.groupchat(CHAT.roomJID, post.val());
+		post.val('');
+	}
 }
 
 /*------------------- DOM is ready -------------------------*/
@@ -183,13 +188,18 @@ $(document).ready(function(){
 function connectFailed() {
 	$('#connecting').hide().prev('#auth').show();
 	$('#wrap').removeClass('connect_message');
+	$('#auth input').addClass('error');
 }
 
 function connectSuccess() {
 	$('#connecting').hide().next('#chat').show();
 	$('#wrap').removeClass('connect_message');
-	$('.room_name').text(CHAT.roomJID.split('@')[0].split('_')[1]);
+	$('input').removeClass('error');
 	checkLogout();
+	
+	var room_name = CHAT.roomJID.split('@')[0];
+	var sym = room_name.indexOf('_') + 1;
+	$('.room_name').text(room_name.slice(sym));
 }
 
 function checkLogout() {
@@ -198,4 +208,12 @@ function checkLogout() {
 		connection.disconnect();
 		localStorage.removeItem('auth');
 	});
+}
+
+function trim(str) {
+	if (str.charAt(0) == ' ')
+		str = trim(str.substring(1, str.length));
+	if (str.charAt(str.length-1) == ' ')
+		str = trim(str.substring(0, str.length-1));
+	return str;
 }

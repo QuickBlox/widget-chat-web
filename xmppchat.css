@@ -29,6 +29,10 @@ button {
 button:hover {
 	opacity:0.6;
 }
+.error {
+	border:1px solid #C70537 !important;
+	box-shadow:0 0 5px rgba(50, 50, 50, 0.75);
+}
 
 /* Wrapper
 ==============================*/
@@ -71,6 +75,12 @@ button:hover {
 		position:absolute;
 		top:0;
 		right:5px;
+		font-size:11px;
+	}
+	#auth .version {
+		position:absolute;
+		top:0;
+		left:5px;
 		font-size:11px;
 	}
 	
