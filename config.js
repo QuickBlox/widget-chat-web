@@ -9,5 +9,5 @@ var QBPARAMS = {
 var CHAT = {
 	server      : 'chat.quickblox.com',
 	bosh_url    : 'http://chat.quickblox.com:5280',
-	roomJID     : '3907_demo_room@muc.chat.quickblox.com'
+	roomJID     : '3907_test@muc.chat.quickblox.com'
 }
