@@ -6,10 +6,64 @@
  *
  */
 
-var storage, login, password, params, connection, userJID, html, occupants;
+var storage, login, password, full_name, email, params, connection, userJID, html, occupants;
 
 function authQB() {
 	$('#buttons').hide().next('#qb_login_form').show().find('input').val('');
+}
+
+function userCreate() {
+	if ($('#qb_signup_form button').is('.disabled')) {
+		return false;
+	}
+	
+	var tmp = true;
+	$('#qb_signup_form input').removeClass('error');
+	
+	full_name = $('#full_name_signup');
+	email = $('#email_signup');
+	login = $('#login_signup');
+	password = $('#password_signup');
+	
+	$([full_name, email, login, password]).each(function() {
+		if (!trim(this.val())) {
+			this.addClass('error');
+			tmp = false;
+		}
+	});
+	
+	if (tmp) {
+		params = {full_name: full_name.val(), email: email.val(), login: login.val(), password: password.val()};
+		
+		$('#qb_signup_form input').prop('disabled', true);
+		$('#qb_signup_form button').addClass('disabled');
+		$('#qb_signup_form').append('<img class="ajax-loader" src="images/ajax-loader.gif" alt="loader" />');
+		
+		QB.init(QBPARAMS.app_id, QBPARAMS.auth_key, QBPARAMS.auth_secret);
+		QB.createSession(function(err, result){
+			if (err) {
+				console.log('Something went wrong: ' + err.detail);
+				$('#qb_signup_form input').addClass('error');
+				signUpFailed();
+			} else {
+				console.log(result);
+				
+				QB.users.create(params, function(err, result){
+					if (err) {
+						console.log('Something went wrong: ' + err.detail);
+						$('#' + Object.keys(JSON.parse(err.detail).errors)[0] + '_signup').addClass('error');
+						signUpFailed();
+					} else {
+						console.log(result);
+						signUpFailed();
+						
+						$('#qb_signup_form').hide().next('.success_reg').show();
+						setTimeout(signUpSuccess, 5 * 1000);
+					}
+				});
+			}
+		});
+	}
 }
 
 function sessionCreate(storage) {
@@ -182,13 +236,25 @@ $(document).ready(function(){
 		storage = JSON.parse($.base64.decode(localStorage['auth']));
 		sessionCreate(storage);
 	}
+	signup();
 });
 
 /*----------------- Helper functions -----------------------*/
+function signUpFailed() {
+	$('.ajax-loader').remove();
+	$('#qb_signup_form input').prop('disabled', false);
+	$('#qb_signup_form button').removeClass('disabled');
+}
+
+function signUpSuccess() {
+	$('.logo, .welcome').show();
+	$('#qb_signup_form, .success_reg').hide().prev('#qb_login_form').show().find('input').val('').removeClass('error');
+}
+
 function connectFailed() {
 	$('#connecting').hide().prev('#auth').show();
 	$('#wrap').removeClass('connect_message');
-	$('#auth input').addClass('error');
+	$('#qb_login_form input').addClass('error');
 }
 
 function connectSuccess() {
@@ -200,6 +266,15 @@ function connectSuccess() {
 	var room_name = CHAT.roomJID.split('@')[0];
 	var sym = room_name.indexOf('_') + 1;
 	$('.room_name').text(room_name.slice(sym));
+}
+
+function signup() {
+	$('#signup').click(function(event){
+		event.preventDefault();
+		$('.logo, .welcome').hide();
+		$('#qb_signup_form input').prop('disabled', false);
+		$('#qb_login_form').hide().next('#qb_signup_form').show().find('input').val('').removeClass('error');
+	});
 }
 
 function checkLogout() {

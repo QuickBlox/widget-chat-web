@@ -33,8 +33,22 @@
 			<div id="qb_login_form">
 				<p><input id="login" type="text" placeholder="Login or Email" /></p>
 				<p><input id="password" type="password" placeholder="Password" /></p>
-				<p><button onclick="sessionCreate()">Connect</button></p>
+				<p><button onclick="sessionCreate()">Connect</button><br />
+					<span>Not registered yet?<br />
+						<a href="#" id="signup">Register an account QuickBlox</a>
+					</span>
+				</p>
 			</div>
+			
+			<div id="qb_signup_form">
+				<p><input id="full_name_signup" type="text" placeholder="Full Name" /></p>
+				<p><input id="email_signup" type="text" placeholder="Email" /></p>
+				<p><input id="login_signup" type="text" placeholder="Login" /></p>
+				<p><input id="password_signup" type="text" placeholder="Password" /></p>
+				<p><button onclick="userCreate()">Sign Up</button></p>
+			</div>
+			
+			<span class="success_reg">Thanks for your registration!</span>
 			
 			<div class="powered">Powered by <a href="http://quickblox.com">QuickBlox</a></div>
 			<div class="version">v1.0.0</div>
