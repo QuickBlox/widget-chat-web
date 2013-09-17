@@ -69,7 +69,7 @@ button:hover {
 			height:130px;
 		}
 	#auth .welcome {
-		margin-bottom:40px;
+		margin-bottom:30px;
 	}
 	#auth .powered {
 		position:absolute;
@@ -86,12 +86,14 @@ button:hover {
 	
 /* Buttons Auth */
 #buttons,
-#qb_login_form {
+#qb_login_form,
+#qb_signup_form {
 	width:210px;
 	margin:0 auto;
 }
 	#buttons button,
-	#qb_login_form button {
+	#qb_login_form button,
+	#qb_signup_form button {
 		display:block;
 		width:100%;
 		height:38px;
@@ -102,20 +104,45 @@ button:hover {
 		}
 
 /* Login form */
-#qb_login_form {
+#qb_login_form,
+#qb_signup_form {
 	display:none;
 }
-	#qb_login_form input {
+	#qb_login_form input,
+	#qb_signup_form input {
 		width:194px;
 		height:22px;
 		padding:7px;
 		border:1px solid #dcdee3;
 	}
 	#qb_login_form button,
+	#qb_signup_form button,
 	#chat button {
 		color:#fff;
 		background:#429abd;
 		border:1px solid #3985a4;
+	}
+	#qb_login_form p:last-child {
+		line-height:16px;
+	}
+		#qb_login_form span {
+			font-size:14px;
+		}
+	
+/* Signup form */
+#qb_signup_form {
+	position:absolute;
+	top:0;
+	right:0;
+	bottom:0;
+	left:0;
+	height:62%;
+	margin:auto;
+}
+	#qb_signup_form .ajax-loader {
+		position:absolute;
+		right:-40px;
+		bottom:2px;
 	}
 	
 /* Connecting */
@@ -130,6 +157,17 @@ button:hover {
 	height:70px;
 	margin:auto;
 	text-align:center;
+}
+.success_reg {
+	display:none;
+	position:absolute;
+	top:0;
+	right:0;
+	bottom:0;
+	left:0;
+	margin:auto;
+	width:40%;
+	height:5%;
 }
 
 /* Chat
