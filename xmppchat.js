@@ -237,6 +237,7 @@ $(document).ready(function(){
 		sessionCreate(storage);
 	}
 	signup();
+	inputFile();
 });
 
 /*----------------- Helper functions -----------------------*/
@@ -291,4 +292,16 @@ function trim(str) {
 	if (str.charAt(str.length-1) == ' ')
 		str = trim(str.substring(0, str.length-1));
 	return str;
+}
+
+function inputFile() {
+	$('.fileUpload').hover(
+		function () { $(this).find('img').addClass('hover'); },
+		function () {	$(this).find('img').removeClass('hover'); }
+	);
+	
+	$('.fileUpload input:file').change(function(){
+		var file = $(this).val();
+		$(this).next().val(file);
+	});
 }
