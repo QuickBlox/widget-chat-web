@@ -235,7 +235,7 @@ ContentProxy.prototype.delete = function(id, callback){
 ContentProxy.prototype.upload = function(params, callback){
   this.service.ajax({url: params.url, data: params.data, contentType: false, processData: false, type: 'POST'}, function(err,result){
     if (err) { callback (err, null); }
-    else { callback (null, err); }
+    else { callback (null, result); }
   });
 };
 
