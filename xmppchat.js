@@ -47,7 +47,7 @@ function userCreate() {
 				signUpFailed();
 			} else {
 				console.log(result);
-				
+
 				QB.users.create(params, function(err, result){
 					if (err) {
 						console.log('Something went wrong: ' + err.detail);
@@ -55,10 +55,61 @@ function userCreate() {
 						signUpFailed();
 					} else {
 						console.log(result);
-						signUpFailed();
 						
-						$('#qb_signup_form').hide().next('.success_reg').show();
-						setTimeout(signUpSuccess, 5 * 1000);
+						var file = $('#qb_signup_form #avatar_signup')[0].files[0];
+					  if (file) {
+					  	params = {login: login.val(), password: password.val()};
+					  	
+					  	QB.createSession(params, function(err, result){
+								if (err) {
+									console.log('Something went wrong: ' + err.detail);
+								} else {
+									console.log(result);
+				
+									QB.content.create({name: file.name, content_type: file.type, 'public': true}, function(err, result){
+								    if (err) {
+								    	console.log('Error creating blob: ' + JSON.stringify(err));
+								    	signUpFailed();
+								    } else {
+								      console.log(result);
+								      
+								      var uri = parseUri(result.blob_object_access.params);
+								      var params_upload = { url: uri.protocol + '://' + uri.host };
+								      var data = new FormData();
+								      console.log(uri.queryKey);
+								      console.log(params_upload);
+								      console.log(data);
+								      data.append('AWSAccessKeyId', uri.queryKey.AWSAccessKeyId);
+								      data.append('Signature', uri.queryKey.Signature);
+								      data.append('acl', uri.queryKey.acl);
+								      data.append('key', uri.queryKey.key);
+								      data.append('success_action_status', uri.queryKey.success_action_status);
+								      data.append('Filename',  result.name);
+								      data.append('Policy', uri.queryKey.Policy);
+								      data.append('Content-Type', uri.queryKey['Content-Type']);
+								      data.append('file', file);
+								      console.log(data);
+								      params_upload.data = data;
+								      console.log(params_upload);
+								      var xhr = new XMLHttpRequest;
+											xhr.open('POST', params_upload.url, true);
+											xhr.send(params_upload.data);
+								      QB.content.upload(params_upload, function(err,res){
+								        console.log('Res: ' + JSON.stringify(res));
+								        console.log('Err: ' + JSON.stringify(err));
+								        signUpFailed();
+										  	$('#qb_signup_form').hide().next('.success_reg').show();
+												setTimeout(signUpSuccess, 5 * 1000);
+								      });
+								    }
+								  });
+								}
+							});
+					  } else {
+					  	signUpFailed();
+					  	$('#qb_signup_form').hide().next('.success_reg').show();
+							setTimeout(signUpSuccess, 5 * 1000);
+					  }
 					}
 				});
 			}
