@@ -257,7 +257,7 @@ ContentProxy.prototype.taggedForCurrentUser = function(callback) {
 };
 
 ContentProxy.prototype.markUploaded = function (params, callback) {
-  this.service.ajax({url: contentIdUrl(id) + '/complete' + config.urls.type, type: 'PUT', data: {blob: {size: params.size}}}, function(err, res){
+  this.service.ajax({url: contentIdUrl(params.id) + '/complete' + config.urls.type, type: 'PUT', data: {blob: {size: params.size}}}, function(err, res){
     if (err) { callback (err, null); }
     else { callback (null, res); }
   });
@@ -715,7 +715,7 @@ UsersProxy.prototype.delete = function(id, callback){
 UsersProxy.prototype.update = function(user, callback){
   var url = baseUrl + '/' + user.id + config.urls.type;
   if (config.debug) { console.debug('UsersProxy.update', url, user); }
-  this.service.ajax({url: url, type: 'PUT', data: {user: user}}, callback);
+  this.service.ajax({url: url, type: 'PUT', data: {user: user.data}}, callback);
 };
 
 UsersProxy.prototype.get = function(params, callback){
