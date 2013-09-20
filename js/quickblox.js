@@ -278,7 +278,7 @@ ContentProxy.prototype.getFile = function (uid, callback) {
 };
 
 ContentProxy.prototype.getBlobObjectById = function (id, callback) {
- this.service.ajax({url: contentIdUrl(id) + '/getblobobjectbyid' + config.urls.type}, function (err, res) {
+ this.service.ajax({url: contentIdUrl(id) + '/getblobobjectbyid' + config.urls.type, type: 'POST'}, function (err, res) {
     if (err) { callback (err, null); }
     else { callback (null, res); }
   });
