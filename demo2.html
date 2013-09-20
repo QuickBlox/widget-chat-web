@@ -34,7 +34,7 @@
 			<form id="qb_login_form" action="#">
 				<p><input id="login" type="text" placeholder="Login or Email" /></p>
 				<p><input id="password" type="password" placeholder="Password" /></p>
-				<p><button onclick="sessionCreate()">Connect</button><br />
+				<p><button onclick="sessionCreate(); return false;">Connect</button><br />
 					<span>Not registered yet?<br />
 						<a href="#" id="signup">Register an account QuickBlox</a>
 					</span>
@@ -51,7 +51,7 @@
 					<input class="fileName" type="text" placeholder="Avatar" />
 					<img src="images/upload_photo.png" alt="upload" />
 				</div>
-				<p><button onclick="userCreate()">Sign Up</button></p>
+				<p><button onclick="userCreate(); return false;">Sign Up</button></p>
 			</form>
 			
 			<span class="success_reg">Thanks for your registration!</span>

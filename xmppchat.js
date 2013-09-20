@@ -6,7 +6,7 @@
  *
  */
 
-var storage, login, password, full_name, email, params, connection, userJID, html, occupants;
+var storage, login, password, full_name, email, params, qbUser, connection, userJID, html, occupants;
 
 function authQB() {
 	$('#buttons').hide().next('#qb_login_form').show().find('input').val('');
@@ -55,6 +55,7 @@ function userCreate() {
 						signUpFailed();
 					} else {
 						console.log(result);
+						qbUser = result;
 						
 						var file = $('#qb_signup_form #avatar_signup')[0].files[0];
 					  if (file) {
@@ -76,30 +77,37 @@ function userCreate() {
 								      var uri = parseUri(result.blob_object_access.params);
 								      var params_upload = { url: uri.protocol + '://' + uri.host };
 								      var data = new FormData();
-								      console.log(uri.queryKey);
-								      console.log(params_upload);
-								      console.log(data);
-								      data.append('AWSAccessKeyId', uri.queryKey.AWSAccessKeyId);
-								      data.append('Signature', uri.queryKey.Signature);
-								      data.append('acl', uri.queryKey.acl);
 								      data.append('key', uri.queryKey.key);
+								      data.append('acl', uri.queryKey.acl);
 								      data.append('success_action_status', uri.queryKey.success_action_status);
-								      data.append('Filename',  result.name);
-								      data.append('Policy', uri.queryKey.Policy);
+								      data.append('AWSAccessKeyId', uri.queryKey.AWSAccessKeyId);
+								      data.append('Policy', decodeURIComponent(uri.queryKey.Policy));
+								      data.append('Signature', decodeURIComponent(uri.queryKey.Signature));
 								      data.append('Content-Type', uri.queryKey['Content-Type']);
-								      data.append('file', file);
-								      console.log(data);
+								      data.append('file', file, result.name);
 								      params_upload.data = data;
-								      console.log(params_upload);
-								      var xhr = new XMLHttpRequest;
-											xhr.open('POST', params_upload.url, true);
-											xhr.send(params_upload.data);
-								      QB.content.upload(params_upload, function(err,res){
-								        console.log('Res: ' + JSON.stringify(res));
-								        console.log('Err: ' + JSON.stringify(err));
-								        signUpFailed();
-										  	$('#qb_signup_form').hide().next('.success_reg').show();
-												setTimeout(signUpSuccess, 5 * 1000);
+								      QB.content.upload(params_upload, function(err, res){
+								        if (err) {
+								          console.log('Error uploading content' + err);
+								        } else {
+								          console.log(res);
+								          
+								          QB.content.markUploaded({id: result.id, size: file.size}, function(res){
+										        console.log(res);
+										        
+										        QB.users.update({id: qbUser.id, data: {blob_id: result.id}}, function(err, res){
+										        	if (err) {
+											         	console.log('Something went wrong: ' + err);
+											       	} else {
+											         	console.log(res);
+											         	
+										          	signUpFailed();
+														  	$('#qb_signup_form').hide().next('.success_reg').show();
+																setTimeout(signUpSuccess, 5 * 1000);
+											        }
+											      });
+										      });
+								        }
 								      });
 								    }
 								  });
