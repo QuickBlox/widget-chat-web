@@ -1,12 +1,12 @@
 /*
  * QuickBlox Web XMPP Chat sample
- * version 1.0.0
+ * version 1.1.1
  *
  * Author: Andrey Povelichenko (andrey.povelichenko@quickblox.com)
  *
  */
 
-var storage, login, password, full_name, email, params, connection, userJID, html, occupants;
+var storage, login, password, full_name, email, params, qbUser, avatarLink, connection, userJID, html, occupants;
 
 function authQB() {
 	$('#buttons').hide().next('#qb_login_form').show().find('input').val('');
@@ -47,7 +47,7 @@ function userCreate() {
 				signUpFailed();
 			} else {
 				console.log(result);
-				
+
 				QB.users.create(params, function(err, result){
 					if (err) {
 						console.log('Something went wrong: ' + err.detail);
@@ -55,10 +55,69 @@ function userCreate() {
 						signUpFailed();
 					} else {
 						console.log(result);
-						signUpFailed();
+						qbUser = result;
 						
-						$('#qb_signup_form').hide().next('.success_reg').show();
-						setTimeout(signUpSuccess, 5 * 1000);
+						var file = $('#qb_signup_form #avatar_signup')[0].files[0];
+					  if (file) {
+					  	params = {login: login.val(), password: password.val()};
+					  	
+					  	QB.createSession(params, function(err, result){
+								if (err) {
+									console.log('Something went wrong: ' + err.detail);
+								} else {
+									console.log(result);
+				
+									QB.content.create({name: file.name, content_type: file.type, 'public': true}, function(err, result){
+								    if (err) {
+								    	console.log('Error creating blob: ' + JSON.stringify(err));
+								    	signUpFailed();
+								    } else {
+								      console.log(result);
+								      
+								      var uri = parseUri(result.blob_object_access.params);
+								      var params_upload = { url: uri.protocol + '://' + uri.host };
+								      var data = new FormData();
+								      data.append('key', uri.queryKey.key);
+								      data.append('acl', uri.queryKey.acl);
+								      data.append('success_action_status', uri.queryKey.success_action_status);
+								      data.append('AWSAccessKeyId', uri.queryKey.AWSAccessKeyId);
+								      data.append('Policy', decodeURIComponent(uri.queryKey.Policy));
+								      data.append('Signature', decodeURIComponent(uri.queryKey.Signature));
+								      data.append('Content-Type', uri.queryKey['Content-Type']);
+								      data.append('file', file, result.name);
+								      params_upload.data = data;
+								      QB.content.upload(params_upload, function(err, res){
+								        if (err) {
+								          console.log('Error uploading content' + err);
+								        } else {
+								          console.log(res);
+								          
+								          QB.content.markUploaded({id: result.id, size: file.size}, function(res){
+										        console.log(res);
+										        
+										        QB.users.update({id: qbUser.id, data: {blob_id: result.id}}, function(err, res){
+										        	if (err) {
+											         	console.log('Something went wrong: ' + err);
+											       	} else {
+											         	console.log(res);
+											         	
+										          	signUpFailed();
+														  	$('#qb_signup_form').hide().next('.success_reg').show();
+																setTimeout(signUpSuccess, 5 * 1000);
+											        }
+											      });
+										      });
+								        }
+								      });
+								    }
+								  });
+								}
+							});
+					  } else {
+					  	signUpFailed();
+					  	$('#qb_signup_form').hide().next('.success_reg').show();
+							setTimeout(signUpSuccess, 5 * 1000);
+					  }
 					}
 				});
 			}
@@ -99,14 +158,38 @@ function sessionCreate(storage) {
 				} else {
 					console.log(result);
 
-					xmppConnect(result.id, result.full_name, login, password);
+					xmppConnect(result.id, result.full_name, result.blob_id, login, password);
 				}
 			});
 		}
 	});
 }
 
-function xmppConnect(user_id, user_full_name, login, password) {
+function xmppConnect(user_id, user_full_name, blob_id, login, password) {
+	if (blob_id == null) {
+		avatarLink = blob_id;
+	} else {
+		params = {login: login, password: password};
+		
+		QB.createSession(params, function(err, result){
+			if (err) {
+				console.log('Something went wrong: ' + err.detail);
+			} else {
+				console.log(result);
+				
+				QB.content.getBlobObjectById(blob_id, function(err, res){
+					if (err) {
+						console.log('Something went wrong: ' + err);
+					} else {
+						console.log(res);
+						
+						avatarLink = res.blob_object_access.params;
+					}
+				});
+			}
+		});
+	}
+	
 	connection = new Strophe.Connection(CHAT.bosh_url);
 	connection.rawInput = rawInput;
 	connection.rawOutput = rawOutput;
@@ -170,9 +253,14 @@ function rawOutput(data) {
 function onMessage(stanza, room) {
 	console.log('[XMPP] Message');
   
-  var message = $(stanza).find('body').context.textContent;
+  var response = JSON.parse(Strophe.unescapeNode($(stanza).find('body').context.textContent));
+  var message = response.message;
+  var avatar = response.avatar;
+  if (avatar == null) {
+  	avatar = 'images/default_avatar.gif';
+  }
   var time = $(stanza).find('delay').attr('stamp');
-  var user = $(stanza).attr('from').split('/')[1].replace(/\\20/g, ' ');
+  var user = Strophe.unescapeNode($(stanza).attr('from').split('/')[1]);
   
   if (!time) {
   	time = new Date();
@@ -181,7 +269,7 @@ function onMessage(stanza, room) {
   }
   
 	html = '<article class="message-wrap">';
-	html += '<img class="avatar" src="images/default_avatar.gif" alt="avatar" />';
+	html += '<img class="avatar" src="' + avatar + '" alt="avatar" />';
 	html += '<div class="message">';
 	html += '<header><h4>' + user + '</h4></header>';
 	html += '<section>' + message + '</section>';
@@ -198,14 +286,14 @@ function onPresence(stanza, room) {
 	console.log('[XMPP] Presence');
   
   var infoLeave = $(stanza).attr('type');
-  var user = $(stanza).find('item').attr('nick').replace(/\\20/g, ' ');
+  var user = Strophe.unescapeNode($(stanza).find('item').attr('nick'));
   var messageLength = $('.message-wrap').length;
   
   if ((messageLength != 0) && infoLeave && (user != 'admin')) {
-  	$('.chat-content').append('<span class="leave">' + user + ' leave this chat..</span>');
+  	$('.chat-content').append('<span class="leave">' + user + ' leave this chat.</span>');
   	$('.chat-content').scrollTo('.leave:last', 0);
   } else if ((messageLength != 0) && (user != 'admin')) {
-  	$('.chat-content').append('<span class="joined">' + user + ' joined to chat..</span>');
+  	$('.chat-content').append('<span class="joined">' + user + ' has joined the room.</span>');
   	$('.chat-content').scrollTo('.joined:last', 0);
   }
   
@@ -225,7 +313,8 @@ function sendMesage() {
 		post.addClass('error');
 	} else {
 		post.removeClass('error');
-		connection.muc.groupchat(CHAT.roomJID, post.val());
+		var message = {message: post.val(), avatar: avatarLink};
+		connection.muc.groupchat(CHAT.roomJID, Strophe.escapeNode(JSON.stringify(message)));
 		post.val('');
 	}
 }
@@ -237,6 +326,7 @@ $(document).ready(function(){
 		sessionCreate(storage);
 	}
 	signup();
+	inputFile();
 });
 
 /*----------------- Helper functions -----------------------*/
@@ -291,4 +381,16 @@ function trim(str) {
 	if (str.charAt(str.length-1) == ' ')
 		str = trim(str.substring(0, str.length-1));
 	return str;
+}
+
+function inputFile() {
+	$('.fileUpload').hover(
+		function () { $(this).find('img').addClass('hover'); },
+		function () {	$(this).find('img').removeClass('hover'); }
+	);
+	
+	$('.fileUpload input:file').change(function(){
+		var file = $(this).val();
+		$(this).next().val(file);
+	});
 }

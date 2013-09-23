@@ -109,7 +109,7 @@ button:hover {
 	display:none;
 }
 	#qb_login_form input,
-	#qb_signup_form input {
+	#qb_signup_form input[type="text"] {
 		width:194px;
 		height:22px;
 		padding:7px;
@@ -136,7 +136,7 @@ button:hover {
 	right:0;
 	bottom:0;
 	left:0;
-	height:62%;
+	height:74%;
 	margin:auto;
 }
 	#qb_signup_form .ajax-loader {
@@ -144,6 +144,35 @@ button:hover {
 		right:-40px;
 		bottom:2px;
 	}
+	#qb_signup_form .fileUpload {
+		position:relative;
+		overflow:hidden;
+		margin-bottom:30px;
+	}
+		#qb_signup_form .fileUpload input[type="file"] {
+			position:relative;
+			opacity:0;
+			height:31px;
+			z-index:1;
+			cursor:pointer;
+		}
+		#qb_signup_form .fileUpload .fileName {
+			position:absolute;
+			top:0;
+			left:0;
+			width:155px;
+			height:15px;
+			font-size:14px;
+		}
+		#qb_signup_form .fileUpload img {
+			position:absolute;
+			top:0;
+			right:0;
+			width:33px;
+		}
+		#qb_signup_form .fileUpload img.hover {
+			opacity:0.6;
+		}
 	
 /* Connecting */
 #connecting {

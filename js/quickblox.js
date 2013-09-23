@@ -233,9 +233,19 @@ ContentProxy.prototype.delete = function(id, callback){
 };
 
 ContentProxy.prototype.upload = function(params, callback){
-  this.service.ajax({url: params.url, data: params.data, contentType: false, processData: false, type: 'POST'}, function(err,result){
+  this.service.ajax({url: params.url, data: params.data, dataType: 'xml',
+                     contentType: false, processData: false, type: 'POST'}, function(err,xmlDoc){
     if (err) { callback (err, null); }
-    else { callback (null, err); }
+    else {
+      // AWS S3 doesn't respond with a JSON structure
+      // so parse the xml and return a JSON structure ourselves
+      var result = {}, rootElement = xmlDoc.documentElement, children = rootElement.childNodes, i, m;
+      for (i = 0, m = children.length; i < m ; i++){
+        result[children[i].nodeName] = children[i].childNodes[0].nodeValue;
+      } 
+      if (config.debug) { console.debug('result', result); }
+      callback (null, result);
+    }
   });
 };
 
@@ -247,7 +257,7 @@ ContentProxy.prototype.taggedForCurrentUser = function(callback) {
 };
 
 ContentProxy.prototype.markUploaded = function (params, callback) {
-  this.service.ajax({url: contentIdUrl(id) + '/complete' + config.urls.type, type: 'PUT', data: {blob: {size: params.size}}}, function(err, res){
+  this.service.ajax({url: contentIdUrl(params.id) + '/complete' + config.urls.type, type: 'PUT', data: {blob: {size: params.size}}}, function(err, res){
     if (err) { callback (err, null); }
     else { callback (null, res); }
   });
@@ -268,7 +278,7 @@ ContentProxy.prototype.getFile = function (uid, callback) {
 };
 
 ContentProxy.prototype.getBlobObjectById = function (id, callback) {
- this.service.ajax({url: contentIdUrl(id) + '/getblobobjectbyid' + config.urls.type}, function (err, res) {
+ this.service.ajax({url: contentIdUrl(id) + '/getblobobjectbyid' + config.urls.type, type: 'POST'}, function (err, res) {
     if (err) { callback (err, null); }
     else { callback (null, res); }
   });
@@ -580,6 +590,7 @@ var jQuery = require('../lib/jquery-1.10.2');
 
 function ServiceProxy(qb){
   this.qbInst = qb;
+  jQuery.support.cors = true;
   if (config.debug) { console.debug("ServiceProxy", qb); }
 }
 
@@ -596,7 +607,7 @@ ServiceProxy.prototype.ajax = function(params, callback) {
       params.data = {token:this.qbInst.session.token}; 
     }
   }
-  if (config.debug) { console.debug('ServiceProxy',  params.type || 'GET', params.url, params.data); }
+  if (config.debug) { console.debug('ServiceProxy',  params.type || 'GET', params); }
   var ajaxCall =   {
     url: params.url,
     type: params.type || 'GET',
@@ -614,7 +625,7 @@ ServiceProxy.prototype.ajax = function(params, callback) {
     error: function(jqHXR, status, error) {
       if (config.debug) {console.debug('ServiceProxy.ajax error', jqHXR, status, error);}
       var errorMsg = {status: status, message:error};
-      if (jqHXR && jqHXR.responseText){ errorMsg.detail = jqHXR.responseText || jqHXR.respoonseXML; }
+      if (jqHXR && jqHXR.responseText){ errorMsg.detail = jqHXR.responseText || jqHXR.responseXML; }
       if (config.debug) {console.debug("ServiceProxy.ajax error", error);}
       callback(errorMsg, null);
     }
@@ -704,7 +715,7 @@ UsersProxy.prototype.delete = function(id, callback){
 UsersProxy.prototype.update = function(user, callback){
   var url = baseUrl + '/' + user.id + config.urls.type;
   if (config.debug) { console.debug('UsersProxy.update', url, user); }
-  this.service.ajax({url: url, type: 'PUT', data: {user: user}}, callback);
+  this.service.ajax({url: url, type: 'PUT', data: {user: user.data}}, callback);
 };
 
 UsersProxy.prototype.get = function(params, callback){
