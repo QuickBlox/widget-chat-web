@@ -6,7 +6,7 @@
  *
  */
 
-var storage, login, password, full_name, email, params, qbUser, connection, userJID, html, occupants;
+var storage, login, password, full_name, email, params, qbUser, avatarLink, connection, userJID, html, occupants;
 
 function authQB() {
 	$('#buttons').hide().next('#qb_login_form').show().find('input').val('');
@@ -158,14 +158,38 @@ function sessionCreate(storage) {
 				} else {
 					console.log(result);
 
-					xmppConnect(result.id, result.full_name, login, password);
+					xmppConnect(result.id, result.full_name, result.blob_id, login, password);
 				}
 			});
 		}
 	});
 }
 
-function xmppConnect(user_id, user_full_name, login, password) {
+function xmppConnect(user_id, user_full_name, blob_id, login, password) {
+	if (blob_id == null) {
+		avatarLink = blob_id;
+	} else {
+		params = {login: login, password: password};
+		
+		QB.createSession(params, function(err, result){
+			if (err) {
+				console.log('Something went wrong: ' + err.detail);
+			} else {
+				console.log(result);
+				
+				QB.content.getBlobObjectById(blob_id, function(err, res){
+					if (err) {
+						console.log('Something went wrong: ' + err);
+					} else {
+						console.log(res);
+						
+						avatarLink = res.blob_object_access.params;
+					}
+				});
+			}
+		});
+	}
+	
 	connection = new Strophe.Connection(CHAT.bosh_url);
 	connection.rawInput = rawInput;
 	connection.rawOutput = rawOutput;
@@ -229,9 +253,14 @@ function rawOutput(data) {
 function onMessage(stanza, room) {
 	console.log('[XMPP] Message');
   
-  var message = $(stanza).find('body').context.textContent;
+  var response = JSON.parse(Strophe.unescapeNode($(stanza).find('body').context.textContent));
+  var message = response.message;
+  var avatar = response.avatar;
+  if (avatar == null) {
+  	avatar = 'images/default_avatar.gif';
+  }
   var time = $(stanza).find('delay').attr('stamp');
-  var user = $(stanza).attr('from').split('/')[1].replace(/\\20/g, ' ');
+  var user = Strophe.unescapeNode($(stanza).attr('from').split('/')[1]);
   
   if (!time) {
   	time = new Date();
@@ -240,7 +269,7 @@ function onMessage(stanza, room) {
   }
   
 	html = '<article class="message-wrap">';
-	html += '<img class="avatar" src="images/default_avatar.gif" alt="avatar" />';
+	html += '<img class="avatar" src="' + avatar + '" alt="avatar" />';
 	html += '<div class="message">';
 	html += '<header><h4>' + user + '</h4></header>';
 	html += '<section>' + message + '</section>';
@@ -257,7 +286,7 @@ function onPresence(stanza, room) {
 	console.log('[XMPP] Presence');
   
   var infoLeave = $(stanza).attr('type');
-  var user = $(stanza).find('item').attr('nick').replace(/\\20/g, ' ');
+  var user = Strophe.unescapeNode($(stanza).find('item').attr('nick'));
   var messageLength = $('.message-wrap').length;
   
   if ((messageLength != 0) && infoLeave && (user != 'admin')) {
@@ -284,7 +313,8 @@ function sendMesage() {
 		post.addClass('error');
 	} else {
 		post.removeClass('error');
-		connection.muc.groupchat(CHAT.roomJID, post.val());
+		var message = {message: post.val(), avatar: avatarLink};
+		connection.muc.groupchat(CHAT.roomJID, Strophe.escapeNode(JSON.stringify(message)));
 		post.val('');
 	}
 }
