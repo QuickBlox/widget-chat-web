@@ -290,10 +290,10 @@ function onPresence(stanza, room) {
   var messageLength = $('.message-wrap').length;
   
   if ((messageLength != 0) && infoLeave && (user != 'admin')) {
-  	$('.chat-content').append('<span class="leave">' + user + ' leave this chat..</span>');
+  	$('.chat-content').append('<span class="leave">' + user + ' leave this chat.</span>');
   	$('.chat-content').scrollTo('.leave:last', 0);
   } else if ((messageLength != 0) && (user != 'admin')) {
-  	$('.chat-content').append('<span class="joined">' + user + ' joined to chat..</span>');
+  	$('.chat-content').append('<span class="joined">' + user + ' has joined the room.</span>');
   	$('.chat-content').scrollTo('.joined:last', 0);
   }
   
