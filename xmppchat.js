@@ -231,7 +231,7 @@ function xmppConnect(user_id, user_full_name, blob_id, login, password) {
 		case Strophe.Status.DISCONNECTING:
 		  console.log('[Connection] Disconnecting');
 		  
-		  connection.muc.leave(CHAT.roomJID, user_full_name);
+		  //connection.muc.leave(CHAT.roomJID, user_full_name);
 		  $('.chat-content').html('');
 			$('#chat, #qb_login_form').hide().prevAll('#auth, #buttons').show();
 		  break;
