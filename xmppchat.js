@@ -6,10 +6,30 @@
  *
  */
 
-var storage, login, password, full_name, email, params, qbUser, avatarLink, connection, userJID, html, occupants;
+var storage, login, password, full_name, email, params, qbToken, qbUser, avatarLink, connection, userJID, html, occupants;
 
 function authQB() {
 	$('#buttons').hide().next('#qb_login_form').show().find('input').val('');
+}
+
+function authFB() {
+	FB.getLoginStatus(function(response) {
+    if (response.status === 'connected') {
+        console.log('Facebook: ' + JSON.stringify(response));
+      //_this.facebook = response.authResponse;
+    } else {
+      FB.Event.subscribe('auth.authResponseChange', function(response) {
+        console.debug('FB Auth change', response);
+        console.log('Facebook: ' + JSON.stringify(response));
+        if (response.status === 'connected'){
+          //_this.facebook = response.authResponse;
+        } else {
+          //_this.facebook = null;
+        }
+      });
+      FB.login();
+    }
+  });
 }
 
 function userCreate() {
@@ -125,7 +145,7 @@ function userCreate() {
 	}
 }
 
-function sessionCreate(storage) {
+function sessionCreate(storage, fb_token) {
 	$('#auth').hide().next('#connecting').show();
 	$('#wrap').addClass('connect_message');
 	
@@ -143,6 +163,10 @@ function sessionCreate(storage) {
 		params = {login: login, password: password};
 	}
 	
+	if (fb_token) {
+		params = {provider: 'facebook', keys: {token: fb_token}};
+	}
+	
 	QB.init(QBPARAMS.app_id, QBPARAMS.auth_key, QBPARAMS.auth_secret);
 	QB.createSession(function(err, result){
 		if (err) {
@@ -150,6 +174,7 @@ function sessionCreate(storage) {
 			connectFailed();
 		} else {
 			console.log(result);
+			qbToken = result.token;
 			
 			QB.login(params, function(err, result){
 				if (err) {
@@ -158,16 +183,20 @@ function sessionCreate(storage) {
 				} else {
 					console.log(result);
 
-					xmppConnect(result.id, result.full_name, result.blob_id, login, password);
+					xmppConnect(result.id, result.full_name, result.blob_id, login, password, result.facebook_id, qbToken);
 				}
 			});
 		}
 	});
 }
 
-function xmppConnect(user_id, user_full_name, blob_id, login, password) {
+function xmppConnect(user_id, user_full_name, blob_id, login, password, facebook_id, qbToken) {
 	if (blob_id == null) {
 		avatarLink = blob_id;
+		if (facebook_id) {
+			avatarLink = 'https://graph.facebook.com/' + facebook_id + '/picture/';
+			password = qbToken;
+		}
 	} else {
 		params = {login: login, password: password};
 		
@@ -220,8 +249,10 @@ function xmppConnect(user_id, user_full_name, blob_id, login, password) {
 		  console.log('[Connection] Connected');
 		  connectSuccess();
 			
-			storage = {type: 0, login: login, password: password};
-			localStorage['auth'] = $.base64.encode(JSON.stringify(storage));
+			if (facebook_id == null) {
+				storage = {type: 0, login: login, password: password};
+				localStorage['auth'] = $.base64.encode(JSON.stringify(storage));
+			}
 			
 			connection.muc.join(CHAT.roomJID, user_full_name, onMessage, onPresence, roster);
 		  break;
@@ -253,9 +284,18 @@ function rawOutput(data) {
 function onMessage(stanza, room) {
 	console.log('[XMPP] Message');
   
-  var response = JSON.parse(Strophe.unescapeNode($(stanza).find('body').context.textContent));
-  var message = response.message;
-  var avatar = response.avatar;
+  try {
+  	var response = JSON.parse(Strophe.unescapeNode($(stanza).find('body').context.textContent));
+	}	catch (err) {
+  	var response = Strophe.unescapeNode($(stanza).find('body').context.textContent);
+	}
+
+  if (response.message) {var message = response.message;}
+  else {var message = response;}
+
+  if (response.avatar) {var avatar = response.avatar;}
+  else {var avatar = null;}
+
   if (avatar == null) {
   	avatar = 'images/default_avatar.gif';
   }
@@ -319,12 +359,44 @@ function sendMesage() {
 	}
 }
 
+function fbAPI(FB_accessToken) {
+	console.log('Welcome!  Fetching your information.... ');
+	FB.api('/me', function(response) {
+		console.log(response);
+		console.log('Good to see you, ' + response.name + '.');
+		
+		sessionCreate(null, FB_accessToken);
+	});
+}
+
 /*------------------- DOM is ready -------------------------*/
 $(document).ready(function(){
 	if (localStorage['auth']) {
 		storage = JSON.parse($.base64.decode(localStorage['auth']));
 		sessionCreate(storage);
 	}
+	
+	$.ajaxSetup({ cache: true });
+	$.getScript('http://connect.facebook.net/en_US/all.js', function(){
+		FB.init({
+			appId: '368137086642884',
+			status: true,
+			cookie: true
+		});
+		
+		FB.Event.subscribe('auth.authResponseChange', function(response) {
+			console.log('facebook authorization...');
+			console.log(response.status);
+			if (response.status === 'connected') {
+				fbAPI(response.authResponse.accessToken);
+			} else if (response.status === 'not_authorized') {
+				FB.login();
+			} else {
+				FB.login();
+			}
+		});
+	});
+	
 	signup();
 	inputFile();
 });
