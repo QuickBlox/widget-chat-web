@@ -182,7 +182,7 @@ function sessionCreate(storage, fb_token) {
 					connectFailed();
 				} else {
 					console.log(result);
-
+					
 					xmppConnect(result.id, result.full_name, result.blob_id, login, password, result.facebook_id, qbToken);
 				}
 			});
@@ -342,8 +342,29 @@ function onPresence(stanza, room) {
 function roster(users, room) {
 	occupants = Object.keys(users).length;
 	$('.occupants .number').text(occupants);
+	
+	$('.occupants .list').html('<li class="title">Occupants</li>');
+	$(Object.keys(users)).each(function(i){
+		var key = Object.keys(users)[i];
+	  var user = Strophe.unescapeNode(users[key].nick);
+	  $('.occupants .list').append('<li>' + user + '</li>');
+	});
   
   return true;
+}
+
+function occupants() {
+	$('.occupants').click(function(){
+		$(this).css('background','#dadada');
+		$(this).find('.list').show();
+	});
+	$(document).click(function(e){
+		if ($(e.target).is('.occupants, .occupants *')) {
+			return;
+		}
+	  $('.occupants .list').hide();
+	  $('.occupants').css('background','none');
+	});
 }
 
 function sendMesage() {
@@ -399,8 +420,7 @@ $(document).ready(function(){
 	
 	signup();
 	inputFile();
-	textareaUp();
-	smiles();
+	occupants();
 });
 
 /*----------------- Helper functions -----------------------*/
@@ -425,7 +445,10 @@ function connectSuccess(username) {
 	$('#connecting').hide().next('#chat').show();
 	$('#wrap').removeClass('connect_message');
 	$('input').removeClass('error');
+	$('textarea').val('');
 	checkLogout(username);
+	textareaUp();
+	smiles();
 	
 	var room_name = CHAT.roomJID.split('@')[0];
 	var sym = room_name.indexOf('_') + 1;
@@ -514,6 +537,7 @@ function smilesParser(text) {
 }
 
 function smiles() {
+	$('.smiles-icons').remove();
 	$('#area').append('<div class="smiles-icons"></div>');
 	for(var i = 0; i < SMILEICONS.length; i++) {
 		$('.smiles-icons').append('<img class="smileicons" alt="icons" data-plain="' + SMILEICONS[i].plain + '" src="images/smiles/' + SMILEICONS[i].image + '" />');

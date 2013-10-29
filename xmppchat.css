@@ -346,6 +346,7 @@ button:hover {
 	.controls {
 		display:block;
 		height:25px;
+		padding-left:5px;
 		background:#f3f3f3;
 		border-bottom:1px solid #cacaca;
 	}
@@ -355,10 +356,11 @@ button:hover {
 			height:26px;
 			text-align:center;
 			line-height:32px;
-			cursor:pointer;
 		}
-		.controls .smiles:hover {
+		.controls .smiles:hover,
+		#chat .chat-footer .occupants:hover {
 			background:#dadada !important;
+			cursor:pointer;
 		}
 	#message_area {
 		width:300px;
@@ -367,6 +369,7 @@ button:hover {
 		padding:3px 7px;
 		font-size:15px;
 		line-height:18px;
+		background:#fff;
 		font-family:Helvetica, Arial, sans-serif;
 		outline:0;
 		border:0;
@@ -394,3 +397,42 @@ button:hover {
 		background:rgba(0,0,0,0.9);
 		cursor:pointer;
 	}
+	
+.list {
+	position:absolute;
+	display:none;
+	bottom:40px;
+	right:0;
+	width:250px;
+	overflow:auto;
+	max-height:418px;
+	background:#fff;
+	border:1px solid #cacaca;
+	border-radius:3px;
+}
+	.list li {
+		display:block;
+		padding:3px 5px;
+		color:#5a5a5a;
+		font-size:15px;
+		line-height:20px;
+		background:#fff;
+		border-bottom:1px solid #cacaca;
+		word-break:break-all;
+	}
+	.list li:last-child {
+		border-bottom:0;
+	}
+	.list li:hover {
+		font-weight:bold;
+	}
+	
+.title {
+	background:#f3f3f3 !important;
+	font-weight:bold;
+	font-size:15px;
+	line-height:25px;
+}
+.title:hover {
+	cursor:auto;
+}
