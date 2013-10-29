@@ -470,6 +470,10 @@ function checkLogout(username) {
 		connection.muc.leave(CHAT.roomJID, username);
 		
 		setTimeout(function() {connection.disconnect()}, 1000);
+		FB.logout(function(response) {
+			console.log("[FB Logout]");
+			console.log(response);
+		});
 		localStorage.removeItem('auth');
 	});
 }
