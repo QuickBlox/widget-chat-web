@@ -1,6 +1,6 @@
 /*
  * QuickBlox Web XMPP Chat sample
- * version 1.1.1
+ * version 1.2.1
  *
  * Author: Andrey Povelichenko (andrey.povelichenko@quickblox.com)
  *
