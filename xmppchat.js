@@ -1,15 +1,35 @@
 /*
  * QuickBlox Web XMPP Chat sample
- * version 1.1.1
+ * version 1.2.1
  *
  * Author: Andrey Povelichenko (andrey.povelichenko@quickblox.com)
  *
  */
 
-var storage, login, password, full_name, email, params, qbUser, avatarLink, connection, userJID, html, occupants;
+var storage, login, password, full_name, email, params, qbToken, qbUser, avatarLink, connection, userJID, html, occupants;
 
 function authQB() {
 	$('#buttons').hide().next('#qb_login_form').show().find('input').val('');
+}
+
+function authFB() {
+	FB.getLoginStatus(function(response) {
+    if (response.status === 'connected') {
+        console.log('Facebook: ' + JSON.stringify(response));
+      //_this.facebook = response.authResponse;
+    } else {
+      FB.Event.subscribe('auth.authResponseChange', function(response) {
+        console.debug('FB Auth change', response);
+        console.log('Facebook: ' + JSON.stringify(response));
+        if (response.status === 'connected'){
+          //_this.facebook = response.authResponse;
+        } else {
+          //_this.facebook = null;
+        }
+      });
+      FB.login();
+    }
+  });
 }
 
 function userCreate() {
@@ -125,7 +145,7 @@ function userCreate() {
 	}
 }
 
-function sessionCreate(storage) {
+function sessionCreate(storage, fb_token) {
 	$('#auth').hide().next('#connecting').show();
 	$('#wrap').addClass('connect_message');
 	
@@ -143,6 +163,10 @@ function sessionCreate(storage) {
 		params = {login: login, password: password};
 	}
 	
+	if (fb_token) {
+		params = {provider: 'facebook', keys: {token: fb_token}};
+	}
+	
 	QB.init(QBPARAMS.app_id, QBPARAMS.auth_key, QBPARAMS.auth_secret);
 	QB.createSession(function(err, result){
 		if (err) {
@@ -150,6 +174,7 @@ function sessionCreate(storage) {
 			connectFailed();
 		} else {
 			console.log(result);
+			qbToken = result.token;
 			
 			QB.login(params, function(err, result){
 				if (err) {
@@ -157,17 +182,21 @@ function sessionCreate(storage) {
 					connectFailed();
 				} else {
 					console.log(result);
-
-					xmppConnect(result.id, result.full_name, result.blob_id, login, password);
+					
+					xmppConnect(result.id, result.full_name, result.blob_id, login, password, result.facebook_id, qbToken);
 				}
 			});
 		}
 	});
 }
 
-function xmppConnect(user_id, user_full_name, blob_id, login, password) {
+function xmppConnect(user_id, user_full_name, blob_id, login, password, facebook_id, qbToken) {
 	if (blob_id == null) {
 		avatarLink = blob_id;
+		if (facebook_id) {
+			avatarLink = 'https://graph.facebook.com/' + facebook_id + '/picture/';
+			password = qbToken;
+		}
 	} else {
 		params = {login: login, password: password};
 		
@@ -218,10 +247,12 @@ function xmppConnect(user_id, user_full_name, blob_id, login, password) {
 		  break;
 		case Strophe.Status.CONNECTED:
 		  console.log('[Connection] Connected');
-		  connectSuccess();
+		  connectSuccess(user_full_name);
 			
-			storage = {type: 0, login: login, password: password};
-			localStorage['auth'] = $.base64.encode(JSON.stringify(storage));
+			if (facebook_id == null) {
+				storage = {type: 0, login: login, password: password};
+				localStorage['auth'] = $.base64.encode(JSON.stringify(storage));
+			}
 			
 			connection.muc.join(CHAT.roomJID, user_full_name, onMessage, onPresence, roster);
 		  break;
@@ -231,7 +262,6 @@ function xmppConnect(user_id, user_full_name, blob_id, login, password) {
 		case Strophe.Status.DISCONNECTING:
 		  console.log('[Connection] Disconnecting');
 		  
-		  connection.muc.leave(CHAT.roomJID, user_full_name);
 		  $('.chat-content').html('');
 			$('#chat, #qb_login_form').hide().prevAll('#auth, #buttons').show();
 		  break;
@@ -253,9 +283,18 @@ function rawOutput(data) {
 function onMessage(stanza, room) {
 	console.log('[XMPP] Message');
   
-  var response = JSON.parse(Strophe.unescapeNode($(stanza).find('body').context.textContent));
-  var message = response.message;
-  var avatar = response.avatar;
+  try {
+  	var response = JSON.parse(Strophe.unescapeNode($(stanza).find('body').context.textContent));
+	}	catch (err) {
+  	var response = Strophe.unescapeNode($(stanza).find('body').context.textContent);
+	}
+
+  if (response.message) {var message = response.message;}
+  else {var message = response;}
+
+  if (response.avatar) {var avatar = response.avatar;}
+  else {var avatar = null;}
+
   if (avatar == null) {
   	avatar = 'images/default_avatar.gif';
   }
@@ -272,7 +311,7 @@ function onMessage(stanza, room) {
 	html += '<img class="avatar" src="' + avatar + '" alt="avatar" />';
 	html += '<div class="message">';
 	html += '<header><h4>' + user + '</h4></header>';
-	html += '<section>' + message + '</section>';
+	html += '<section>' + smilesParser(toHTML(linkURLs(message))) + '</section>';
 	html += '<footer class="time">' + $.formatDateTime('M dd, yy hh:ii:ss', time) + '</footer>';
 	html += '</div></article>';
 	
@@ -303,20 +342,52 @@ function onPresence(stanza, room) {
 function roster(users, room) {
 	occupants = Object.keys(users).length;
 	$('.occupants .number').text(occupants);
+	
+	$('.occupants .list').html('<li class="title">Occupants</li>');
+	$(Object.keys(users)).each(function(i){
+		var key = Object.keys(users)[i];
+	  var user = Strophe.unescapeNode(users[key].nick);
+	  $('.occupants .list').append('<li>' + user + '</li>');
+	});
   
   return true;
 }
 
+function occupants() {
+	$('.occupants').click(function(){
+		$(this).css('background','#dadada');
+		$(this).find('.list').show();
+	});
+	$(document).click(function(e){
+		if ($(e.target).is('.occupants, .occupants *')) {
+			return;
+		}
+	  $('.occupants .list').hide();
+	  $('.occupants').css('background','none');
+	});
+}
+
 function sendMesage() {
-	var post = $('.message_field');
+	var post = $('#message_area');
 	if (!trim(post.val())) {
-		post.addClass('error');
+		$('.message_field').addClass('error');
 	} else {
-		post.removeClass('error');
+		$('.message_field').removeClass('error');
 		var message = {message: post.val(), avatar: avatarLink};
 		connection.muc.groupchat(CHAT.roomJID, Strophe.escapeNode(JSON.stringify(message)));
 		post.val('');
+		$('.message_field').val('');
 	}
+}
+
+function fbAPI(FB_accessToken) {
+	console.log('Welcome!  Fetching your information.... ');
+	FB.api('/me', function(response) {
+		console.log(response);
+		console.log('Good to see you, ' + response.name + '.');
+		
+		sessionCreate(null, FB_accessToken);
+	});
 }
 
 /*------------------- DOM is ready -------------------------*/
@@ -325,8 +396,31 @@ $(document).ready(function(){
 		storage = JSON.parse($.base64.decode(localStorage['auth']));
 		sessionCreate(storage);
 	}
+	
+	$.ajaxSetup({ cache: true });
+	$.getScript('http://connect.facebook.net/en_US/all.js', function(){
+		FB.init({
+			appId: '368137086642884',
+			status: true,
+			cookie: true
+		});
+		
+		FB.Event.subscribe('auth.authResponseChange', function(response) {
+			console.log('facebook authorization...');
+			console.log(response.status);
+			if (response.status === 'connected') {
+				fbAPI(response.authResponse.accessToken);
+			} else if (response.status === 'not_authorized') {
+				FB.login();
+			} else {
+				FB.login();
+			}
+		});
+	});
+	
 	signup();
 	inputFile();
+	occupants();
 });
 
 /*----------------- Helper functions -----------------------*/
@@ -347,11 +441,14 @@ function connectFailed() {
 	$('#qb_login_form input').addClass('error');
 }
 
-function connectSuccess() {
+function connectSuccess(username) {
 	$('#connecting').hide().next('#chat').show();
 	$('#wrap').removeClass('connect_message');
 	$('input').removeClass('error');
-	checkLogout();
+	$('textarea').val('');
+	checkLogout(username);
+	textareaUp();
+	smiles();
 	
 	var room_name = CHAT.roomJID.split('@')[0];
 	var sym = room_name.indexOf('_') + 1;
@@ -367,10 +464,16 @@ function signup() {
 	});
 }
 
-function checkLogout() {
+function checkLogout(username) {
 	$('.logout').click(function(event){
 		event.preventDefault();
-		connection.disconnect();
+		connection.muc.leave(CHAT.roomJID, username);
+		
+		setTimeout(function() {connection.disconnect()}, 1000);
+		FB.logout(function(response) {
+			console.log("[FB Logout]");
+			console.log(response);
+		});
 		localStorage.removeItem('auth');
 	});
 }
@@ -392,5 +495,70 @@ function inputFile() {
 	$('.fileUpload input:file').change(function(){
 		var file = $(this).val();
 		$(this).next().val(file);
+	});
+}
+
+function linkURLs(text) {
+	var url_regexp = /\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/gi;
+	
+	var link = text.replace(url_regexp, function(match) {
+		var url = (/^[a-z]+:/i).test(match) ? match : "http://" + match;
+		var url_text = match;
+		
+		return "<a href=\""+escapeHTML(url)+"\" target=\"_blank\">"+escapeHTML(url_text)+"</a>";
+	});
+	
+	return link;
+}
+
+function escapeHTML(s) {
+	return s.replace(/</g,"&lt;").replace(/>/g,"^&gt;");
+}
+
+function textareaUp() {
+	$('.message_field').click(function(){
+		$('#area').show();
+		$('#message_area').focus();
+	});
+	$(document).click(function(e){
+		if ($(e.target).is('.message_field, #message_area, .controls, .controls *, .smiles-icons, .smiles-icons *')) {
+			return;
+		}
+	  $('.message_field').val($('#message_area').val());
+	  $("#area").hide();
+	});
+}
+
+function toHTML(str) {
+	return ('<p>' + str).replace(/\n\n/g, '<p>').replace(/\n/g, '<br>');
+}
+
+function smilesParser(text) {
+	for(var i = SMILEICONS.length-1; i >= 0; i--) {
+		text = text.replace(SMILEICONS[i].regex, '$2<img class="smileicons" alt="$1" src="images/smiles/' + SMILEICONS[i].image + '" />$3');
+	}
+	return text;
+}
+
+function smiles() {
+	$('.smiles-icons').remove();
+	$('#area').append('<div class="smiles-icons"></div>');
+	for(var i = 0; i < SMILEICONS.length; i++) {
+		$('.smiles-icons').append('<img class="smileicons" alt="icons" data-plain="' + SMILEICONS[i].plain + '" src="images/smiles/' + SMILEICONS[i].image + '" />');
+	}
+	
+	$('.smiles').click(function(){
+		$(this).css('background','#dadada');
+		$(this).parents('#area').find('.smiles-icons').show();
+	});
+	$(document).click(function(e){
+		if ($(e.target).is('.smiles *, .smiles-icons, .smiles-icons *')) {
+			if ($(e.target).is('.smiles-icons *')) {
+				$('#message_area').val($('#message_area').val() + ' ' + $(e.target).data('plain') + ' ');
+			}
+			return;
+		}
+	  $('.smiles-icons').hide();
+	  $('.smiles').css('background','none');
 	});
 }

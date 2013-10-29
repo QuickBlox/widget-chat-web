@@ -20,6 +20,7 @@
 	<script src="xmppchat.js"></script>
 </head>
 <body>
+	<div id="fb-root"></div>
 	<div id="wrap">
 		<div id="auth">
 			<div class="logo"><img src="images/logo.png" alt="QuickBlox logo" /></div>
@@ -27,7 +28,7 @@
 			
 			<div id="buttons">
 				<p><button onclick="authQB()"><img src="images/login_quickblox.png" alt="Sign in with QuickBlox" /></button></p>
-				<p><button onclick="authFB()" style="display:none"><img src="images/login_facebook.png" alt="Sign in with Facebook" /></button></p>
+				<p><button onclick="authFB()"><img src="images/login_facebook.png" alt="Sign in with Facebook" /></button></p>
 				<p><button onclick="authTW()" style="display:none"><img src="images/login_twitter.png" alt="Sign in with Twitter" /></button></p>
 			</div>
 			
@@ -57,7 +58,7 @@
 			<span class="success_reg">Thanks for your registration!</span>
 			
 			<div class="powered">Powered by <a href="http://quickblox.com">QuickBlox</a></div>
-			<div class="version">v1.1.1</div>
+			<div class="version">v1.2.1</div>
 		</div>
 		
 		<div id="connecting">
@@ -73,13 +74,20 @@
 			<section class="chat-content"></section>
 			<footer class="chat-footer">
 				<div class="send_message">
-					<input type="text" id="message"/>
-					<input class="message_field" type="text" placeholder="Enter message..." />
-					<button onclick="sendMesage()">Send</button>
+					<form id="qb_send_message" action="#">
+						<input type="text" id="message"/>
+						<textarea class="message_field" type="text" placeholder="Enter message..."></textarea>
+						<div id="area">
+							<div class="controls"><span class="title">Message</span><span class="smiles"><img src="images/smile.png" alt="smiles" width="20" /></span></div>
+							<textarea name="message_area" id="message_area"></textarea>
+						</div>
+						<button onclick="sendMesage(); return false;">Send</button>
+					</form>
 				</div>
 				<div class="occupants">
 					<span class="number"></span>
 					<img src="images/icon_users.png" alt="users" />
+					<ul class="list"></ul>
 				</div>
 			</footer>
 		</div>
