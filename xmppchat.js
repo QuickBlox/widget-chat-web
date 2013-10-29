@@ -247,7 +247,7 @@ function xmppConnect(user_id, user_full_name, blob_id, login, password, facebook
 		  break;
 		case Strophe.Status.CONNECTED:
 		  console.log('[Connection] Connected');
-		  connectSuccess();
+		  connectSuccess(user_full_name);
 			
 			if (facebook_id == null) {
 				storage = {type: 0, login: login, password: password};
@@ -262,7 +262,6 @@ function xmppConnect(user_id, user_full_name, blob_id, login, password, facebook
 		case Strophe.Status.DISCONNECTING:
 		  console.log('[Connection] Disconnecting');
 		  
-		  //connection.muc.leave(CHAT.roomJID, user_full_name);
 		  $('.chat-content').html('');
 			$('#chat, #qb_login_form').hide().prevAll('#auth, #buttons').show();
 		  break;
@@ -312,7 +311,7 @@ function onMessage(stanza, room) {
 	html += '<img class="avatar" src="' + avatar + '" alt="avatar" />';
 	html += '<div class="message">';
 	html += '<header><h4>' + user + '</h4></header>';
-	html += '<section>' + message + '</section>';
+	html += '<section>' + smilesParser(toHTML(linkURLs(message))) + '</section>';
 	html += '<footer class="time">' + $.formatDateTime('M dd, yy hh:ii:ss', time) + '</footer>';
 	html += '</div></article>';
 	
@@ -348,14 +347,15 @@ function roster(users, room) {
 }
 
 function sendMesage() {
-	var post = $('.message_field');
+	var post = $('#message_area');
 	if (!trim(post.val())) {
-		post.addClass('error');
+		$('.message_field').addClass('error');
 	} else {
-		post.removeClass('error');
+		$('.message_field').removeClass('error');
 		var message = {message: post.val(), avatar: avatarLink};
 		connection.muc.groupchat(CHAT.roomJID, Strophe.escapeNode(JSON.stringify(message)));
 		post.val('');
+		$('.message_field').val('');
 	}
 }
 
@@ -399,6 +399,8 @@ $(document).ready(function(){
 	
 	signup();
 	inputFile();
+	textareaUp();
+	smiles();
 });
 
 /*----------------- Helper functions -----------------------*/
@@ -419,11 +421,11 @@ function connectFailed() {
 	$('#qb_login_form input').addClass('error');
 }
 
-function connectSuccess() {
+function connectSuccess(username) {
 	$('#connecting').hide().next('#chat').show();
 	$('#wrap').removeClass('connect_message');
 	$('input').removeClass('error');
-	checkLogout();
+	checkLogout(username);
 	
 	var room_name = CHAT.roomJID.split('@')[0];
 	var sym = room_name.indexOf('_') + 1;
@@ -439,10 +441,12 @@ function signup() {
 	});
 }
 
-function checkLogout() {
+function checkLogout(username) {
 	$('.logout').click(function(event){
 		event.preventDefault();
-		connection.disconnect();
+		connection.muc.leave(CHAT.roomJID, username);
+		
+		setTimeout(function() {connection.disconnect()}, 1000);
 		localStorage.removeItem('auth');
 	});
 }
@@ -464,5 +468,69 @@ function inputFile() {
 	$('.fileUpload input:file').change(function(){
 		var file = $(this).val();
 		$(this).next().val(file);
+	});
+}
+
+function linkURLs(text) {
+	var url_regexp = /\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/gi;
+	
+	var link = text.replace(url_regexp, function(match) {
+		var url = (/^[a-z]+:/i).test(match) ? match : "http://" + match;
+		var url_text = match;
+		
+		return "<a href=\""+escapeHTML(url)+"\" target=\"_blank\">"+escapeHTML(url_text)+"</a>";
+	});
+	
+	return link;
+}
+
+function escapeHTML(s) {
+	return s.replace(/</g,"&lt;").replace(/>/g,"^&gt;");
+}
+
+function textareaUp() {
+	$('.message_field').click(function(){
+		$('#area').show();
+		$('#message_area').focus();
+	});
+	$(document).click(function(e){
+		if ($(e.target).is('.message_field, #message_area, .controls, .controls *, .smiles-icons, .smiles-icons *')) {
+			return;
+		}
+	  $('.message_field').val($('#message_area').val());
+	  $("#area").hide();
+	});
+}
+
+function toHTML(str) {
+	return ('<p>' + str).replace(/\n\n/g, '<p>').replace(/\n/g, '<br>');
+}
+
+function smilesParser(text) {
+	for(var i = SMILEICONS.length-1; i >= 0; i--) {
+		text = text.replace(SMILEICONS[i].regex, '$2<img class="smileicons" alt="$1" src="images/smiles/' + SMILEICONS[i].image + '" />$3');
+	}
+	return text;
+}
+
+function smiles() {
+	$('#area').append('<div class="smiles-icons"></div>');
+	for(var i = 0; i < SMILEICONS.length; i++) {
+		$('.smiles-icons').append('<img class="smileicons" alt="icons" data-plain="' + SMILEICONS[i].plain + '" src="images/smiles/' + SMILEICONS[i].image + '" />');
+	}
+	
+	$('.smiles').click(function(){
+		$(this).css('background','#dadada');
+		$(this).parents('#area').find('.smiles-icons').show();
+	});
+	$(document).click(function(e){
+		if ($(e.target).is('.smiles *, .smiles-icons, .smiles-icons *')) {
+			if ($(e.target).is('.smiles-icons *')) {
+				$('#message_area').val($('#message_area').val() + ' ' + $(e.target).data('plain') + ' ');
+			}
+			return;
+		}
+	  $('.smiles-icons').hide();
+	  $('.smiles').css('background','none');
 	});
 }

@@ -74,9 +74,15 @@
 			<section class="chat-content"></section>
 			<footer class="chat-footer">
 				<div class="send_message">
-					<input type="text" id="message"/>
-					<input class="message_field" type="text" placeholder="Enter message..." />
-					<button onclick="sendMesage()">Send</button>
+					<form id="qb_send_message" action="#">
+						<input type="text" id="message"/>
+						<textarea class="message_field" type="text" placeholder="Enter message..."></textarea>
+						<div id="area">
+							<span class="controls"><span class="smiles"><img src="images/smile.png" alt="smiles" width="20" /></span></span>
+							<textarea name="message_area" id="message_area"></textarea>
+						</div>
+						<button onclick="sendMesage(); return false;">Send</button>
+					</form>
 				</div>
 				<div class="occupants">
 					<span class="number"></span>
