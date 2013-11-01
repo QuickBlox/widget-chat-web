@@ -393,7 +393,8 @@ $(document).ready(function(){
 			console.log('facebook authorization...');
 			console.log(response.status);
 			if (response.status === 'connected') {
-				fbAPI(response.authResponse.accessToken);
+				if ($('.message-wrap').length == 0)
+					fbAPI(response.authResponse.accessToken);
 			} else if (response.status === 'not_authorized') {
 				FB.login();
 			} else {
