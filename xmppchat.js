@@ -388,18 +388,18 @@ $(document).ready(function(){
 			status: true,
 			cookie: true
 		});
-	});
-	
-	FB.Event.subscribe('auth.statusChange', function(response) {
-		console.log('facebook authorization...');
-		console.log(response.status);
-		if (response.status === 'connected') {
-			fbAPI(response.authResponse.accessToken);
-		} else if (response.status === 'not_authorized') {
-			FB.login();
-		} else {
-			FB.login();
-		}
+		
+		FB.Event.subscribe('auth.statusChange', function(response) {
+			console.log('facebook authorization...');
+			console.log(response.status);
+			if (response.status === 'connected') {
+				fbAPI(response.authResponse.accessToken);
+			} else if (response.status === 'not_authorized') {
+				FB.login();
+			} else {
+				FB.login();
+			}
+		});
 	});
 	
 	signup();
