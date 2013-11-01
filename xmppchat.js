@@ -13,23 +13,7 @@ function authQB() {
 }
 
 function authFB() {
-	FB.getLoginStatus(function(response) {
-    if (response.status === 'connected') {
-        console.log('Facebook: ' + JSON.stringify(response));
-      //_this.facebook = response.authResponse;
-    } else {
-      FB.Event.subscribe('auth.authResponseChange', function(response) {
-        console.debug('FB Auth change', response);
-        console.log('Facebook: ' + JSON.stringify(response));
-        if (response.status === 'connected'){
-          //_this.facebook = response.authResponse;
-        } else {
-          //_this.facebook = null;
-        }
-      });
-      FB.login();
-    }
-  });
+  FB.login();
 }
 
 function userCreate() {
@@ -404,18 +388,18 @@ $(document).ready(function(){
 			status: true,
 			cookie: true
 		});
-		
-		FB.Event.subscribe('auth.authResponseChange', function(response) {
-			console.log('facebook authorization...');
-			console.log(response.status);
-			if (response.status === 'connected') {
-				fbAPI(response.authResponse.accessToken);
-			} else if (response.status === 'not_authorized') {
-				FB.login();
-			} else {
-				FB.login();
-			}
-		});
+	});
+	
+	FB.Event.subscribe('auth.statusChange', function(response) {
+		console.log('facebook authorization...');
+		console.log(response.status);
+		if (response.status === 'connected') {
+			fbAPI(response.authResponse.accessToken);
+		} else if (response.status === 'not_authorized') {
+			FB.login();
+		} else {
+			FB.login();
+		}
 	});
 	
 	signup();
