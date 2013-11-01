@@ -420,7 +420,7 @@ function signUpSuccess() {
 }
 
 function connectFailed() {
-	$('#connecting').hide().prev('#auth').show();
+	$('#connecting, #chat').hide().prev('#auth').show();
 	$('#wrap').removeClass('connect_message');
 	$('#qb_login_form input').addClass('error');
 }
