@@ -1,6 +1,6 @@
 /*
  * QuickBlox Web XMPP Chat sample
- * version 1.2.1
+ * version 1.2.2
  *
  * Author: Andrey Povelichenko (andrey.povelichenko@quickblox.com)
  *
@@ -13,23 +13,7 @@ function authQB() {
 }
 
 function authFB() {
-	FB.getLoginStatus(function(response) {
-    if (response.status === 'connected') {
-        console.log('Facebook: ' + JSON.stringify(response));
-      //_this.facebook = response.authResponse;
-    } else {
-      FB.Event.subscribe('auth.authResponseChange', function(response) {
-        console.debug('FB Auth change', response);
-        console.log('Facebook: ' + JSON.stringify(response));
-        if (response.status === 'connected'){
-          //_this.facebook = response.authResponse;
-        } else {
-          //_this.facebook = null;
-        }
-      });
-      FB.login();
-    }
-  });
+  FB.login();
 }
 
 function userCreate() {
@@ -405,11 +389,12 @@ $(document).ready(function(){
 			cookie: true
 		});
 		
-		FB.Event.subscribe('auth.authResponseChange', function(response) {
+		FB.Event.subscribe('auth.statusChange', function(response) {
 			console.log('facebook authorization...');
 			console.log(response.status);
 			if (response.status === 'connected') {
-				fbAPI(response.authResponse.accessToken);
+				if ($('.message-wrap').length == 0)
+					fbAPI(response.authResponse.accessToken);
 			} else if (response.status === 'not_authorized') {
 				FB.login();
 			} else {
@@ -436,7 +421,7 @@ function signUpSuccess() {
 }
 
 function connectFailed() {
-	$('#connecting').hide().prev('#auth').show();
+	$('#connecting, #chat').hide().prev('#auth').show();
 	$('#wrap').removeClass('connect_message');
 	$('#qb_login_form input').addClass('error');
 }
