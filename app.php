@@ -58,7 +58,7 @@
 			<span class="success_reg">Thanks for your registration!</span>
 			
 			<div class="powered">Powered by <a href="http://quickblox.com">QuickBlox</a></div>
-			<div class="version">v1.2.1</div>
+			<div class="version">v1.2.2</div>
 		</div>
 		
 		<div id="connecting">
