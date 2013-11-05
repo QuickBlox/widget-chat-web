@@ -1,7 +1,6 @@
 <?php
 
 require_once 'config.php';
-require_once 'lib/curl.php';
 require_once 'lib/quickblox.php';
 
 $appId = null;

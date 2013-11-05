@@ -434,10 +434,6 @@ function connectSuccess(username) {
 	checkLogout(username);
 	textareaUp();
 	smiles();
-	
-	var room_name = CHAT.roomJID.split('@')[0];
-	var sym = room_name.indexOf('_') + 1;
-	$('.room_name').text(room_name.slice(sym));
 }
 
 function signup() {

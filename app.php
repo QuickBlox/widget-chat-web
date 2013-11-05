@@ -1,23 +1,51 @@
+<?php
+	require_once 'config.php';
+	require_once 'lib/quickblox.php';
+	
+	$key = null;
+	if (isset($_GET['key'])) {
+		$key = $_GET['key'];
+	}
+	
+	if ($key) {
+		$adminToken = qbAuth($QB['app_id'], $QB['auth_key'], $QB['auth_secret'], $QB['login'], $QB['password']);
+		
+		$params = array('key' => $key);
+		$widgets = qbCustomGet($params, $adminToken);
+		
+		if (count($widgets) > 0) {
+			$appId = $widgets[0]['app_id'];
+			$authKey = $widgets[0]['auth_key'];
+			$authSecret = $widgets[0]['auth_secret'];
+			$roomJid = $widgets[0]['room_jid'];
+			$chatTitle = $widgets[0]['chat_title'];
+			
+			#current version of widget
+			$version = '1.2.2';
+		}
+	}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
-	<title>Chat DEMO</title>
-	
-	<link rel="stylesheet" href="css/reset.css" />
+	<title>XMPP Chat DEMO</title>
 	<link rel="stylesheet" href="xmppchat.css" />
 	
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-	<script src="js/quickblox.js"></script>
-	<script src="js/strophe.js"></script>
-	<script src="js/strophe.muc.js"></script>
-	<script src="js/jquery.base64.min.js"></script>
-	<script src="js/jquery.formatDateTime.js"></script>
-	<script src="js/jquery.scrollTo-min.js"></script>
-	<script src="js/parseUri.js"></script>
-
-	<script src="config.js"></script>
-	<script src="xmppchat.js"></script>
+	<script>
+		//QB Account params
+		var QBPARAMS = {
+			app_id      : '<?php echo $appId; ?>',
+			auth_key    : '<?php echo $authKey; ?>',
+			auth_secret : '<?php echo $authSecret; ?>'
+		}
+		//Chat params
+		var CHAT = {
+			roomJID     : '<?php echo $roomJid; ?>',
+			server      : 'chat.quickblox.com',
+			bosh_url    : 'http://chat.quickblox.com:5280'
+		}
+	</script>
 </head>
 <body>
 	<div id="fb-root"></div>
@@ -58,7 +86,7 @@
 			<span class="success_reg">Thanks for your registration!</span>
 			
 			<div class="powered">Powered by <a href="http://quickblox.com">QuickBlox</a></div>
-			<div class="version">v1.2.2</div>
+			<div class="version"><?php echo $version; ?></div>
 		</div>
 		
 		<div id="connecting">
@@ -68,7 +96,7 @@
 		
 		<div id="chat">
 			<header class="chat-header">
-				<h3 class="room_name"></h3>
+				<h3 class="room_name"><?php echo $chatTitle; ?></h3>
 				<a href="#" class="logout">Logout</a>
 			</header>
 			<section class="chat-content"></section>
@@ -92,5 +120,17 @@
 			</footer>
 		</div>
 	</div>
+	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script src="js/quickblox.js"></script>
+	<script src="js/strophe.js"></script>
+	<script src="js/strophe.muc.js"></script>
+	<script src="js/jquery.base64.min.js"></script>
+	<script src="js/jquery.formatDateTime.js"></script>
+	<script src="js/jquery.scrollTo-min.js"></script>
+	<script src="js/parseUri.js"></script>
+
+	<script src="smiles.js"></script>
+	<script src="xmppchat.js"></script>
 </body>
 </html>
