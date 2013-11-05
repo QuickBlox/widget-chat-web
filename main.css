@@ -1,0 +1,34 @@
+/* Widget Code Generator Styles */
+.header-wrap {
+	padding:10px 0 9px;
+	margin:0 0 20px;
+	background-color:#f6f6f6;
+}
+	.header-wrap .logo {
+		margin-top:27px;
+	}
+.list-group {
+	margin-top:10px;
+}
+	.list-group-item {
+		margin-bottom:2px;
+		border:0;
+		border-bottom:1px solid #ddd;
+		border-radius:0 !important;
+	}
+	.list-group-item:last-child {
+		border-bottom:0;
+	}
+form {
+	padding:15px;
+	margin:10px 32px;
+	background-color:#f6f6f6;
+	border:1px solid #ccc;
+	border-radius:5px;
+}
+.text-success {
+	color:#0c550d;
+}
+textarea {
+	resize:none;
+}

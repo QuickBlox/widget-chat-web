@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>QuickBlox Web XMPP Chat Code Generator</title>
+	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="main.css">
+</head>
+<body>
+	<div class="page-header header-wrap">
+		<div class="container">
+			<header class="row">
+				<img class="col-md-1 col-md-offset-1 logo" src="images/logo.png" alt="QuickBlox logo" />
+				<h1 class="col-md-9">QuickBlox Web XMPP Chat<br />Code Generator</h1>
+			</header>
+		</div>
+	</div>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-10 col-md-offset-1">
+				<section class="panel panel-default" id="xmpp-widget">
+				  <div class="panel-heading">
+				    <h2 class="panel-title">Embed XMPP Chat widget to any website</h2>
+				  </div>
+				  <div class="panel-body row">
+						<div class="col-md-6">
+							<div class="list-group">
+							  <div class="list-group-item">
+							    <h4 class="list-group-item-heading lead text-success">1. Create the QuickBlox account</h4>
+							    <p class="list-group-item-text">You need <a href="http://admin.quickblox.com/register">register in the QuickBlox</a> service</p>
+							  </div>
+							  <div class="list-group-item">
+							    <h4 class="list-group-item-heading lead text-success">2. Login to the Admin panel</h4>
+							    <p class="list-group-item-text"><a href="http://admin.quickblox.com/signin">Login to the QuickBlox</a> Admin panel with your access credentials</p>
+							  </div>
+							  <div class="list-group-item">
+							    <h4 class="list-group-item-heading lead text-success">3. Add the new application</h4>
+							    <p class="list-group-item-text"><a href="https://www.diigo.com/item/image/4es83/bq34">Create the new application</a> in your QB account which will use the XMPP chat</p>
+							  </div>
+							  <div class="list-group-item">
+							    <h4 class="list-group-item-heading lead text-success">4. Add the new chat room</h4>
+							    <p class="list-group-item-text"><a href="https://www.diigo.com/item/image/4es83/2c78">Choose QB Chat module</a> in panel. <a href="https://www.diigo.com/item/image/4es83/95e4">Create the XMPP chat room</a> for your widget</p>
+							  </div>
+							  <div class="list-group-item">
+							    <h4 class="list-group-item-heading lead text-success">5. Put application parameters</h4>
+							    <p class="list-group-item-text">Write <a href="https://www.diigo.com/item/image/4es83/53te">application parameters</a> into corresponding fields in the current form</p>
+							  </div>
+							  <div class="list-group-item">
+							    <h4 class="list-group-item-heading lead text-success">6. Demo</h4>
+							    <p class="list-group-item-text">You can look at <a href="http://quickblox.com/applications/xmppchat/demo.html">the demonstration QB Web XMPP Chat</a>.</p>
+							  </div>
+							</div>
+						</div>
+						
+						<form role="form" class="col-md-5" action="code.php" method="post" accept-charset="utf-8">
+						  <div class="form-group">
+						    <label for="app_id">Application id</label>
+						    <input type="text" class="form-control" name="app_id" id="app_id" placeholder="e.g. 3907" autofocus>
+						  </div>
+						  <div class="form-group">
+						    <label for="auth_key">Authorization key</label>
+						    <input type="text" class="form-control" name="auth_key" id="auth_key" placeholder="e.g. jRVze-6OzVDh-WX">
+						  </div>
+						  <div class="form-group">
+						    <label for="auth_secret">Authorization secret</label>
+						    <input type="text" class="form-control" name="auth_secret" id="auth_secret" placeholder="e.g. uX8dZDexGW8TrEe">
+						  </div>
+						  <div class="form-group">
+						    <label for="room_jid">Room JID</label>
+						    <input type="text" class="form-control" name="room_jid" id="room_jid" placeholder="e.g. 3907_demo_room@muc.chat.quickblox.com">
+						  </div>
+						  <div class="form-group">
+						    <label for="chat_title">Chat Title</label>
+						    <input type="text" class="form-control" name="chat_title" id="chat_title" placeholder="e.g. QB Web XMPP Chat">
+						  </div>
+						  <button type="submit" class="btn btn-primary">Get widget key</button>
+						</form>
+					</div>
+				</section>
+			</div>
+		</div>
+	</div>
+	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script src="js/jquery.form.min.js"></script>
+	<script src="js/jquery.scrollTo-min.js"></script>
+	<script src="main.js"></script>
+</body>
+</html>
