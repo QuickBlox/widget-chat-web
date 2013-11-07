@@ -6,14 +6,15 @@
  *
  */
 
-var storage, login, password, full_name, email, params, qbToken, qbUser, avatarLink, connection, userJID, html, occupants;
+var storage, FB_active, login, password, full_name, email, params, qbToken, qbUser, avatarLink, connection, userJID, html, occupants;
 
 function authQB() {
 	$('#buttons').hide().next('#qb_login_form').show().find('input').val('');
 }
 
 function authFB() {
-  FB.login();
+	FB.login();
+  fbAPI();
 }
 
 function userCreate() {
@@ -41,7 +42,6 @@ function userCreate() {
 		
 		$('#qb_signup_form input').prop('disabled', true);
 		$('#qb_signup_form button').addClass('disabled');
-		$('#qb_signup_form').append('<img class="ajax-loader" src="images/ajax-loader.gif" alt="loader" />');
 		
 		QB.init(QBPARAMS.app_id, QBPARAMS.auth_key, QBPARAMS.auth_secret);
 		QB.createSession(function(err, result){
@@ -364,53 +364,70 @@ function sendMesage() {
 	}
 }
 
-function fbAPI(FB_accessToken) {
-	console.log('Welcome!  Fetching your information.... ');
-	FB.api('/me', function(response) {
-		console.log(response);
-		console.log('Good to see you, ' + response.name + '.');
-		
-		sessionCreate(null, FB_accessToken);
-	});
-}
-
-/*------------------- DOM is ready -------------------------*/
-$(document).ready(function(){
-	if (localStorage['auth']) {
-		storage = JSON.parse($.base64.decode(localStorage['auth']));
-		sessionCreate(storage);
-	}
-	
-	$.ajaxSetup({ cache: true });
-	$.getScript('http://connect.facebook.net/en_US/all.js', function(){
-		FB.init({
-			appId: '368137086642884',
-			status: true,
-			cookie: true
-		});
-		
+function fbAPI() {
+	if (!FB_active) {
 		FB.Event.subscribe('auth.statusChange', function(response) {
 			console.log('facebook authorization...');
 			console.log(response.status);
 			if (response.status === 'connected') {
-				if ($('.message-wrap').length == 0)
-					fbAPI(response.authResponse.accessToken);
+				if ($('.message-wrap').length == 0) {
+					var FB_accessToken = response.authResponse.accessToken;
+					console.log('Welcome!  Fetching your information.... ');
+					FB.api('/me', function(response) {
+						console.log(response);
+						console.log('Good to see you, ' + response.name + '.');
+						sessionCreate(null, FB_accessToken);
+					});
+				}
 			} else if (response.status === 'not_authorized') {
 				FB.login();
 			} else {
 				FB.login();
 			}
 		});
-	});
+	}
+}
+
+/*------------------- DOM is ready -------------------------*/
+$(document).ready(function(){
+	if (localStorage['auth']) {
+		console.log('localStorage');
+		storage = JSON.parse($.base64.decode(localStorage['auth']));
+		sessionCreate(storage);
+	} else {
+		console.log("FB");
+		fbAPI();
+		FB_active = 1;
+	}
 	
+	widgetView();
 	signup();
 	inputFile();
 	occupants();
 });
 
 /*----------------- Helper functions -----------------------*/
+function widgetView() {
+	$('#chat .chat-content').css('height', WIDGET_HEIGHT - 95);
+	$('#chat .chat-footer textarea').css('width', WIDGET_WIDTH - 100);
+	$('#area').css('width', WIDGET_WIDTH - 86);
+	$('.list').css('width', WIDGET_WIDTH/2 + 23).css('max-height', WIDGET_HEIGHT - 72);
+
+	if (WIDGET_WIDTH > 600 && WIDGET_HEIGHT > 600) {
+		$('#area').addClass('big-layout');
+	}
+	
+	if (WIDGET_HEIGHT < 500) {
+		$('#chat .chat-content').css('height', WIDGET_HEIGHT - 93);
+	}
+	
+	if (WIDGET_WIDTH < 350 || WIDGET_HEIGHT < 350) {
+		$('#chat .chat-content').css('height', WIDGET_HEIGHT - 79);
+		$('#chat .chat-footer textarea').css('width', WIDGET_WIDTH - 90);
+		$('#area').css('width', WIDGET_WIDTH - 76);
+	}
+}
 function signUpFailed() {
-	$('.ajax-loader').remove();
 	$('#qb_signup_form input').prop('disabled', false);
 	$('#qb_signup_form button').removeClass('disabled');
 }
@@ -428,10 +445,10 @@ function connectFailed() {
 
 function connectSuccess(username) {
 	$('#connecting').hide().next('#chat').show();
-	$('#wrap').removeClass('connect_message');
+	$('#wrap').removeClass('connect_message').css('width', 'auto');
 	$('input').removeClass('error');
 	$('textarea').val('');
-	checkLogout(username);
+	$('.logout').attr('data-username', username);
 	textareaUp();
 	smiles();
 }
@@ -445,18 +462,19 @@ function signup() {
 	});
 }
 
-function checkLogout(username) {
-	$('.logout').click(function(event){
-		event.preventDefault();
-		connection.muc.leave(CHAT.roomJID, username);
-		
-		setTimeout(function() {connection.disconnect()}, 1000);
+function checkLogout() {
+	if (localStorage['auth']) {
+		localStorage.removeItem('auth');
+	} else {
 		FB.logout(function(response) {
 			console.log("[FB Logout]");
 			console.log(response);
 		});
-		localStorage.removeItem('auth');
-	});
+	}
+
+	var nick = $('.logout').data('data-username');
+	connection.muc.leave(CHAT.roomJID, nick);
+	setTimeout(function() {connection.disconnect()}, 1000);
 }
 
 function trim(str) {
