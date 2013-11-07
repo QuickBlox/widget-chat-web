@@ -1,7 +1,7 @@
 <?php
 	require_once 'auth.php';
 	
-	$version = '1.2.2'; #current version of widget
+	$version = '1.2.3'; #current version of widget
 ?>
 <!DOCTYPE html>
 <html lang="en">
