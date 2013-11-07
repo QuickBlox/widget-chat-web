@@ -1,0 +1,49 @@
+/* Fix widget styles with parameters less than 500px
+============================================================*/
+p {
+	margin-bottom:20px;
+}
+#auth .logo {
+	margin-bottom:15px;
+}
+	#auth .logo img {
+		width:80px;
+		height:auto;
+	}
+#auth .welcome {
+	width:210px;
+	margin:0 auto 15px;
+}
+#buttons {
+	margin:0 auto;
+}
+#qb_login_form input,
+#qb_signup_form input[type="text"] {
+	width:200px;
+	height:18px;
+	padding:5px;
+	font-size:14px;
+}
+#qb_login_form button,
+#qb_signup_form button {
+	height:28px;
+	margin:0 auto;
+	font-size:16px;
+}
+#qb_login_form button {
+	margin-bottom:5px;
+}
+	#qb_login_form span {
+		font-size:13px;
+	}
+#qb_signup_form .fileUpload {
+	margin-bottom:20px;
+}
+	#qb_signup_form .fileUpload .fileName {
+		width:160px;
+	}
+	#qb_signup_form .fileUpload img {
+		top:1px;
+		right:0;
+		width:28px;
+	}

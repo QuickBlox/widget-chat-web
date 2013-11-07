@@ -1,3 +1,5 @@
+@import url('css/reset.css');
+
 /* Global
 ==============================*/
 html {
@@ -37,14 +39,9 @@ button:hover {
 /* Wrapper
 ==============================*/
 #wrap {
-	position:absolute;
-	top:0;
-	right:0;
-	bottom:0;
-	left:0;
-	width:500px;
-	height:500px;
-	margin:auto;
+	position:relative;
+	height:99%;
+	max-width:1366px;
 	border:1px solid #cacaca;
 	border-radius:5px;
 }
@@ -56,21 +53,27 @@ button:hover {
 ==============================*/
 #auth {
 	position:relative;
+	display:table;
+	width:100%;
 	height:100%;
 	text-align:center;
 	background:url('images/bg-header.png') no-repeat;
 }
-	#auth .logo {
-		margin-bottom:20px;
-		padding-top:30px;
+	#auth .main-wrap {
+		display:table-cell;
+		width:100%;
+		vertical-align:middle;
 	}
-		#auth .logo img {
-			width:130px;
-			height:130px;
+		#auth .logo {
+			margin-bottom:20px;
 		}
-	#auth .welcome {
-		margin-bottom:30px;
-	}
+			#auth .logo img {
+				width:130px;
+				height:130px;
+			}
+		#auth .welcome {
+			margin-bottom:30px;
+		}
 	#auth .powered {
 		position:absolute;
 		top:0;
@@ -122,6 +125,9 @@ button:hover {
 		background:#429abd;
 		border:1px solid #3985a4;
 	}
+	#qb_login_form button {
+		margin-bottom:15px;
+	}
 	#qb_login_form p:last-child {
 		line-height:16px;
 	}
@@ -131,13 +137,7 @@ button:hover {
 	
 /* Signup form */
 #qb_signup_form {
-	position:absolute;
-	top:0;
-	right:0;
-	bottom:0;
-	left:0;
-	height:74%;
-	margin:auto;
+	margin-top:10px;
 }
 	#qb_signup_form .ajax-loader {
 		position:absolute;
@@ -173,7 +173,7 @@ button:hover {
 		#qb_signup_form .fileUpload img.hover {
 			opacity:0.6;
 		}
-	
+
 /* Connecting */
 #connecting {
 	display:none;
@@ -189,14 +189,6 @@ button:hover {
 }
 .success_reg {
 	display:none;
-	position:absolute;
-	top:0;
-	right:0;
-	bottom:0;
-	left:0;
-	margin:auto;
-	width:40%;
-	height:5%;
 }
 
 /* Chat
@@ -211,29 +203,43 @@ button:hover {
 		background:#f3f3f3;
 	}
 	#chat .chat-header {
-		height:26px;
-		padding:7px;
+		height:40px;
 		border-bottom:1px solid #cacaca;
 		border-radius:5px 5px 0 0;
 	}
-		#chat .chat-header .room_name {
-			display:block;
+		#chat .chat-header .occupants {
 			float:left;
+			padding:7px;
 			line-height:26px;
+			border-right:1px solid #cacaca;
 		}
-		#chat .chat-header .logout {
-			display:block;
+			#chat .occupants img {
+				width:16px;
+				height:16px;
+				position:relative;
+				top:2px;
+			}
+		#chat .chat-header .logout-wrap {
 			float:right;
-			padding:0 5px;
-			font-size:13px;
-			line-height:24px;
-			color:#fff;
-			text-decoration:none;
-			background:#76112b;
-			border:1px solid #580d20;
+			padding:7px;
 		}
-		#chat .chat-header .logout:hover {
-			opacity:0.6;
+			#chat .chat-header .logout {
+				display:block;
+				padding:0 5px;
+				font-size:13px;
+				line-height:25px;
+				color:#fff;
+				text-decoration:none;
+				background:#76112b;
+				border:1px solid #580d20;
+			}
+			#chat .chat-header .logout:hover {
+				opacity:0.6;
+			}
+		#chat .chat-header .room_name {
+			overflow:hidden;
+			padding:7px;
+			line-height:26px;
 		}
 	#chat .chat-content {
 		position:relative;
@@ -274,49 +280,35 @@ button:hover {
 				}
 	#chat .chat-footer {
 		overflow:hidden;
+		padding:7px;
 		border-top:1px solid #cacaca;
 		border-radius:0 0 5px 5px;
 	}
-		#chat .chat-footer .send_message {
+		#chat .chat-footer #message {
+			display:none;
+		}
+		#chat .chat-footer textarea {
+			width:300px;
+			padding:3px 7px;
+			font-family:Helvetica, Arial, sans-serif;
+			font-size:15px;
+			line-height:18px;
+			background:#fff;
+			resize:none;
+		}
+		#chat .chat-footer .message_field {
+			overflow:hidden;
 			float:left;
-			padding:7px;
+			height:18px;
+			margin-right:7px;
+			border:1px solid #cacaca;
+			border-radius:3px;
 		}
-			#chat .send_message #message {
-				display:none;
-			}
-			#chat .send_message .message_field {
-				float:left;
-				width:300px;
-				margin-right:7px;
-				padding:3px 7px;
-				font-size:15px;
-				height:18px;
-				line-height:18px;
-				background:#fff;
-				border:1px solid #cacaca;
-				border-radius:3px;
-				font-family:Helvetica, Arial, sans-serif;
-				resize:none;
-				overflow:hidden;
-			}
-			#chat .send_message button {
-				float:left;
-				padding:0 10px;
-				height:24px;
-				line-height:23px;
-			}
-		#chat .chat-footer .occupants {
-			float:right;
-			padding:7px 7px 7px 10px;
-			line-height:26px;
-			border-left:1px solid #cacaca;
+		#chat .chat-footer button {
+			float:left;
+			padding:0 10px;
+			height:26px;
 		}
-			#chat .occupants img {
-				width:16px;
-				height:16px;
-				position:relative;
-				top:2px;
-			}
 
 .joined,
 .leave {
@@ -358,19 +350,12 @@ button:hover {
 			line-height:32px;
 		}
 		.controls .smiles:hover,
-		#chat .chat-footer .occupants:hover {
+		#chat .chat-header .occupants:hover {
 			background:#dadada !important;
 			cursor:pointer;
 		}
 	#message_area {
-		width:300px;
 		height:94px;
-		resize:none;
-		padding:3px 7px;
-		font-size:15px;
-		line-height:18px;
-		background:#fff;
-		font-family:Helvetica, Arial, sans-serif;
 		outline:0;
 		border:0;
 	}
@@ -383,12 +368,18 @@ button:hover {
 .smiles-icons {
 	position:absolute;
 	display:none;
-	top:-156px;
-	right:-90px;
-	width:210px;
-	height:154px;
+	top:-102px;
+	right:0;
+	width:150px;
+	height:100px;
+	overflow:auto;
 	background:rgba(0,0,0,0.7);
 	border-radius:3px;
+}
+#area.big-layout .smiles-icons {
+	top:-156px;
+	width:210px;
+	height:154px;
 }
 	.smiles-icons .smileicons {
 		padding:7px;
@@ -400,15 +391,17 @@ button:hover {
 	
 .list {
 	position:absolute;
-	display:none;
-	bottom:40px;
-	right:0;
-	width:250px;
 	overflow:auto;
+	display:none;
+	top:40px;
+	left:0;
+	width:250px;
+	max-width:450px;
 	max-height:418px;
 	background:#fff;
 	border:1px solid #cacaca;
 	border-radius:3px;
+	z-index:1;
 }
 	.list li {
 		display:block;
@@ -423,9 +416,6 @@ button:hover {
 	.list li:last-child {
 		border-bottom:0;
 	}
-	.list li:hover {
-		font-weight:bold;
-	}
 	
 .title {
 	background:#f3f3f3 !important;
@@ -433,6 +423,7 @@ button:hover {
 	font-size:15px;
 	line-height:25px;
 }
-.title:hover {
+.title:hover,
+.list li:hover {
 	cursor:auto;
 }

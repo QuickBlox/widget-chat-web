@@ -1,5 +1,7 @@
 <?php
 
+require_once 'curl.php';
+
 function qbAuth($appId, $authKey, $authSecret, $login, $password) {
 	$nonce = rand(0, 1000);
 	$timestamp = time();
