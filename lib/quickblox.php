@@ -13,7 +13,7 @@ function qbAuth($appId, $authKey, $authSecret, $login, $password) {
 	}
 	$signature = hash_hmac("sha1", $message, $authSecret);
 	
-	$url = "http://api.quickblox.com/session.json?";
+	$url = "http://api.quickblox.com/session.json";
 	$data = "$message&signature=$signature";
 	$response = POSTRequest($url, $data, false);
 	
@@ -40,7 +40,7 @@ function qbCustomCreate($params, $token) {
 	foreach($params as $key=>$value) { $params_string .= $key.'='.urlencode($value).'&'; }
 	rtrim($params_string, '&');
 	
-	$url = "http://api.quickblox.com/data/widgets.json?";
+	$url = "http://api.quickblox.com/data/widgets.json";
 	$data = $params_string;
 	$response = POSTRequest($url, $data, $token);
 }

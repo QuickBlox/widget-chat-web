@@ -7,6 +7,7 @@ $appId = null;
 $authKey = null;
 $authSecret = null;
 $roomJid = null;
+$domain = null; #for WP plugin
 $paramResponse = 0; #for WP plugin
 
 $errorMessage = null;
@@ -26,6 +27,10 @@ if (isset($_POST['auth_secret'])) {
 
 if (isset($_POST['room_jid'])) {
 	$roomJid = $_POST['room_jid'];
+}
+
+if (isset($_POST['domain'])) {
+	$domain = $_POST['domain'];
 }
 
 if (isset($_POST['param_response'])) {
@@ -52,6 +57,7 @@ if ($appId && $authKey && $authSecret && $roomJid) {
 											'auth_key' => $authKey,
 											'auth_secret' => $authSecret,
 											'room_jid' => $roomJid,
+											'domain' => $domain,
 											'key' => $key);
 			qbCustomCreate($params, $adminToken);
 		}
