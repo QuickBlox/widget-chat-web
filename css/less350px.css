@@ -10,13 +10,13 @@ p {
 	#auth .logo img {
 		position:relative;
 		top:5px;
-		left:-65px;
+		left:-60px;
 		width:55px;
 		height:auto;
 	}
 #auth .welcome {
 	width:115px;
-	padding-left:70px;
+	padding-left:75px;
 	margin:0 auto 15px;
 	text-align:left;
 }
@@ -71,7 +71,7 @@ p {
 }
 	#chat .chat-header .occupants {
 		font-size:15px;
-		line-height:17px;
+		line-height:15px;
 	}
 		#chat .list {
 			top:32px;
