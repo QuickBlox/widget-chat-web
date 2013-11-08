@@ -390,16 +390,24 @@ function fbAPI() {
 
 /*------------------- DOM is ready -------------------------*/
 $(document).ready(function(){
-	if (localStorage['auth']) {
-		console.log('localStorage');
-		storage = JSON.parse($.base64.decode(localStorage['auth']));
-		sessionCreate(storage);
-	} else {
-		console.log("FB");
-		fbAPI();
-		FB_active = 1;
-	}
-	
+	$.ajaxSetup({ cache: true });
+	$.getScript('http://connect.facebook.net/en_EN/all.js', function(){
+		FB.init({
+			appId: FB_APP_ID,
+			cookie: true
+		});
+		
+		if (localStorage['auth']) {
+			console.log('localStorage');
+			storage = JSON.parse($.base64.decode(localStorage['auth']));
+			sessionCreate(storage);
+		} else {
+			console.log("FB");
+			fbAPI();
+			FB_active = 1;
+		}
+	});
+
 	widgetView();
 	signup();
 	inputFile();
@@ -409,8 +417,8 @@ $(document).ready(function(){
 /*----------------- Helper functions -----------------------*/
 function widgetView() {
 	$('#chat .chat-content').css('height', WIDGET_HEIGHT - 95);
-	$('#chat .chat-footer textarea').css('width', WIDGET_WIDTH - 100);
-	$('#area').css('width', WIDGET_WIDTH - 86);
+	$('#chat .chat-footer textarea').css('width', WIDGET_WIDTH - 108);
+	$('#area').css('width', WIDGET_WIDTH - 94);
 	$('.list').css('width', WIDGET_WIDTH/2 + 23).css('max-height', WIDGET_HEIGHT - 72);
 
 	if (WIDGET_WIDTH > 600 && WIDGET_HEIGHT > 600) {
@@ -423,8 +431,8 @@ function widgetView() {
 	
 	if (WIDGET_WIDTH < 350 || WIDGET_HEIGHT < 350) {
 		$('#chat .chat-content').css('height', WIDGET_HEIGHT - 79);
-		$('#chat .chat-footer textarea').css('width', WIDGET_WIDTH - 90);
-		$('#area').css('width', WIDGET_WIDTH - 76);
+		$('#chat .chat-footer textarea').css('width', WIDGET_WIDTH - 100);
+		$('#area').css('width', WIDGET_WIDTH - 86);
 	}
 }
 function signUpFailed() {

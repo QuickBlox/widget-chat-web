@@ -24,17 +24,8 @@
 			server      : 'chat.quickblox.com',
 			bosh_url    : 'http://chat.quickblox.com:5280'
 		}
-	</script>
-	
-	<script>
-		//FB init
-		$.ajaxSetup({ cache: true });
-		$.getScript('http://connect.facebook.net/en_US/all.js', function(){
-			FB.init({
-				appId: '368137086642884',
-				cookie: true
-			});
-		});
+		//FB params
+		var FB_APP_ID = '368137086642884';
 	</script>
 </head>
 <body>
