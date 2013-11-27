@@ -1,6 +1,10 @@
 /.bundle
-/log/*.log
-/tmp
+
+# Server logic
+/lib/*.php
+auth.php
+code.php
+config.php
 
 # IDE meta files
 .project
