@@ -1,6 +1,6 @@
 /*
  * QuickBlox Web XMPP Chat sample
- * version 1.2.4
+ * version 1.2.5
  *
  * Author: Andrey Povelichenko (andrey.povelichenko@quickblox.com)
  *
@@ -430,7 +430,7 @@ function widgetView() {
 	}
 	
 	if (WIDGET_WIDTH < 350 || WIDGET_HEIGHT < 350) {
-		$('#chat .chat-content').css('height', WIDGET_HEIGHT - 79);
+		$('#chat .chat-content').css('height', WIDGET_HEIGHT - 80);
 		$('#chat .chat-footer textarea').css('width', WIDGET_WIDTH - 100);
 		$('#area').css('width', WIDGET_WIDTH - 86);
 	}
