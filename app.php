@@ -7,7 +7,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
-	<title>XMPP Chat DEMO</title>
+	<title>QB Group Chat Room (XMPP)</title>
 	<link rel="stylesheet" href="xmppchat.css" />
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 	
@@ -36,7 +36,7 @@
 			
 			<div class="main-wrap">
 				<div class="logo"><img src="images/logo.png" alt="QuickBlox logo" /></div>
-				<div class="welcome">Welcome to<br />QuickBlox Web XMPP Chat</div>
+				<div class="welcome">Welcome to<br />QB Group Chat Room (XMPP)</div>
 				
 				<div id="buttons">
 					<p><button onclick="authQB()"><img src="images/login_quickblox.png" alt="Sign in with QuickBlox" /></button></p>
