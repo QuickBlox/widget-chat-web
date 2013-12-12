@@ -295,7 +295,7 @@ function onMessage(stanza, room) {
 	html += '<img class="avatar" src="' + avatar + '" alt="avatar" />';
 	html += '<div class="message">';
 	html += '<header><h4>' + user + '</h4></header>';
-	html += '<section>' + smilesParser(toHTML(linkURLs(message))) + '</section>';
+	html += '<section>' + smilesParser(toHTML(linkURLs(escapeHTML(message)))) + '</section>';
 	html += '<footer class="time">' + $.formatDateTime('M dd, yy hh:ii:ss', time) + '</footer>';
 	html += '</div></article>';
 	
@@ -519,7 +519,7 @@ function linkURLs(text) {
 }
 
 function escapeHTML(s) {
-	return s.replace(/</g,"&lt;").replace(/>/g,"^&gt;");
+	return s.replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
 
 function textareaUp() {

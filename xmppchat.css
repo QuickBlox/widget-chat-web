@@ -20,7 +20,7 @@ p {
 	margin-bottom:30px;
 }
 p:last-child {
-	margin-bottom:0;
+	margin-bottom:0 !important;
 }
 button {
 	padding:0;
@@ -268,6 +268,9 @@ button:hover {
 				font-size:14px;
 				word-break:break-all;
 			}
+				#chat .message-wrap .message p {
+					margin-bottom:15px;
+				}
 				#chat .message-wrap .message a {
 					color:#429abd;
 				}
