@@ -1,6 +1,6 @@
 /*
- * QuickBlox Web XMPP Chat sample
- * version 1.2.5
+ * QB Group Chat Room (XMPP)
+ * version 2.0.0a
  *
  * Author: Andrey Povelichenko (andrey.povelichenko@quickblox.com)
  *

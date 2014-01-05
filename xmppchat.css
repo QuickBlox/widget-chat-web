@@ -12,6 +12,8 @@ body {
 	font-family:Helvetica, Arial, sans-serif;
 	color:#5a5a5a;
 	line-height:20px;
+	max-width:1366px;
+	background:#eeefee;
 }
 a:hover {
 	text-decoration:none;
@@ -36,18 +38,56 @@ button:hover {
 	box-shadow:0 0 5px rgba(50, 50, 50, 0.75);
 }
 
-/* Wrapper
+/* Bubbles
 ==============================*/
-#wrap {
-	position:relative;
-	height:99%;
-	max-width:1366px;
-	border:1px solid #cacaca;
-	border-radius:5px;
+.bubbles {
+	position:absolute;
+	width:100%;
+	height:35%;
 }
-#wrap.connect_message {
-	background:#fbfbfb;
-}
+	.bubble {
+		position:absolute;
+	}
+	.bubble_green {
+		width:40%;
+		height:40%;
+		background:#00c72d;
+		border-radius:0 0 12px 0;
+	}
+	.bubble_blue {
+		right:0;
+		width:73%;
+		height:65%;
+		background:rgba(0,84,138,0.75);
+		border-radius:0 0 0 20px;
+	}
+	.bubble_light_blue {
+		right:0;
+		width:50%;
+		height:30%;
+		background:#54a2d5;
+		border-radius:0 0 0 15px;
+	}
+	.bubble:after {
+		content:"";
+		position:absolute;
+		top:100%;
+	}
+	.bubble_green:after {
+   	left:20%;
+    border-top:15px solid #00c72d;
+    border-right:20px solid transparent;
+	}
+	.bubble_blue:after {
+		left:50%;
+    border-top:25px solid rgba(0,84,138,0.75);
+    border-left:35px solid transparent;
+	}
+	.bubble_light_blue:after {
+		left:55%;
+    border-top:20px solid #54a2d5;
+    border-right:25px solid transparent;
+	}
 
 /* Authorization
 ==============================*/
