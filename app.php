@@ -26,7 +26,10 @@
 		bosh_url: 'http://chat.quickblox.com:5280'
 	}
 	//FB params
-	var FB_APP_ID = '368137086642884';
+	var FBPARAMS = {
+		app_id: '368137086642884',
+		graph_server: 'https://graph.facebook.com'
+	}
 	</script>
 </head>
 <body>
@@ -53,22 +56,28 @@
 			</div>
 		</div>
 		
+		<div id="login-fom" class="hidden">
+			<form action="#" class="center-wrap">
+				<fieldset>
+					<input id="login" type="text" placeholder="Login or email">
+					<input id="pass" type="password" placeholder="Password">
+				</fieldset>
+				<button class="btn_qb" onclick="formData(); return false;"><span>Connect</span></button>
+				<span class="not-registered">Not registered yet?<br>
+					<a href="#" onclick="signUp(); return false;">Register an account QuickBlox</a>
+				</span>
+			</form>
+		</div>
+	</div>
+	
+	<div id="connecting" class="layout hidden">
+		<span class="progress">
+			<p>Connecting. Please wait...</p>
+			<progress></progress>
+		</span>
 	</div>
 	
 	
-	<!--
-		<div class="main-wrap">
-			
-			<form id="qb_login_form" action="#">
-				<p><input id="login" type="text" placeholder="Login or Email" /></p>
-				<p><input id="password" type="password" placeholder="Password" /></p>
-				<p><button onclick="sessionCreate(); return false;">Connect</button>
-					<span>Not registered yet?<br />
-						<a href="#" id="signup" onclick="signup()">Register an account QuickBlox</a>
-					</span>
-				</p>
-			</form>
-			
 			<form id="qb_signup_form" action="#" enctype="multipart/form-data">
 				<p><input id="full_name_signup" type="text" placeholder="Full Name" /></p>
 				<p><input id="email_signup" type="text" placeholder="Email" /></p>
@@ -77,20 +86,14 @@
 				<div class="fileUpload">
 					<input id="avatar_signup" type="file" size="8" accept="image/*" />
 					<input class="fileName" type="text" placeholder="Avatar" />
-					<img src="images/upload_photo.png" alt="upload" />
+					<img src="images/upload.png" alt="upload" />
 				</div>
 				<p><button onclick="userCreate(); return false;">Sign Up</button></p>
 			</form>
 			
 			<span class="success_reg">Thanks for your registration!</span>
-		</div>
-	-->
-	
-	<div id="connecting">
-		<p>Connecting. Please wait...</p>
-		<p><img src="" alt="connecting" /></p>
-	</div>
-	
+			
+	<!--
 	<div id="chat">
 		<header class="chat-header">
 			<div class="occupants" onclick="occupants()">
@@ -118,6 +121,7 @@
 			</form>
 		</footer>
 	</div>
+	-->
 	
 	<!-- include outside js libraries -->
 	<script src="js/libs/quickblox.js"></script>
@@ -128,6 +132,7 @@
 
 	<!-- scripts of widget -->
 	<script src="js/smiles.js"></script>
+	<script src="js/helpers.js"></script>
 	<script src="qbchatroom.js"></script>
 </body>
 </html>

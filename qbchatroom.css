@@ -15,6 +15,11 @@ html {
 	height: 100%;
 	font-size: 62.5%;
 }
+/* flexible styles */
+.html-55 {font-size: 55%;}
+.html-80 {font-size: 80%;}
+.html-90 {font-size: 90%;}
+
 body {
 	width: 100%;
 	max-width: 900px;
@@ -28,6 +33,7 @@ button {
 	margin-bottom: .9rem;
 	text-align: center;
 	border: 0;
+	outline: 0;
 	cursor: pointer;
 }
 button:hover {
@@ -42,6 +48,24 @@ button:hover {
 		background: left center no-repeat;
 		background-size: 2.4rem auto;
 	}
+fieldset {
+	padding: 0 .3rem;
+}
+.flexible fieldset {
+	padding: 0;
+}
+	fieldset input {
+		width: 100%;
+		height: 3.2rem;
+		padding: .7rem;
+		margin-bottom: .7rem;
+		font-size: 1.4rem;
+		border: 0;
+		box-sizing: border-box;
+	}
+a {
+	color: #0077cb;
+}
 a:hover {
 	text-decoration: none;
 }
@@ -56,16 +80,24 @@ a:hover {
 	max-width: 300px;
 	margin: 0 auto;
 }
-/*
+.hidden {
+	display: none;
+}
 .error {
-	border: 1px solid #C70537 !important;
-	box-shadow: 0 0 5px rgba(50, 50, 50, 0.75);
-}*/
+	border: 1px solid #ff6969;
+	box-shadow: 0 0 5px rgba(146, 146, 146, 0.75);
+}
 
 /* Bubbles */
 .bubbles {
 	position: relative;
 	height: 10.5rem;
+}
+.bubbles_login {
+	height: 5rem;
+}
+.flexible .bubbles_login {
+	height: 7rem;
 }
 	.bubble {
 		position: absolute;
@@ -90,30 +122,49 @@ a:hover {
 		right: 0;
 		width: 75%;
 		height: 73%;
-		background: rgba(0,110,188,0.8);
+		background: rgba(0, 110, 188, 0.8);
 		border-radius: 0 0 0 2.5rem;
 	}
 	.bubble_blue:after {
 		right: 20%;
-		border-top: 2.8rem solid rgba(0,110,188,0.8);
+		border-top: 2.8rem solid rgba(0, 110, 188, 0.8);
 		border-left: 4rem solid transparent;
 	}
 	.bubble_light_blue {
 		right: 0;
 		width: 50%;
 		height: 32%;
-		background: rgba(255,255,255,0.29);
+		background: rgba(255, 255, 255, 0.29);
 		border-radius: 0 0 0 1.8rem;
 	}
 	.bubble_light_blue:after {
 		right: 12%;
-		border-top: 2.5rem solid rgba(255,255,255,0.29);
+		border-top: 2.5rem solid rgba(255, 255, 255, 0.29);
 		border-right: 3.5rem solid transparent;
+	}
+	
+	.bubbles_login .bubble_green {
+		height: 30%;
+	}
+	.flexible .bubbles_login .bubble_green {
+		height: 50%;
+	}
+	.bubbles_login .bubble_green:after {
+		left: 0;
+	}
+	.flexible .bubbles_login .bubble_green:after {
+		left: 15%;
 	}
 
 /* Title */
 .header {
 	margin: -1.7rem 0 1.8rem;
+}
+.header_login {
+	margin: -1rem 0 .3rem;
+}
+.flexible .header_login {
+	margin: 0 0 1.5rem;
 }
 	.header h1 {
 		display: table;
@@ -149,33 +200,37 @@ a:hover {
 	}
 	
 /* Login */
+#login-fom .not-registered {
+	display: block;
+	font-size: 1.2rem;
+	line-height: 1.5rem;
+	text-align: center;
+	color: #999;
+}
+
+/* Connecting
+==============================*/
+#connecting {
+	position: relative;
+}
+	#connecting .progress {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		height: 3.5rem;
+		margin: auto;
+		font-size: 1.2rem;
+		text-align: center;
+	}
+		#connecting .progress p {
+			margin-bottom: 1rem;
+		}
 
 /* Signup
 ==============================*/
-/*#auth {
-	position: relative;
-	display: table;
-	width: 100%;
-	height: 100%;
-	text-align: center;
-	background: url('images/bg-header.png') no-repeat;
-}*/
-	#auth .main-wrap {
-		display: table-cell;
-		width: 100%;
-		vertical-align: middle;
-	}
-		#auth .logo {
-			margin-bottom: 20px;
-		}
-			#auth .logo img {
-				width: 130px;
-				height: 130px;
-			}
-		#auth .welcome {
-			margin-bottom: 30px;
-		}
-	#auth .powered {
+/*	#auth .powered {
 		position: absolute;
 		top: 0;
 		right: 5px;
@@ -186,55 +241,7 @@ a:hover {
 		top: 0;
 		left: 5px;
 		font-size: 11px;
-	}
-	
-/* Buttons Auth */
-#buttons,
-#qb_login_form,
-#qb_signup_form {
-	width: 210px;
-	margin: 0 auto;
-}
-	#buttons button,
-	#qb_login_form button,
-	#qb_signup_form button {
-		display: block;
-		width: 100%;
-		height: 38px;
-	}
-		#buttons button img {
-			width: 100%;
-			height: 100%;
-		}
-
-/* Login form */
-#qb_login_form,
-#qb_signup_form {
-	display: none;
-}
-	#qb_login_form input,
-	#qb_signup_form input[type="text"] {
-		width: 194px;
-		height: 22px;
-		padding: 7px;
-		border: 1px solid #dcdee3;
-	}
-	#qb_login_form button,
-	#qb_signup_form button,
-	#chat button {
-		color: #fff;
-		background: #429abd;
-		border: 1px solid #3985a4;
-	}
-	#qb_login_form button {
-		margin-bottom: 15px;
-	}
-	#qb_login_form p: last-child {
-		line-height: 16px;
-	}
-		#qb_login_form span {
-			font-size: 14px;
-		}
+	}*/
 	
 /* Signup form */
 #qb_signup_form {
@@ -274,20 +281,7 @@ a:hover {
 		#qb_signup_form .fileUpload img.hover {
 			opacity: 0.6;
 		}
-
-/* Connecting */
-#connecting {
-	display: none;
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	width: 200px;
-	height: 70px;
-	margin: auto;
-	text-align: center;
-}
+		
 .success_reg {
 	display: none;
 }

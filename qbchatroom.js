@@ -6,32 +6,41 @@
  *
  */
 
-var params, connection, userJID, html, occupants;
+var storage, params, connection, userJID, html, occupants;
 
-// Object structure of chat user
+/*
+	* Switch parameter
+	* If the user has already subscribed on FB Event 'auth.statusChange'
+	* and no need to do this anymore
+	*/
+var enableSubscribe = false;
+
+/*
+	* Object structure of chat user
+	*/
 var USER = {
 	nick: null,
 	avatar: null,
 	qb: {
-		user_id: null,
+		id: null,
 		login: null,
-		password: null,
 		email: null,
+		blob_id: null,
 		token: null
 	},
 	fb: {
-		active: false,
+		id: null,
+		profile: null,
 		access_token: null
 	}
-}
+};
 
 /*------------------- DOM is ready -------------------------*/
 $(document).ready(function(){
 	$.ajaxSetup({ cache: true });
-	$.getScript('http://connect.facebook.net/en_EN/all.js', function(){
+	$.getScript('https://connect.facebook.net/en_EN/all.js', function(){
 		FB.init({
-			appId: FB_APP_ID,
-			status: true,
+			appId: FBPARAMS.app_id,
 			cookie: true
 		});
 		
@@ -41,57 +50,138 @@ $(document).ready(function(){
 
 /*---------------- Authorization Module -------------------*/
 /*
-	* autoLogin()
 	* To check if the user has already logged previously
 	*/
 function autoLogin() {
 	if (localStorage['qbAuth']) {
 		// Autologin as QB user
-		console.log('QuickBlox login is active');
-		USER = $.parseJSON(localStorage['qbAuth']);
-		sessionCreate(USER);
+		console.log('QuickBlox login is chosen');
+		storage = $.parseJSON(localStorage['qbAuth']);
+		sessionCreate(storage);
 	} else {
 		// Autologin as FB user
-		console.log('Facebook login is active');
-		facebookAPI();
-		USER.fb.active = true;
+		subscribeFBStatusEvent();
+		enableSubscribe = true;
 	}
 }
 
-function authFB() {
-	FB.login();
-  facebookAPI();
-}
-
-function authQB() {
-	$('#auth').hide().next('#qb_login_form').show().find('input').val('');
-}
-
-function facebookAPI() {
-	if (!USER.fb.active) {
+function subscribeFBStatusEvent() {
+	if (!enableSubscribe) {
 		FB.Event.subscribe('auth.statusChange', function(response) {
-			console.log('facebook authorization...');
-			console.log(response.status);
-			if (response.status === 'connected') {
-				if ($('.message-wrap').length == 0) {
-					var FB_accessToken = response.authResponse.accessToken;
-					console.log('Welcome!  Fetching your information.... ');
-					FB.api('/me', function(response) {
-						console.log(response);
-						console.log('Good to see you, ' + response.name + '.');
-						sessionCreate(null, FB_accessToken);
-					});
-				}
-			} else if (response.status === 'not_authorized') {
-				FB.login();
-			} else {
-				FB.login();
-			}
+			console.log('Facebook login is chosen');
+			console.log('FB ' + response.status);
+			if (response.status == 'connected')
+				getFBUser(response.authResponse.accessToken);
 		});
 	}
 }
 
+function getFBUser(accessToken) {
+	FB.api('/me', function(response) {
+		USER.fb.id = response.id;
+		USER.fb.profile = response.link;
+		USER.fb.access_token = accessToken;
+		
+		USER.nick = response.name;
+		USER.avatar = FBPARAMS.graph_server + '/' + response.id + '/picture/';
+		
+		sessionCreate();
+	});
+}
+
+function authFB() {
+	console.log('Facebook login is chosen');
+	FB.getLoginStatus(function(response) {
+		console.log('FB ' + response.status);
+		switch (response.status) {
+		case 'connected':
+			getFBUser(response.authResponse.accessToken);
+			break;
+		case 'not_authorized':
+			FB.login();
+			break;
+		default:
+			FB.login();
+			break;
+		}
+	});
+	
+  subscribeFBStatusEvent();
+	enableSubscribe = true;
+}
+
+function authQB() {
+	console.log('QuickBlox login is chosen');
+	$('.bubbles').addClass('bubbles_login');
+	$('.header').addClass('header_login');
+	$('#auth').hide();
+	$('#login-fom').show().find('input').val('');
+}
+
 /*---------------- QB Module -------------------*/
+function formData() {
+	storage = {
+		login: $('#login').val(),
+		pass: $('#pass').val()
+	};
+	
+	// check if the user left empty fields
+	if (trim(storage.login) && trim(storage.pass))
+		sessionCreate(storage);
+	else
+		sessionFailed();
+}
+
+function sessionCreate(storage) {
+	$('#main').hide();
+	$('#connecting').show();
+	
+	/*
+	* Formatted request parameters
+	*/
+	if (USER.fb.access_token) {
+		// via Facebook
+		params = {provider: 'facebook', keys: {token: USER.fb.access_token}};
+	} else if (storage.login.indexOf('@') > 0) {
+		// via QB email and password
+		params = {email: storage.login, password: storage.pass};
+	} else {
+		// via QB login and password
+		params = {login: storage.login, password: storage.pass};
+	}
+	
+	QB.init(QBPARAMS.app_id, QBPARAMS.auth_key, QBPARAMS.auth_secret);
+	QB.createSession(params, function(err, result) {
+		if (err) {
+			console.log(err.detail);
+			sessionFailed();
+		} else {
+			USER.qb.token = result.token;
+			getQBUser(result.user_id);
+		}
+	});
+}
+
+function getQBUser(user_id) {
+	QB.users.get({id: user_id}, function(err, result) {
+		if (err) {
+			console.log(err.detail);
+			sessionFailed();
+		} else {
+			USER.qb.id = result.id;
+			USER.qb.login = result.login;
+			USER.qb.email = result.email;
+			USER.qb.blob_id = result.blob_id;
+			
+			if (!USER.nick)
+				USER.nick = result.full_name;
+			
+			console.log(USER);
+			//xmppConnect(result.id, result.full_name, result.blob_id, login, password, result.facebook_id, qbToken);
+		}
+	});
+}
+
 function userCreate() {
 	inputFileBehavior();
 	
@@ -206,51 +296,7 @@ function userCreate() {
 	}
 }
 
-function sessionCreate(qbAuth, fb_token) {
-	$('#auth').hide().next('#connecting').show();
-	$('#wrap').addClass('connect_message');
-	
-	if (qbAuth) {
-		login = qbAuth.login;
-		password = qbAuth.password;
-	} else {
-		login = $('#login').val();
-		password = $('#password').val();
-	}
-	
-	if (login.indexOf('@') > 0) {
-		params = {email: login, password: password};
-	} else {
-		params = {login: login, password: password};
-	}
-	
-	if (fb_token) {
-		params = {provider: 'facebook', keys: {token: fb_token}};
-	}
-	
-	QB.init(QBPARAMS.app_id, QBPARAMS.auth_key, QBPARAMS.auth_secret);
-	QB.createSession(function(err, result){
-		if (err) {
-			console.log('Something went wrong: ' + err.detail);
-			connectFailed();
-		} else {
-			console.log(result);
-			qbToken = result.token;
-			
-			QB.login(params, function(err, result){
-				if (err) {
-					console.log('Something went wrong: ' + err.detail);
-					connectFailed();
-				} else {
-					console.log(result);
-					
-					xmppConnect(result.id, result.full_name, result.blob_id, login, password, result.facebook_id, qbToken);
-				}
-			});
-		}
-	});
-}
-
+/*---------------- Chat Module -------------------*/
 function xmppConnect(user_id, user_full_name, blob_id, login, password, facebook_id, qbToken) {
 	if (blob_id == null) {
 		avatarLink = blob_id;
@@ -439,137 +485,4 @@ function sendMesage() {
 		post.val('');
 		$('.message_field').val('');
 	}
-}
-
-/*----------------- Helper functions ---------------------*/
-function signUpFailed() {
-	$('#qb_signup_form input').prop('disabled', false);
-	$('#qb_signup_form button').removeClass('disabled');
-}
-
-function signUpSuccess() {
-	$('.logo, .welcome').show();
-	$('#qb_signup_form, .success_reg').hide().prev('#qb_login_form').show().find('input').val('').removeClass('error');
-}
-
-function connectFailed() {
-	$('#connecting, #chat').hide().prev('#auth').show();
-	$('#wrap').removeClass('connect_message');
-	$('#qb_login_form input').addClass('error');
-}
-
-function connectSuccess(username) {
-	$('#connecting').hide().next('#chat').show();
-	$('#wrap').removeClass('connect_message').css('width', 'auto');
-	$('input').removeClass('error');
-	$('textarea').val('');
-	$('.logout').attr('data-username', username);
-	textareaUp();
-	smiles();
-}
-
-function signup() {
-	$('.logo, .welcome').hide();
-	$('#qb_signup_form input').prop('disabled', false);
-	$('#qb_login_form').hide().next('#qb_signup_form').show().find('input').val('').removeClass('error');
-}
-
-function checkLogout() {
-	if (localStorage['qbAuth']) {
-		localStorage.removeItem('qbAuth');
-	} else {
-		FB.logout(function(response) {
-			console.log("[FB Logout]");
-			console.log(response);
-		});
-	}
-
-	var nick = $('.logout').data('data-username');
-	connection.muc.leave(CHAT.roomJID, nick);
-	setTimeout(function() {connection.disconnect()}, 1000);
-}
-
-function trim(str) {
-	if (str.charAt(0) == ' ')
-		str = trim(str.substring(1, str.length));
-	if (str.charAt(str.length-1) == ' ')
-		str = trim(str.substring(0, str.length-1));
-	return str;
-}
-
-function inputFileBehavior() {
-	$('.fileUpload').hover(
-		function () { $(this).find('img').addClass('hover'); },
-		function () {	$(this).find('img').removeClass('hover'); }
-	);
-	
-	$('.fileUpload input:file').change(function(){
-		var file = $(this).val();
-		$(this).next().val(file);
-	});
-}
-
-function linkURLs(text) {
-	var url_regexp = /\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/gi;
-	
-	var link = text.replace(url_regexp, function(match) {
-		var url = (/^[a-z]+:/i).test(match) ? match : "http://" + match;
-		var url_text = match;
-		
-		return "<a href=\""+escapeHTML(url)+"\" target=\"_blank\">"+escapeHTML(url_text)+"</a>";
-	});
-	
-	return link;
-}
-
-function escapeHTML(s) {
-	return s.replace(/</g,"&lt;").replace(/>/g,"&gt;");
-}
-
-function textareaUp() {
-	$('.message_field').click(function(){
-		$('#area').show();
-		$('#message_area').focus();
-	});
-	$(document).click(function(e){
-		if ($(e.target).is('.message_field, #message_area, .controls, .controls *, .smiles-icons, .smiles-icons *')) {
-			return;
-		}
-	  $('.message_field').val($('#message_area').val());
-	  $("#area").hide();
-	});
-}
-
-function toHTML(str) {
-	return ('<p>' + str).replace(/\n\n/g, '<p>').replace(/\n/g, '<br>');
-}
-
-function smilesParser(text) {
-	for(var i = SMILEICONS.length-1; i >= 0; i--) {
-		text = text.replace(SMILEICONS[i].regex, '$2<img class="smileicons" alt="$1" src="images/smiles/' + SMILEICONS[i].image + '" />$3');
-	}
-	return text;
-}
-
-function smiles() {
-	$('.smiles-icons').remove();
-	$('#area').append('<div class="smiles-icons"></div>');
-	for(var i = 0; i < SMILEICONS.length; i++) {
-		$('.smiles-icons').append('<img class="smileicons" alt="icons" data-plain="' + SMILEICONS[i].plain + '" src="images/smiles/' + SMILEICONS[i].image + '" />');
-	}
-	
-	$('.smiles').click(function(){
-		$(this).css('background','#dadada');
-		$(this).parents('#area').find('.smiles-icons').show();
-	});
-	$(document).click(function(e){
-		if ($(e.target).is('.smiles *, .smiles-icons, .smiles-icons *')) {
-			if ($(e.target).is('.smiles-icons *')) {
-				$('#message_area').val($('#message_area').val() + ' ' + $(e.target).data('plain') + ' ');
-			}
-			return;
-		}
-	  $('.smiles-icons').hide();
-	  $('.smiles').css('background','none');
-	});
 }

@@ -1,4 +1,4 @@
-//Smiles
+//Smiles collection
 var SMILEICONS = [
 	{
 		plain: ':)',
