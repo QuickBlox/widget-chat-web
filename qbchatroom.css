@@ -61,6 +61,7 @@ fieldset {
 		margin-bottom: .7rem;
 		font-size: 1.4rem;
 		border: 0;
+		-moz-box-sizing: border-box;
 		box-sizing: border-box;
 	}
 a {
@@ -208,28 +209,6 @@ a:hover {
 	color: #999;
 }
 
-/* Connecting
-==============================*/
-#connecting {
-	position: relative;
-}
-	#connecting .progress {
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		height: 3.5rem;
-		margin: auto;
-		font-size: 1.2rem;
-		text-align: center;
-	}
-		#connecting .progress p {
-			margin-bottom: 1rem;
-		}
-
-/* Signup
-==============================*/
 /*	#auth .powered {
 		position: absolute;
 		top: 0;
@@ -242,48 +221,73 @@ a:hover {
 		left: 5px;
 		font-size: 11px;
 	}*/
-	
-/* Signup form */
-#qb_signup_form {
-	margin-top: 10px;
+
+/* Connecting
+==============================*/
+#connecting {
+	position: relative;
+	font-size: 1.2rem;
 }
-	#qb_signup_form .ajax-loader {
+	.progress {
 		position: absolute;
-		right: -40px;
-		bottom: 2px;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		height: 3.5rem;
+		margin: auto;
+		text-align: center;
 	}
-	#qb_signup_form .fileUpload {
-		position: relative;
-		overflow: hidden;
-		margin-bottom: 30px;
-	}
-		#qb_signup_form .fileUpload input[type="file"] {
-			position: relative;
-			opacity: 0;
-			height: 31px;
-			z-index: 1;
-			cursor: pointer;
+		.progress p {
+			margin-bottom: 1rem;
 		}
-		#qb_signup_form .fileUpload .fileName {
+
+/* Signup
+==============================*/
+#signup-form form {
+	padding-top: 1.5rem;
+}
+.flexible #signup-form form {
+	padding-top: 3.5rem;
+}
+	#signup-form input {
+		margin-bottom: .8rem;
+	}
+	.uploader-wrap {
+		position: relative;
+		margin-bottom: .8rem;
+	}
+	.flexible #signup-form input,
+	.flexible .uploader-wrap {
+		margin-bottom: 1.2rem;
+	}
+		.uploader-wrap img {
+			float: right;
+			width: 2.4rem;
+			margin: .6rem .7rem 0;
+		}
+		.uploader-wrap:hover img {
+			opacity: 0.6;
+		}
+		.uploader-wrap .uploader-text {
+			width: 75%;
+			margin-bottom: 0 !important;
+		}
+		.uploader-wrap input[type="file"] {
 			position: absolute;
 			top: 0;
 			left: 0;
-			width: 155px;
-			height: 15px;
-			font-size: 14px;
+			margin-bottom: 0 !important;
+			opacity: 0;
+			cursor: pointer;
 		}
-		#qb_signup_form .fileUpload img {
-			position: absolute;
-			top: 0;
-			right: 0;
-			width: 33px;
-		}
-		#qb_signup_form .fileUpload img.hover {
-			opacity: 0.6;
-		}
-		
-.success_reg {
-	display: none;
+	#signup-form button {
+		margin-bottom: 0;
+	}
+	
+#signup-success {
+	font-size: 1.4rem;
+	line-height: 1.6rem;
 }
 
 /* Chat

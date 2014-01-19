@@ -62,7 +62,7 @@
 					<input id="login" type="text" placeholder="Login or email">
 					<input id="pass" type="password" placeholder="Password">
 				</fieldset>
-				<button class="btn_qb" onclick="formData(); return false;"><span>Connect</span></button>
+				<button class="btn_qb" onclick="formDataLogin(); return false;"><span>Connect</span></button>
 				<span class="not-registered">Not registered yet?<br>
 					<a href="#" onclick="signUp(); return false;">Register an account QuickBlox</a>
 				</span>
@@ -77,24 +77,29 @@
 		</span>
 	</div>
 	
-	
-			<form id="qb_signup_form" action="#" enctype="multipart/form-data">
-				<p><input id="full_name_signup" type="text" placeholder="Full Name" /></p>
-				<p><input id="email_signup" type="text" placeholder="Email" /></p>
-				<p><input id="login_signup" type="text" placeholder="Login" /></p>
-				<p><input id="password_signup" type="text" placeholder="Password" /></p>
-				<div class="fileUpload">
-					<input id="avatar_signup" type="file" size="8" accept="image/*" />
-					<input class="fileName" type="text" placeholder="Avatar" />
-					<img src="images/upload.png" alt="upload" />
+	<div id="signup-form" class="layout hidden">
+		<form action="#" class="center-wrap" enctype="multipart/form-data">
+			<fieldset>
+				<input id="signup_name" type="text" placeholder="Full Name">
+				<input id="signup_email" type="text" placeholder="Email">
+				<input id="signup_login" type="text" placeholder="Login">
+				<input id="signup_pass" type="password" placeholder="Password">
+				<div class="uploader-wrap">
+					<img src="images/upload.png" alt="upload">
+					<input class="uploader-text" type="text" placeholder="User picture">
+					<input id="signup_avatar" type="file" accept="image/*">
 				</div>
-				<p><button onclick="userCreate(); return false;">Sign Up</button></p>
-			</form>
-			
-			<span class="success_reg">Thanks for your registration!</span>
-			
-	<!--
+			</fieldset>
+			<button class="btn_qb" onclick="formDataSignUp(); return false;"><span>Register</span></button>
+		</form>
+	</div>
+	
+	<div id="signup-success" class="layout hidden">
+		<span class="progress">Thanks for your<br>registration!</span>
+	</div>
+	
 	<div id="chat">
+	<!--
 		<header class="chat-header">
 			<div class="occupants" onclick="occupants()">
 				<span class="number"></span>
@@ -120,14 +125,13 @@
 				</div>
 			</form>
 		</footer>
+		-->
 	</div>
-	-->
 	
 	<!-- include outside js libraries -->
 	<script src="js/libs/quickblox.js"></script>
 	<script src="js/libs/strophe.js"></script>
 	<script src="js/libs/strophe.muc.js"></script>
-	<script src="js/libs/parseUri.js"></script>
 	<script src="js/libs/jquery.scrollTo-min.js"></script>
 
 	<!-- scripts of widget -->

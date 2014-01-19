@@ -1,33 +1,34 @@
 /*----------------- Helper functions ---------------------*/
-function sessionFailed() {
+function connectFailed() {
 	$('#connecting').hide();
 	$('#main').show();
 	$('#login-fom input').addClass('error');
 }
 
+function connectSuccess(username) {
+	$('#connecting').hide();
+	$('#chat').show();
+	$('#chat input').val('').removeClass('error');
+	/*$('.logout').attr('data-username', username);
+	textareaUp();
+	smiles();*/
+}
+
 function signUpFailed() {
-	$('#qb_signup_form input').prop('disabled', false);
-	$('#qb_signup_form button').removeClass('disabled');
+	$('#signup-form fieldset > input').addClass('error');
+	$('#signup-form input').prop('disabled', false);
 }
 
 function signUpSuccess() {
-	$('.logo, .welcome').show();
-	$('#qb_signup_form, .success_reg').hide().prev('#qb_login_form').show().find('input').val('').removeClass('error');
-}
-
-function connectSuccess(username) {
-	$('#connecting').hide().next('#chat').show();
-	$('#wrap').removeClass('connect_message').css('width', 'auto');
-	$('input').removeClass('error');
-	$('textarea').val('');
-	$('.logout').attr('data-username', username);
-	textareaUp();
-	smiles();
-}
-
-function signUp() {
-	$('#qb_signup_form input').prop('disabled', false);
-	$('#qb_login_form').hide().next('#qb_signup_form').show().find('input').val('').removeClass('error');
+	function timeout() {
+		$('#signup-success').hide();
+		$('#main').show();
+		$('#login-fom input').val('').removeClass('error');
+	}
+	
+	$('#signup-form').hide();
+	$('#signup-success').show();
+	setTimeout(timeout, 3 * 1000);
 }
 
 function checkLogout() {
@@ -43,18 +44,6 @@ function checkLogout() {
 	var nick = $('.logout').data('data-username');
 	connection.muc.leave(CHAT.roomJID, nick);
 	setTimeout(function() {connection.disconnect()}, 1000);
-}
-
-function inputFileBehavior() {
-	$('.fileUpload').hover(
-		function () { $(this).find('img').addClass('hover'); },
-		function () {	$(this).find('img').removeClass('hover'); }
-	);
-	
-	$('.fileUpload input:file').change(function(){
-		var file = $(this).val();
-		$(this).next().val(file);
-	});
 }
 
 function linkURLs(text) {
@@ -119,6 +108,16 @@ function smiles() {
 		}
 	  $('.smiles-icons').hide();
 	  $('.smiles').css('background','none');
+	});
+}
+
+/*
+* Making a custom style for input file
+*/
+function inputFileBehavior() {
+	$('.uploader-wrap input:file').change(function() {
+		var file = $(this).val();
+		$(this).siblings('.uploader-text').val(file);
 	});
 }
 

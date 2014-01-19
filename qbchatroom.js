@@ -9,15 +9,15 @@
 var storage, params, connection, userJID, html, occupants;
 
 /*
-	* Switch parameter
-	* If the user has already subscribed on FB Event 'auth.statusChange'
-	* and no need to do this anymore
-	*/
+ * Switch parameter
+ * If the user has already subscribed on FB Event 'auth.statusChange'
+ * and no need to do this anymore
+ */
 var enableSubscribe = false;
 
 /*
-	* Object structure of chat user
-	*/
+ * Object structure of chat user
+ */
 var USER = {
 	nick: null,
 	avatar: null,
@@ -45,13 +45,14 @@ $(document).ready(function(){
 		});
 		
 		autoLogin();
+		inputFileBehavior();
 	});
 });
 
 /*---------------- Authorization Module -------------------*/
 /*
-	* To check if the user has already logged previously
-	*/
+* To check if the user has already logged previously
+*/
 function autoLogin() {
 	if (localStorage['qbAuth']) {
 		// Autologin as QB user
@@ -106,7 +107,7 @@ function authFB() {
 		}
 	});
 	
-  subscribeFBStatusEvent();
+	subscribeFBStatusEvent();
 	enableSubscribe = true;
 }
 
@@ -115,11 +116,15 @@ function authQB() {
 	$('.bubbles').addClass('bubbles_login');
 	$('.header').addClass('header_login');
 	$('#auth').hide();
-	$('#login-fom').show().find('input').val('');
+	$('#login-fom').show();
+	$('#login-fom input').val('').removeClass('error');
 }
 
-/*---------------- QB Module -------------------*/
-function formData() {
+/*---------------- QB Module (find the user) -------------------*/
+/*
+* This function needs to prepare form data and to check them on the void
+*/
+function formDataLogin() {
 	storage = {
 		login: $('#login').val(),
 		pass: $('#pass').val()
@@ -129,7 +134,7 @@ function formData() {
 	if (trim(storage.login) && trim(storage.pass))
 		sessionCreate(storage);
 	else
-		sessionFailed();
+		connectFailed();
 }
 
 function sessionCreate(storage) {
@@ -154,7 +159,7 @@ function sessionCreate(storage) {
 	QB.createSession(params, function(err, result) {
 		if (err) {
 			console.log(err.detail);
-			sessionFailed();
+			connectFailed();
 		} else {
 			USER.qb.token = result.token;
 			getQBUser(result.user_id);
@@ -166,7 +171,7 @@ function getQBUser(user_id) {
 	QB.users.get({id: user_id}, function(err, result) {
 		if (err) {
 			console.log(err.detail);
-			sessionFailed();
+			connectFailed();
 		} else {
 			USER.qb.id = result.id;
 			USER.qb.login = result.login;
@@ -177,123 +182,112 @@ function getQBUser(user_id) {
 				USER.nick = result.full_name;
 			
 			console.log(USER);
+			connectSuccess();
 			//xmppConnect(result.id, result.full_name, result.blob_id, login, password, result.facebook_id, qbToken);
 		}
 	});
 }
 
-function userCreate() {
-	inputFileBehavior();
-	
-	if ($('#qb_signup_form button').is('.disabled')) {
+/*---------------- QB Module (create the user) -------------------*/
+function signUp() {
+	$('#main').hide();
+	$('#signup-form').show();
+	$('#signup-form input').val('').removeClass('error').prop('disabled', false);
+}
+
+/*
+* This function needs to prepare form data and to check them on the void
+*/
+function formDataSignUp() {
+	// check if form is disabled
+	if ($('#signup-form input:first').is(':disabled'))
 		return false;
-	}
+	else
+		$('#signup-form input').removeClass('error');
 	
-	var tmp = true;
-	$('#qb_signup_form input').removeClass('error');
+	storage = {
+		name: $('#signup_name'),
+		email: $('#signup_email'),
+		login: $('#signup_login'),
+		pass: $('#signup_pass')
+	};
 	
-	full_name = $('#full_name_signup');
-	email = $('#email_signup');
-	login = $('#login_signup');
-	password = $('#password_signup');
+	// check if the user left empty fields
+	$(Object.keys(storage)).each(function() {
+		var obj = $(storage[this][0]);
+		if (!trim(obj.val()))
+			obj.addClass('error');
+	});
+	if ($('#signup-form input').is('.error'))
+		return false;
+	else
+		$('#signup-form input').prop('disabled', true);
 	
-	$([full_name, email, login, password]).each(function() {
-		if (!trim(this.val())) {
-			this.addClass('error');
-			tmp = false;
+	// create the QB session
+	QB.init(QBPARAMS.app_id, QBPARAMS.auth_key, QBPARAMS.auth_secret);
+	QB.createSession(function(err, result) {
+		if (err) {
+			console.log(err.detail);
+			signUpFailed();
+		} else {
+			userCreate(storage);
 		}
 	});
-	
-	if (tmp) {
-		params = {full_name: full_name.val(), email: email.val(), login: login.val(), password: password.val()};
-		
-		$('#qb_signup_form input').prop('disabled', true);
-		$('#qb_signup_form button').addClass('disabled');
-		
-		QB.init(QBPARAMS.app_id, QBPARAMS.auth_key, QBPARAMS.auth_secret);
-		QB.createSession(function(err, result){
-			if (err) {
-				console.log('Something went wrong: ' + err.detail);
-				$('#qb_signup_form input').addClass('error');
-				signUpFailed();
-			} else {
-				console.log(result);
+}
 
-				QB.users.create(params, function(err, result){
-					if (err) {
-						console.log('Something went wrong: ' + err.detail);
-						$('#' + Object.keys(JSON.parse(err.detail).errors)[0] + '_signup').addClass('error');
-						signUpFailed();
-					} else {
-						console.log(result);
-						qbUser = result;
-						
-						var file = $('#qb_signup_form #avatar_signup')[0].files[0];
-					  if (file) {
-					  	params = {login: login.val(), password: password.val()};
-					  	
-					  	QB.createSession(params, function(err, result){
-								if (err) {
-									console.log('Something went wrong: ' + err.detail);
-								} else {
-									console.log(result);
-				
-									QB.content.create({name: file.name, content_type: file.type, 'public': true}, function(err, result){
-								    if (err) {
-								    	console.log('Error creating blob: ' + JSON.stringify(err));
-								    	signUpFailed();
-								    } else {
-								      console.log(result);
-								      
-								      var uri = parseUri(result.blob_object_access.params);
-								      var params_upload = { url: uri.protocol + '://' + uri.host };
-								      var data = new FormData();
-								      data.append('key', uri.queryKey.key);
-								      data.append('acl', uri.queryKey.acl);
-								      data.append('success_action_status', uri.queryKey.success_action_status);
-								      data.append('AWSAccessKeyId', uri.queryKey.AWSAccessKeyId);
-								      data.append('Policy', decodeURIComponent(uri.queryKey.Policy));
-								      data.append('Signature', decodeURIComponent(uri.queryKey.Signature));
-								      data.append('Content-Type', uri.queryKey['Content-Type']);
-								      data.append('file', file, result.name);
-								      params_upload.data = data;
-								      QB.content.upload(params_upload, function(err, res){
-								        if (err) {
-								          console.log('Error uploading content' + err);
-								        } else {
-								          console.log(res);
-								          
-								          QB.content.markUploaded({id: result.id, size: file.size}, function(res){
-										        console.log(res);
-										        
-										        QB.users.update({id: qbUser.id, data: {blob_id: result.id}}, function(err, res){
-										        	if (err) {
-											         	console.log('Something went wrong: ' + err);
-											       	} else {
-											         	console.log(res);
-											         	
-										          	signUpFailed();
-														  	$('#qb_signup_form').hide().next('.success_reg').show();
-																setTimeout(signUpSuccess, 5 * 1000);
-											        }
-											      });
-										      });
-								        }
-								      });
-								    }
-								  });
-								}
-							});
-					  } else {
-					  	signUpFailed();
-					  	$('#qb_signup_form').hide().next('.success_reg').show();
-							setTimeout(signUpSuccess, 5 * 1000);
-					  }
-					}
-				});
-			}
-		});
-	}
+function userCreate(storage) {
+	var file = $('#signup_avatar')[0].files[0];
+	params = {
+		full_name: storage.name.val(),
+		email: storage.email.val(),
+		login: storage.login.val(),
+		password: storage.pass.val()
+	};
+	
+	QB.users.create(params, function(err, result){
+		if (err) {
+			console.log(err.detail);
+			signUpFailed();
+		} else if (file) {
+		  blobCreate(file);
+		} else {
+			signUpSuccess();
+		}
+	});
+}
+
+function blobCreate(file) {
+	var user_id;
+	params = {
+		login: params.login,
+		password: params.password
+	};
+	
+	QB.login(params, function(err, result){
+		if (err) {
+			console.log(err.detail);
+			signUpFailed();
+		} else {
+			user_id = result.id;
+			
+			QB.content.createAndUpload({file: file, public: true}, function(err, result){
+			  if (err) {
+			   	console.log(err.detail);
+					signUpFailed();
+			  } else {
+			    
+					QB.users.update({id: user_id, blob_id: result.id}, function(err, result){
+					 	if (err) {
+					   	console.log(err.detail);
+							signUpFailed();
+					 	} else {
+					   	signUpSuccess();
+						}
+				  });
+				}
+			});
+		}
+	});
 }
 
 /*---------------- Chat Module -------------------*/
