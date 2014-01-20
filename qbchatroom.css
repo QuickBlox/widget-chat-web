@@ -1,21 +1,29 @@
+/**
+ * QB Group Chat Room (XMPP)
+ * version 2.0.0a
+ * 
+ * author: Andrey Povelichenko <andrey.povelichenko@quickblox.com>
+ */
+
 @import url(css/reset.css);
 
 @font-face {
 	font-family: Helvetica-Light;
-	src: url(fonts/HelveticaLTStd-Light.otf) format("opentype");
+	src: url(fonts/HelveticaLTStd-Light.woff) format("woff");
 }
 @font-face {
 	font-family: Helvetica-Bold;
-	src: url(fonts/HelveticaLTStd-Bold.otf) format("opentype");
+	src: url(fonts/HelveticaLTStd-Bold.woff) format("woff");
 }
 
 /* Global
-==============================*/
+----------------------------------------------------------*/
 html {
 	height: 100%;
 	font-size: 62.5%;
 }
-/* flexible styles */
+
+/* Flexible styles */
 .html-55 {font-size: 55%;}
 .html-80 {font-size: 80%;}
 .html-90 {font-size: 90%;}
@@ -71,13 +79,13 @@ a:hover {
 	text-decoration: none;
 }
 
-/* Main
-==============================*/
+/* Main Layout
+-----------------------------------------------------------*/
 .layout {
 	height: 100%;
 	background: #ececec;
 }
-.center-wrap {
+.center {
 	max-width: 300px;
 	margin: 0 auto;
 }
@@ -176,7 +184,7 @@ a:hover {
 		line-height: 2.4rem;
 		font-weight: normal;
 		color: #333;
-		background: url(images/qb-logo.png) left top no-repeat;
+		background: url(images/qb_logo.png) left top no-repeat;
 		background-size: 2.5rem auto;
 	}
 		.header h1 b {
@@ -188,16 +196,17 @@ a:hover {
 	background: #3b5998;
 }
 	.btn_fb span {
-		background-image: url(images/fb-auth.png);
+		background-image: url(images/fb_auth.png);
 	}
 .btn_qb {
 	background: #0077cb;
 }
-#auth .btn_qb {
+#auth .btn_qb,
+#signup-form .btn_qb {
 	margin-bottom: 0;
 }
 	.btn_qb span {
-		background-image: url(images/qb-auth.png);
+		background-image: url(images/qb_auth.png);
 	}
 	
 /* Login */
@@ -209,21 +218,21 @@ a:hover {
 	color: #999;
 }
 
-/*	#auth .powered {
+/* .powered {
 		position: absolute;
 		top: 0;
 		right: 5px;
 		font-size: 11px;
 	}
-	#auth .version {
+	.version {
 		position: absolute;
 		top: 0;
 		left: 5px;
 		font-size: 11px;
 	}*/
 
-/* Connecting
-==============================*/
+/* Connecting Layout
+-------------------------------------------------------------*/
 #connecting {
 	position: relative;
 	font-size: 1.2rem;
@@ -242,8 +251,8 @@ a:hover {
 			margin-bottom: 1rem;
 		}
 
-/* Signup
-==============================*/
+/* Signup Layout
+----------------------------------------------------------*/
 #signup-form form {
 	padding-top: 1.5rem;
 }
@@ -281,17 +290,14 @@ a:hover {
 			opacity: 0;
 			cursor: pointer;
 		}
-	#signup-form button {
-		margin-bottom: 0;
-	}
 	
 #signup-success {
 	font-size: 1.4rem;
 	line-height: 1.6rem;
 }
 
-/* Chat
-==============================*/
+/* Chat Layout
+----------------------------------------------------------*/
 #chat {
 	position: relative;
 	display: none;

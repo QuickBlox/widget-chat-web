@@ -1,24 +1,13 @@
-/*
+/**
  * QB Group Chat Room (XMPP)
  * version 2.0.0a
- *
- * Author: Andrey Povelichenko (andrey.povelichenko@quickblox.com)
- *
+ * 
+ * author: Andrey Povelichenko <andrey.povelichenko@quickblox.com>
  */
 
 var storage, params, connection, userJID, html, occupants;
-
-/*
- * Switch parameter
- * If the user has already subscribed on FB Event 'auth.statusChange'
- * and no need to do this anymore
- */
-var enableSubscribe = false;
-
-/*
- * Object structure of chat user
- */
-var USER = {
+var isSubscribeEnabled = false;
+var chatUser = {
 	nick: null,
 	avatar: null,
 	qb: {
@@ -35,41 +24,43 @@ var USER = {
 	}
 };
 
-/*------------------- DOM is ready -------------------------*/
-$(document).ready(function(){
+$(document).ready(function() {
 	$.ajaxSetup({ cache: true });
-	$.getScript('https://connect.facebook.net/en_EN/all.js', function(){
+	$.getScript('https://connect.facebook.net/en_EN/all.js', function() {
 		FB.init({
-			appId: FBPARAMS.app_id,
+			appId: FBAPP.app_id,
 			cookie: true
 		});
+		QB.init(QBAPP.app_id, QBAPP.auth_key, QBAPP.auth_secret);
 		
 		autoLogin();
-		inputFileBehavior();
+		changeInputFileBehavior();
+		
+		$('#authFB').click(function(){ authFB() });
+		$('#authQB').click(function(){ authQB() });
+		$('#signUp').click(function(){ signUp(); return false; });
+		$('#dataLogin').click(function(){ prepareDataForLogin(); return false; });
+		$('#dataSignup').click(function(){ prepareDataForSignUp(); return false; });
 	});
 });
 
-/*---------------- Authorization Module -------------------*/
-/*
-* To check if the user has already logged previously
-*/
+/* Authorization Module
+--------------------------------------------------------------------------*/
 function autoLogin() {
 	if (localStorage['qbAuth']) {
 		// Autologin as QB user
-		console.log('QuickBlox login is chosen');
 		storage = $.parseJSON(localStorage['qbAuth']);
-		sessionCreate(storage);
+		createSession(storage);
 	} else {
 		// Autologin as FB user
 		subscribeFBStatusEvent();
-		enableSubscribe = true;
+		isSubscribeEnabled = true;
 	}
 }
 
 function subscribeFBStatusEvent() {
-	if (!enableSubscribe) {
+	if (!isSubscribeEnabled) {
 		FB.Event.subscribe('auth.statusChange', function(response) {
-			console.log('Facebook login is chosen');
 			console.log('FB ' + response.status);
 			if (response.status == 'connected')
 				getFBUser(response.authResponse.accessToken);
@@ -79,19 +70,18 @@ function subscribeFBStatusEvent() {
 
 function getFBUser(accessToken) {
 	FB.api('/me', function(response) {
-		USER.fb.id = response.id;
-		USER.fb.profile = response.link;
-		USER.fb.access_token = accessToken;
+		chatUser.fb.id = response.id;
+		chatUser.fb.profile = response.link;
+		chatUser.fb.access_token = accessToken;
 		
-		USER.nick = response.name;
-		USER.avatar = FBPARAMS.graph_server + '/' + response.id + '/picture/';
+		chatUser.nick = response.name;
+		chatUser.avatar = FBAPP.graph_server + '/' + response.id + '/picture/';
 		
-		sessionCreate();
+		createSession();
 	});
 }
 
 function authFB() {
-	console.log('Facebook login is chosen');
 	FB.getLoginStatus(function(response) {
 		console.log('FB ' + response.status);
 		switch (response.status) {
@@ -108,11 +98,10 @@ function authFB() {
 	});
 	
 	subscribeFBStatusEvent();
-	enableSubscribe = true;
+	isSubscribeEnabled = true;
 }
 
 function authQB() {
-	console.log('QuickBlox login is chosen');
 	$('.bubbles').addClass('bubbles_login');
 	$('.header').addClass('header_login');
 	$('#auth').hide();
@@ -120,11 +109,9 @@ function authQB() {
 	$('#login-fom input').val('').removeClass('error');
 }
 
-/*---------------- QB Module (find the user) -------------------*/
-/*
-* This function needs to prepare form data and to check them on the void
-*/
-function formDataLogin() {
+/* QB Module (find the user)
+-----------------------------------------------------------------------------*/
+function prepareDataForLogin() {
 	storage = {
 		login: $('#login').val(),
 		pass: $('#pass').val()
@@ -132,21 +119,18 @@ function formDataLogin() {
 	
 	// check if the user left empty fields
 	if (trim(storage.login) && trim(storage.pass))
-		sessionCreate(storage);
+		createSession(storage);
 	else
-		connectFailed();
+		connectFailure();
 }
 
-function sessionCreate(storage) {
+function createSession(storage) {
 	$('#main').hide();
 	$('#connecting').show();
 	
-	/*
-	* Formatted request parameters
-	*/
-	if (USER.fb.access_token) {
+	if (chatUser.fb.access_token) {
 		// via Facebook
-		params = {provider: 'facebook', keys: {token: USER.fb.access_token}};
+		params = {provider: 'facebook', keys: {token: chatUser.fb.access_token}};
 	} else if (storage.login.indexOf('@') > 0) {
 		// via QB email and password
 		params = {email: storage.login, password: storage.pass};
@@ -155,13 +139,12 @@ function sessionCreate(storage) {
 		params = {login: storage.login, password: storage.pass};
 	}
 	
-	QB.init(QBPARAMS.app_id, QBPARAMS.auth_key, QBPARAMS.auth_secret);
 	QB.createSession(params, function(err, result) {
 		if (err) {
 			console.log(err.detail);
-			connectFailed();
+			connectFailure();
 		} else {
-			USER.qb.token = result.token;
+			chatUser.qb.token = result.token;
 			getQBUser(result.user_id);
 		}
 	});
@@ -171,126 +154,119 @@ function getQBUser(user_id) {
 	QB.users.get({id: user_id}, function(err, result) {
 		if (err) {
 			console.log(err.detail);
-			connectFailed();
+			connectFailure();
 		} else {
-			USER.qb.id = result.id;
-			USER.qb.login = result.login;
-			USER.qb.email = result.email;
-			USER.qb.blob_id = result.blob_id;
+			chatUser.qb.id = result.id;
+			chatUser.qb.login = result.login;
+			chatUser.qb.email = result.email;
+			chatUser.qb.blob_id = result.blob_id;
 			
-			if (!USER.nick)
-				USER.nick = result.full_name;
+			if (!chatUser.nick)
+				chatUser.nick = result.full_name;
 			
-			console.log(USER);
+			console.log(chatUser);
 			connectSuccess();
 			//xmppConnect(result.id, result.full_name, result.blob_id, login, password, result.facebook_id, qbToken);
 		}
 	});
 }
 
-/*---------------- QB Module (create the user) -------------------*/
+/* QB Module (creating the user)
+--------------------------------------------------------------------------------*/
 function signUp() {
 	$('#main').hide();
 	$('#signup-form').show();
 	$('#signup-form input').val('').removeClass('error').prop('disabled', false);
 }
 
-/*
-* This function needs to prepare form data and to check them on the void
-*/
-function formDataSignUp() {
-	// check if form is disabled
+function prepareDataForSignUp() {
 	if ($('#signup-form input:first').is(':disabled'))
 		return false;
 	else
 		$('#signup-form input').removeClass('error');
-	
-	storage = {
-		name: $('#signup_name'),
-		email: $('#signup_email'),
-		login: $('#signup_login'),
-		pass: $('#signup_pass')
-	};
-	
+
 	// check if the user left empty fields
-	$(Object.keys(storage)).each(function() {
-		var obj = $(storage[this][0]);
-		if (!trim(obj.val()))
-			obj.addClass('error');
+	$([$('#signup_name'), $('#signup_email'), $('#signup_login'), $('#signup_pass')]).each(function() {
+		if (!trim(this.val()))
+			this.addClass('error');
 	});
+	
 	if ($('#signup-form input').is('.error'))
 		return false;
 	else
 		$('#signup-form input').prop('disabled', true);
+
+	createUser();
+}
+
+function createUser() {
+	var file = $('#signup_avatar')[0].files[0];
+	params = {
+		full_name: $('#signup_name').val(),
+		email: $('#signup_email').val(),
+		login: $('#signup_login').val(),
+		password: $('#signup_pass').val()
+	};
 	
-	// create the QB session
-	QB.init(QBPARAMS.app_id, QBPARAMS.auth_key, QBPARAMS.auth_secret);
 	QB.createSession(function(err, result) {
 		if (err) {
 			console.log(err.detail);
-			signUpFailed();
+			signUpFailure();
 		} else {
-			userCreate(storage);
-		}
-	});
-}
-
-function userCreate(storage) {
-	var file = $('#signup_avatar')[0].files[0];
-	params = {
-		full_name: storage.name.val(),
-		email: storage.email.val(),
-		login: storage.login.val(),
-		password: storage.pass.val()
-	};
-	
-	QB.users.create(params, function(err, result){
-		if (err) {
-			console.log(err.detail);
-			signUpFailed();
-		} else if (file) {
-		  blobCreate(file);
-		} else {
-			signUpSuccess();
-		}
-	});
-}
-
-function blobCreate(file) {
-	var user_id;
-	params = {
-		login: params.login,
-		password: params.password
-	};
-	
-	QB.login(params, function(err, result){
-		if (err) {
-			console.log(err.detail);
-			signUpFailed();
-		} else {
-			user_id = result.id;
 			
-			QB.content.createAndUpload({file: file, public: true}, function(err, result){
-			  if (err) {
-			   	console.log(err.detail);
-					signUpFailed();
-			  } else {
-			    
-					QB.users.update({id: user_id, blob_id: result.id}, function(err, result){
-					 	if (err) {
-					   	console.log(err.detail);
-							signUpFailed();
-					 	} else {
-					   	signUpSuccess();
-						}
-				  });
+			QB.users.create(params, function(err, result) {
+				if (err) {
+					console.log(err.detail);
+					signUpFailure();
+				} else if (file) {
+					createBlob(file, params);
+				} else {
+					signUpSuccess();
 				}
 			});
 		}
 	});
 }
 
-/*---------------- Chat Module -------------------*/
+function createBlob(file, data) {
+	var user_id;
+	params = {
+		login: data.login,
+		password: data.password
+	};
+	
+	QB.login(params, function(err, result) {
+		if (err) {
+			console.log(err.detail);
+			signUpFailure();
+		} else {
+			user_id = result.id;
+			
+			QB.content.createAndUpload({file: file, public: true}, function(err, result) {
+			  if (err) {
+			   	console.log(err.detail);
+					signUpFailure();
+			  } else {
+			    assignBlobToUser(result.id, user_id);
+				}
+			});
+		}
+	});
+}
+
+function assignBlobToUser(blob, user) {
+	QB.users.update({id: user, blob_id: blob}, function(err, result) {
+	 	if (err) {
+		 	console.log(err.detail);
+			signUpFailure();
+	 	} else {
+	   	signUpSuccess();
+		}
+	});
+}
+
+/* Chat Module
+-----------------------------------------------------------------------*/
 function xmppConnect(user_id, user_full_name, blob_id, login, password, facebook_id, qbToken) {
 	if (blob_id == null) {
 		avatarLink = blob_id;
@@ -337,14 +313,14 @@ function xmppConnect(user_id, user_full_name, blob_id, login, password, facebook
 			break;
 		case Strophe.Status.CONNFAIL:
 		  console.log('[Connection] Failed to connect');
-		  connectFailed();
+		  connectFailure();
 		  break;
 		case Strophe.Status.AUTHENTICATING:
 		  console.log('[Connection] Authenticating');
 		  break;
 		case Strophe.Status.AUTHFAIL:
 		  console.log('[Connection] Unauthorized');
-		  connectFailed();
+		  connectFailure();
 		  break;
 		case Strophe.Status.CONNECTED:
 		  console.log('[Connection] Connected');

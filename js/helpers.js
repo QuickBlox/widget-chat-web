@@ -1,5 +1,6 @@
-/*----------------- Helper functions ---------------------*/
-function connectFailed() {
+/* Helper functions for widget
+-----------------------------------------------------------------------*/
+function connectFailure() {
 	$('#connecting').hide();
 	$('#main').show();
 	$('#login-fom input').addClass('error');
@@ -14,21 +15,28 @@ function connectSuccess(username) {
 	smiles();*/
 }
 
-function signUpFailed() {
+function signUpFailure() {
 	$('#signup-form fieldset > input').addClass('error');
 	$('#signup-form input').prop('disabled', false);
 }
 
 function signUpSuccess() {
-	function timeout() {
+	$('#signup-form').hide();
+	$('#signup-success').show();
+	setTimeout(backToLogin, 3 * 1000);
+	
+	function backToLogin() {
 		$('#signup-success').hide();
 		$('#main').show();
 		$('#login-fom input').val('').removeClass('error');
 	}
-	
-	$('#signup-form').hide();
-	$('#signup-success').show();
-	setTimeout(timeout, 3 * 1000);
+}
+
+function changeInputFileBehavior() {
+	$('.uploader-wrap input:file').change(function() {
+		var file = $(this).val();
+		$(this).siblings('.uploader-text').val(file);
+	});
 }
 
 function checkLogout() {
@@ -111,22 +119,6 @@ function smiles() {
 	});
 }
 
-/*
-* Making a custom style for input file
-*/
-function inputFileBehavior() {
-	$('.uploader-wrap input:file').change(function() {
-		var file = $(this).val();
-		$(this).siblings('.uploader-text').val(file);
-	});
-}
-
-/*
-* This function trims all gaps in the begin and in the end of your string.
-* 
-* For example:
-* trim("   String   ") => "String"
-*/
 function trim(str) {
 	if (str.charAt(0) == ' ')
 		str = trim(str.substring(1, str.length));

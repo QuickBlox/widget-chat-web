@@ -1,7 +1,6 @@
 <?php
 	require_once 'server/auth.php';
-	
-	$version = '2.0.0a'; #current version of widget
+	$version = '2.0.0a';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -11,31 +10,26 @@
 	<link rel="stylesheet" href="qbchatroom.css">
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 	
-	<!-- This is a config block -->
 	<script>
-	//QB Account params
-	var QBPARAMS = {
-		app_id: '<?php echo $appId; ?>',
-		auth_key: '<?php echo $authKey; ?>',
-		auth_secret: '<?php echo $authSecret; ?>'
-	}
-	//Chat params
-	var CHAT = {
-		roomJID: '<?php echo $roomJid; ?>',
-		server: 'chat.quickblox.com',
-		bosh_url: 'http://chat.quickblox.com:5280'
-	}
-	//FB params
-	var FBPARAMS = {
-		app_id: '368137086642884',
-		graph_server: 'https://graph.facebook.com'
-	}
+		var QBAPP = {
+			app_id: '<?php echo $appId; ?>',
+			auth_key: '<?php echo $authKey; ?>',
+			auth_secret: '<?php echo $authSecret; ?>'
+		};
+		var FBAPP = {
+			app_id: '368137086642884',
+			graph_server: 'https://graph.facebook.com'
+		};
+		var CHAT = {
+			server: 'chat.quickblox.com',
+			bosh_server: 'http://chat.quickblox.com:5280',
+			room_jid: '<?php echo $roomJid; ?>'
+		};
 	</script>
 </head>
 <body>
 	<div id="fb-root"></div>
-	<!-- flexibleStyles.js needs to choose current sizes for widget -->
-	<script src="js/flexibleStyles.js"></script>
+	<script src="js/flexible_styles.js"></script>
 	
 	<div id="main" class="layout">
 		<div class="bubbles">
@@ -44,27 +38,27 @@
 			<div class="bubble bubble_light_blue"></div>
 		</div>
 		<header class="header">
-			<div class="center-wrap">
+			<div class="center">
 				<h1>QuickBlox<br><b>Chat Room</b></h1>
 			</div>
 		</header>
 		
 		<div id="auth">
-			<div class="center-wrap">
-				<button class="btn_fb" onclick="authFB()"><span>Login with FB</span></button>
-				<button class="btn_qb" onclick="authQB()"><span>Login with QB</span></button>
+			<div class="center">
+				<button id="authFB" class="btn_fb"><span>Login with FB</span></button>
+				<button id="authQB" class="btn_qb"><span>Login with QB</span></button>
 			</div>
 		</div>
 		
 		<div id="login-fom" class="hidden">
-			<form action="#" class="center-wrap">
+			<form action="#" class="center">
 				<fieldset>
 					<input id="login" type="text" placeholder="Login or email">
 					<input id="pass" type="password" placeholder="Password">
 				</fieldset>
-				<button class="btn_qb" onclick="formDataLogin(); return false;"><span>Connect</span></button>
+				<button id="dataLogin" class="btn_qb"><span>Connect</span></button>
 				<span class="not-registered">Not registered yet?<br>
-					<a href="#" onclick="signUp(); return false;">Register an account QuickBlox</a>
+					<a href="#" id="signUp">Register an account QuickBlox</a>
 				</span>
 			</form>
 		</div>
@@ -78,7 +72,7 @@
 	</div>
 	
 	<div id="signup-form" class="layout hidden">
-		<form action="#" class="center-wrap" enctype="multipart/form-data">
+		<form action="#" class="center" enctype="multipart/form-data">
 			<fieldset>
 				<input id="signup_name" type="text" placeholder="Full Name">
 				<input id="signup_email" type="text" placeholder="Email">
@@ -90,7 +84,7 @@
 					<input id="signup_avatar" type="file" accept="image/*">
 				</div>
 			</fieldset>
-			<button class="btn_qb" onclick="formDataSignUp(); return false;"><span>Register</span></button>
+			<button id="dataSignup" class="btn_qb"><span>Register</span></button>
 		</form>
 	</div>
 	
@@ -98,7 +92,7 @@
 		<span class="progress">Thanks for your<br>registration!</span>
 	</div>
 	
-	<div id="chat">
+	<div id="chat" class="layout hidden">
 	<!--
 		<header class="chat-header">
 			<div class="occupants" onclick="occupants()">
@@ -128,13 +122,11 @@
 		-->
 	</div>
 	
-	<!-- include outside js libraries -->
 	<script src="js/libs/quickblox.js"></script>
 	<script src="js/libs/strophe.js"></script>
 	<script src="js/libs/strophe.muc.js"></script>
 	<script src="js/libs/jquery.scrollTo-min.js"></script>
 
-	<!-- scripts of widget -->
 	<script src="js/smiles.js"></script>
 	<script src="js/helpers.js"></script>
 	<script src="qbchatroom.js"></script>

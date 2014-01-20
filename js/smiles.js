@@ -1,5 +1,4 @@
-//Smiles collection
-var SMILEICONS = [
+var SMILES = [
 	{
 		plain: ':)',
 		regex: /((\s):-?\)|:-?\)(\s|$))/gm,
@@ -135,29 +134,29 @@ var SMILEICONS = [
 		regex: /((\s)<3|<3(\s|$))/gm,
 		image: '27.png'
 	},
-		{
+	{
 		plain: ':like:',
 		regex: /((\s):like:|:like:(\s|$))/gm,
 		image: '28.png'
 	},
-		{
+	{
 		plain: ':dislike:',
 		regex: /((\s):dislike:|:dislike:(\s|$))/gm,
 		image: '29.png'
 	},
-		{
+	{
 		plain: ':up:',
 		regex: /((\s):up:|:up:(\s|$))/gm,
 		image: '30.png'
 	},
-		{
+	{
 		plain: ':v:',
 		regex: /((\s):v:|:v:(\s|$))/gm,
 		image: '31.png'
 	},
-		{
+	{
 		plain: ':ok:',
 		regex: /((\s):ok:|:ok:(\s|$))/gm,
 		image: '32.png'
 	}
-]
+];

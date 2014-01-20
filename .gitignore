@@ -2,7 +2,7 @@
 
 # Server logic
 /server/*.php
-code.php
+/server/libs/*.php
 
 # IDE meta files
 .project

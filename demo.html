@@ -5,30 +5,33 @@
 	<title>QB Group Chat Room (XMPP) DEMO</title>
 	
 	<style>
-	* {
-		padding:0;
-		margin:0;
-	}
-	html {
-		height:100%;
-	}
-	body {
-		width:100%;
-		height:100%;
-	}
-	#qb-xmppchat {
-		position:absolute;
-		top:0;
-		right:0;
-		bottom:0;
-		left:0;
-		width:500px;
-		height:500px;
-		margin:auto;
-	}
+		* {
+			padding: 0;
+			margin: 0;
+		}
+		html {
+			height: 100%;
+		}
+		body {
+			width: 100%;
+			height: 100%;
+		}
+		#qbchatroom {
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			width: 200px;
+			height: 275px;
+			margin: auto;
+		}
 	</style>
 </head>
 <body>
-	<div id='qb-xmppchat'><div style='display:none'>Powered by <a href='http://quickblox.com'>QuickBlox cloud communication backend</a></div><iframe src='http://quickblox.com/applications/xmppchat/app.php?key=08d51bed8a583d3e228c2dc7a2b444f9dc46c824' frameborder=0 scrolling='no' width=100% height=100%></iframe></div>
+	<div id='qbchatroom'>
+		<div style='display:none'><a href='http://quickblox.com'>QuickBlox cloud communication backend</a></div>
+		<iframe src='http://quickblox.com/applications/anry-test/app.php?key=6ee29d29f3913223dca4fe9bbefd7d13b693f6e9' frameborder='0' scrolling='no' width='100%' height='100%'></iframe>
+	</div>
 </body>
 </html>
