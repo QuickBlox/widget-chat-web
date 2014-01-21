@@ -1,6 +1,6 @@
 <?php
 	require_once 'server/auth.php';
-	$version = '2.0.0a';
+	$version = '2.0.0b';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -33,7 +33,7 @@
 	
 	<div id="main" class="layout">
 		<div class="bubbles">
-			<div class="bubble bubble_green"></div>
+			<div class="bubble bubble_green version"><?php echo $version; ?></div>
 			<div class="bubble bubble_blue"></div>
 			<div class="bubble bubble_light_blue"></div>
 		</div>
@@ -93,38 +93,28 @@
 	</div>
 	
 	<div id="chat" class="layout hidden">
-	<!--
 		<header class="chat-header">
-			<div class="occupants" onclick="occupants()">
-				<span class="number"></span>
-				<img src="" alt="users" />
-				<ul class="list"></ul>
-			</div>
-			<div class="logout-wrap">
-				<a href="#" class="logout" onclick="checkLogout(); return false;">Logout</a>
-			</div>
-			<h3 class="room_name">XMPP Group Chat</h3>
+			<a href="#" class="users"><span class="users-count">0</span></a>
+			<a href="#" class="logout"><img src="images/logout.png" alt="logout"></a>
+			<h2 class="chat-name">Group Chat</h2>
+			<ul class="users-list hidden"></ul>
 		</header>
 		
 		<section class="chat-content"></section>
 		
 		<footer class="chat-footer">
-			<form id="qb_send_message" action="#">
-				<input type="text" id="message"/>
-				<textarea class="message_field" type="text" placeholder="Enter message..."></textarea>
-				<button onclick="sendMesage(); return false;">Send</button>
-				<div id="area">
-					<div class="controls"><span class="title">Message</span><span class="smiles"><img src="images/smile.png" alt="smiles" width="20" /></span></div>
-					<textarea name="message_area" id="message_area"></textarea>
-				</div>
+			<form action="#" id="send-message-form">
+				<textarea id="message" placeholder="Enter Message" rows="1"></textarea>
+				<a href="#" class="smile"><img src="images/smile.png" alt="smile"></a>
+				<div class="smiles-list hidden"></div>
 			</form>
 		</footer>
-		-->
 	</div>
 	
 	<script src="js/libs/quickblox.js"></script>
 	<script src="js/libs/strophe.js"></script>
 	<script src="js/libs/strophe.muc.js"></script>
+	<script src="js/libs/jquery.timeago.js"></script>
 	<script src="js/libs/jquery.scrollTo-min.js"></script>
 
 	<script src="js/smiles.js"></script>

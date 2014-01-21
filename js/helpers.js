@@ -1,18 +1,18 @@
 /* Helper functions for widget
 -----------------------------------------------------------------------*/
+var URL_REGEXP = /\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/gi;
+
 function connectFailure() {
 	$('#connecting').hide();
 	$('#main').show();
 	$('#login-fom input').addClass('error');
 }
 
-function connectSuccess(username) {
+function connectSuccess() {
 	$('#connecting').hide();
 	$('#chat').show();
-	$('#chat input').val('').removeClass('error');
-	/*$('.logout').attr('data-username', username);
-	textareaUp();
-	smiles();*/
+	$('#chat .chat-content').html('');
+	$('#chat #message').val('');
 }
 
 function signUpFailure() {
@@ -32,6 +32,13 @@ function signUpSuccess() {
 	}
 }
 
+function logoutSuccess() {
+	$('.bubbles').removeClass('bubbles_login');
+	$('.header').removeClass('header_login');
+	$('#chat, #login-fom').hide();
+	$('#main, #auth').show();
+}
+
 function changeInputFileBehavior() {
 	$('.uploader-wrap input:file').change(function() {
 		var file = $(this).val();
@@ -39,84 +46,55 @@ function changeInputFileBehavior() {
 	});
 }
 
-function checkLogout() {
-	if (localStorage['qbAuth']) {
-		localStorage.removeItem('qbAuth');
-	} else {
-		FB.logout(function(response) {
-			console.log("[FB Logout]");
-			console.log(response);
-		});
-	}
-
-	var nick = $('.logout').data('data-username');
-	connection.muc.leave(CHAT.roomJID, nick);
-	setTimeout(function() {connection.disconnect()}, 1000);
+function changeHeightChatBlock() {
+	var fixHeight = 2;
+	var chatHeaderHeight = $('.chat-header').height();
+	var chatFooterHeight = $('.chat-footer').height();
+	var chatContentHeight;
+	
+	chatContentHeight = WIDGET_HEIGHT - chatHeaderHeight - chatFooterHeight - fixHeight;
+	$('.chat-content').height(chatContentHeight);
 }
 
-function linkURLs(text) {
-	var url_regexp = /\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/gi;
-	
-	var link = text.replace(url_regexp, function(match) {
-		var url = (/^[a-z]+:/i).test(match) ? match : "http://" + match;
-		var url_text = match;
-		
-		return "<a href=\""+escapeHTML(url)+"\" target=\"_blank\">"+escapeHTML(url_text)+"</a>";
+function getSmiles() {
+	$(SMILES).each(function(i) {
+		$('.smiles-list').append('<img class="smileicons" alt="icons" data-plain="' + SMILES[i].plain + '" src="images/smiles/' + SMILES[i].image + '">');
+	});
+}
+
+function updateTime() {
+	$('.message-time').each(function() {
+		$(this).text($.timeago($(this).data('time')));
 	});
 	
-	return link;
+	setTimeout(updateTime, 60 * 1000);
 }
 
-function escapeHTML(s) {
-	return s.replace(/</g,"&lt;").replace(/>/g,"&gt;");
-}
-
-function textareaUp() {
-	$('.message_field').click(function(){
-		$('#area').show();
-		$('#message_area').focus();
-	});
-	$(document).click(function(e){
-		if ($(e.target).is('.message_field, #message_area, .controls, .controls *, .smiles-icons, .smiles-icons *')) {
-			return;
-		}
-	  $('.message_field').val($('#message_area').val());
-	  $("#area").hide();
-	});
-}
-
-function toHTML(str) {
-	return ('<p>' + str).replace(/\n\n/g, '<p>').replace(/\n/g, '<br>');
-}
-
-function smilesParser(text) {
-	for(var i = SMILEICONS.length-1; i >= 0; i--) {
-		text = text.replace(SMILEICONS[i].regex, '$2<img class="smileicons" alt="$1" src="images/smiles/' + SMILEICONS[i].image + '" />$3');
-	}
-	return text;
-}
-
-function smiles() {
-	$('.smiles-icons').remove();
-	$('#area').append('<div class="smiles-icons"></div>');
-	for(var i = 0; i < SMILEICONS.length; i++) {
-		$('.smiles-icons').append('<img class="smileicons" alt="icons" data-plain="' + SMILEICONS[i].plain + '" src="images/smiles/' + SMILEICONS[i].image + '" />');
-	}
+function showUsersList() {
+	$('.users').addClass('visible');
+	$('.users-list').show();
 	
-	$('.smiles').click(function(){
-		$(this).css('background','#dadada');
-		$(this).parents('#area').find('.smiles-icons').show();
+	$(document).click(function(e) {
+		if ($(e.target).is('.users, .users-list *')) return;
+	  $('.users-list').hide();
+		$('.users').removeClass('visible');
 	});
-	$(document).click(function(e){
-		if ($(e.target).is('.smiles *, .smiles-icons, .smiles-icons *')) {
-			if ($(e.target).is('.smiles-icons *')) {
-				$('#message_area').val($('#message_area').val() + ' ' + $(e.target).data('plain') + ' ');
-			}
-			return;
-		}
-	  $('.smiles-icons').hide();
-	  $('.smiles').css('background','none');
+}
+
+function showSmiles() {
+	$('.smile').addClass('visible');
+	$('.smiles-list').show();
+
+	$(document).click(function(e) {
+		if ($(e.target).is('.smile, .smiles-list *'))	return;
+		$('.smiles-list').hide();
+		$('.smile').removeClass('visible');
 	});
+}
+
+function choseSmile(img) {
+	var tmp = $('#message').val() + ' ' + $(img).data('plain') + ' ';
+	$('#message').val(tmp);
 }
 
 function trim(str) {
@@ -125,4 +103,34 @@ function trim(str) {
 	if (str.charAt(str.length-1) == ' ')
 		str = trim(str.substring(0, str.length-1));
 	return str;
+}
+
+function checkResponse(response) {
+	try {
+		return $.parseJSON(Strophe.unescapeNode(response));
+	}	catch(err) {
+		return Strophe.unescapeNode(response);
+	}
+}
+
+function getAuthorName(JID) {
+	return Strophe.unescapeNode(Strophe.getResourceFromJid(JID));
+}
+
+function parser(str) {
+	var str = ('<p>' + escapeHTML(str)).replace(/\n\n/g, '<p>').replace(/\n/g, '<br>').replace(URL_REGEXP, function(match) {
+		var url = (/^[a-z]+:/i).test(match) ? match : "http://" + match;
+		var url_text = match;
+		
+		return "<a href=\""+escapeHTML(url)+"\" target=\"_blank\">"+escapeHTML(url_text)+"</a>";
+	});
+
+	$(SMILES).each(function(i) {
+		str = str.replace(SMILES[i].regex, '$2<img class="smileicons" alt="$1" src="images/smiles/' + SMILES[i].image + '">$3');
+	});
+	return str;
+		
+	function escapeHTML(s) {
+		return s.replace(/</g,"&lt;").replace(/>/g,"&gt;");
+	}
 }

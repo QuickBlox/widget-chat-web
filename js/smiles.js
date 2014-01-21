@@ -86,7 +86,7 @@ var SMILES = [
 	},
 	{
 		plain: '<(',
-		regex: /((\s)<\(|<\((\s|$))/gm,
+		regex: /((\s)&lt;\(|&lt;\((\s|$))/gm,
 		image: '18.png'
 	},
 	{
@@ -95,8 +95,8 @@ var SMILES = [
 		image: '19.png'
 	},
 	{
-		plain: 'O:)',
-		regex: /((\s)O:\)|O:\)(\s|$))/gm,
+		plain: 'Ox)',
+		regex: /((\s)Ox\)|Ox\)(\s|$))/gm,
 		image: '20.png'
 	},
 	{
@@ -131,7 +131,7 @@ var SMILES = [
 	},
 	{
 		plain: '<3',
-		regex: /((\s)<3|<3(\s|$))/gm,
+		regex: /((\s)&lt;3|&lt;3(\s|$))/gm,
 		image: '27.png'
 	},
 	{
