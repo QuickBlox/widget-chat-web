@@ -285,40 +285,40 @@ function connectChat(chatUser, storage) {
 	connection.connect(userJID, userPass, function (status) {
 		switch (status) {
 		case Strophe.Status.ERROR:
-		  console.log('[Connection] Error');
-		  break;
+			console.log('[Connection] Error');
+			break;
 		case Strophe.Status.CONNECTING:
 			console.log('[Connection] Connecting');
 			break;
 		case Strophe.Status.CONNFAIL:
-		  console.log('[Connection] Failed to connect');
-		  connectFailure();
-		  break;
+			console.log('[Connection] Failed to connect');
+			connectFailure();
+			break;
 		case Strophe.Status.AUTHENTICATING:
-		  console.log('[Connection] Authenticating');
-		  break;
+			console.log('[Connection] Authenticating');
+			break;
 		case Strophe.Status.AUTHFAIL:
-		  console.log('[Connection] Unauthorized');
-		  connectFailure();
-		  break;
+			console.log('[Connection] Unauthorized');
+			connectFailure();
+			break;
 		case Strophe.Status.CONNECTED:
-		  console.log('[Connection] Connected');
-
+			console.log('[Connection] Connected');
+			
 			if (storage)	localStorage['qbAuth'] = JSON.stringify(storage);
 			
 			connectSuccess();
 			connection.muc.join(CHAT.room_jid, chatUser.nick, getMessage, getPresence, getRoster);
-		  break;
+			break;
 		case Strophe.Status.DISCONNECTING:
-		  console.log('[Connection] Disconnecting');
+			console.log('[Connection] Disconnecting');
 			logoutSuccess();
-		  break;
+			break;
 		case Strophe.Status.DISCONNECTED:
-		  console.log('[Connection] Disconnected');
-		  break;
+			console.log('[Connection] Disconnected');
+			break;
 		case Strophe.Status.ATTACHED:
-		  console.log('[Connection] Attached');
-		  break;
+			console.log('[Connection] Attached');
+			break;
 		}
 	});
 }
@@ -344,18 +344,18 @@ function getPresence(stanza, room) {
 	console.log('[XMPP] Presence');
 	
 	var messagesCount = $('.message').length;
-  var type = $(stanza).attr('type');
+	var type = $(stanza).attr('type');
 	var user = getAuthorName($(stanza).attr('from'));
-  
-  if (messagesCount > 0 && type && user != 'admin') {
-  	$('.chat-content').append('<span class="service-message left">' + user + ' has left this chat.</span>');
-  	$('.chat-content').scrollTo('.left:last', 0);
-  } else if (messagesCount > 0 && user != 'admin') {
-  	$('.chat-content').append('<span class="service-message joined">' + user + ' has joined the chat.</span>');
-  	$('.chat-content').scrollTo('.joined:last', 0);
-  }
-  
-  return true;
+	
+	if (messagesCount > 0 && type && user != 'admin') {
+		$('.chat-content').append('<span class="service-message left">' + user + ' has left this chat.</span>');
+		$('.chat-content').scrollTo('.left:last', 0);
+	} else if (messagesCount > 0 && user != 'admin') {
+		$('.chat-content').append('<span class="service-message joined">' + user + ' has joined the chat.</span>');
+		$('.chat-content').scrollTo('.joined:last', 0);
+	}
+	
+	return true;
 }
 
 function getMessage(stanza, room) {
@@ -390,19 +390,19 @@ function sendMesage() {
 	var message, post;
 	
 	$('#message').keydown(function(event) {
-    if (event.keyCode == 13 && !event.shiftKey) {
+		if (event.keyCode == 13 && !event.shiftKey) {
 			post = $('#message').val();
 			
 			if (trim(post)) {
 				message = {message: post, avatar: chatUser.avatar};
 				message = Strophe.escapeNode(JSON.stringify(message));
 				connection.muc.groupchat(CHAT.room_jid, message);
-
+				
 				$('#message').val('');
 			}
-      return false;
-    }
-  });
+			return false;
+		}
+	});
 }
 
 function logout() {
