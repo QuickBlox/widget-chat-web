@@ -6,6 +6,7 @@
  */
 
 var storage, params, connection;
+var isFBConnected = false;
 var isSubscribeEnabled = false;
 var chatUser = {
 	nick: null,
@@ -22,13 +23,14 @@ var chatUser = {
 };
 
 $(document).ready(function() {
+	QB.init(QBAPP.app_id, QBAPP.auth_key, QBAPP.auth_secret);
+	
 	$.ajaxSetup({ cache: true });
 	$.getScript('https://connect.facebook.net/en_EN/all.js', function() {
 		FB.init({
 			appId: FBAPP.app_id,
 			cookie: true
 		});
-		QB.init(QBAPP.app_id, QBAPP.auth_key, QBAPP.auth_secret);
 		
 		autoLogin();
 		changeInputFileBehavior();
@@ -59,6 +61,7 @@ function autoLogin() {
 	} else {
 		// Autologin as FB user
 		subscribeFBStatusEvent();
+		isFBConnected = true;
 		isSubscribeEnabled = true;
 	}
 }
@@ -90,7 +93,8 @@ function authFB() {
 		console.log('FB ' + response.status);
 		switch (response.status) {
 		case 'connected':
-			getFBUser(response.authResponse.accessToken);
+			if (!isFBConnected)
+				getFBUser(response.authResponse.accessToken);
 			break;
 		case 'not_authorized':
 			FB.login();
@@ -410,6 +414,7 @@ function logout() {
 	localStorage.removeItem('qbAuth');
 	if (chatUser.fb.id) {
 		FB.logout();
+		isFBConnected = false;
 	}
 	
 	chatUser.nick = null;
