@@ -1,6 +1,6 @@
 /**
  * QB Group Chat Room (XMPP)
- * version 2.0.0b
+ * version 2.1.0
  * 
  * author: Andrey Povelichenko <andrey.povelichenko@quickblox.com>
  */
