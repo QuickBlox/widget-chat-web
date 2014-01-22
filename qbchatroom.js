@@ -28,7 +28,7 @@ $(document).ready(function() {
 	$.ajaxSetup({ cache: true });
 	$.getScript('https://connect.facebook.net/en_EN/all.js', function() {
 		FB.init({
-			appId: FBAPP.app_id,
+			appId: FBAPP_ID,
 			cookie: true
 		});
 		
@@ -82,7 +82,7 @@ function getFBUser(accessToken) {
 		chatUser.fb.access_token = accessToken;
 		
 		chatUser.nick = response.name;
-		chatUser.avatar = FBAPP.graph_server + '/' + response.id + '/picture/';
+		chatUser.avatar = 'https://graph.facebook.com/' + response.id + '/picture/';
 		
 		createSession();
 	});
@@ -194,7 +194,7 @@ function signUp() {
 }
 
 function prepareDataForSignUp() {
-	if ($('#signup-form input:first').is(':disabled'))	return false;
+	if ($('#signup-form input:first').is(':disabled')) return false;
 	
 	$('#signup-form input').removeClass('error');
 
@@ -204,7 +204,7 @@ function prepareDataForSignUp() {
 			this.addClass('error');
 	});
 	
-	if ($('#signup-form input').is('.error'))	return false;
+	if ($('#signup-form input').is('.error')) return false;
 	
 	$('#signup-form input').prop('disabled', true);
 	createUser();
@@ -254,11 +254,11 @@ function createBlob(file, data) {
 			user_id = result.id;
 			
 			QB.content.createAndUpload({file: file, public: true}, function(err, result) {
-			  if (err) {
-			   	console.log(err.detail);
+				if (err) {
+					console.log(err.detail);
 					signUpFailure();
-			  } else {
-			    assignBlobToUser(result.id, user_id);
+				} else {
+					assignBlobToUser(result.id, user_id);
 				}
 			});
 		}
@@ -267,11 +267,11 @@ function createBlob(file, data) {
 
 function assignBlobToUser(blob, user) {
 	QB.users.update({id: user, blob_id: blob}, function(err, result) {
-	 	if (err) {
-		 	console.log(err.detail);
+		if (err) {
+			console.log(err.detail);
 			signUpFailure();
-	 	} else {
-	   	signUpSuccess();
+		} else {
+			signUpSuccess();
 		}
 	});
 }
@@ -308,7 +308,7 @@ function connectChat(chatUser, storage) {
 		case Strophe.Status.CONNECTED:
 			console.log('[Connection] Connected');
 			
-			if (storage)	localStorage['qbAuth'] = JSON.stringify(storage);
+			if (storage) localStorage['qbAuth'] = JSON.stringify(storage);
 			
 			connectSuccess();
 			connection.muc.join(CHAT.room_jid, chatUser.nick, getMessage, getPresence, getRoster);
@@ -337,8 +337,8 @@ function getRoster(users, room) {
 	$('.users-list').html('<li class="users-list-title">Occupants</li>');
 	
 	$(occupants).each(function() {
-	  var user = Strophe.unescapeNode(users[this].nick);
-	  $('.users-list').append('<li>' + user + '</li>');
+		var user = Strophe.unescapeNode(users[this].nick);
+		$('.users-list').append('<li>' + user + '</li>');
 	});
   
   return true;

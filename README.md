@@ -1,4 +1,4 @@
 sample-chat-xmpp-web
 ====================
 
-XMPP chat code sample for QuickBlox
+Web XMPP Chat code sample for QuickBlox

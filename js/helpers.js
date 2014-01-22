@@ -76,7 +76,7 @@ function showUsersList() {
 	
 	$(document).click(function(e) {
 		if ($(e.target).is('.users, .users-list *')) return;
-	  $('.users-list').hide();
+		$('.users-list').hide();
 		$('.users').removeClass('visible');
 	});
 }
@@ -86,7 +86,7 @@ function showSmiles() {
 	$('.smiles-list').show();
 
 	$(document).click(function(e) {
-		if ($(e.target).is('.smile, .smiles-list *'))	return;
+		if ($(e.target).is('.smile, .smiles-list *')) return;
 		$('.smiles-list').hide();
 		$('.smile').removeClass('visible');
 	});
@@ -108,7 +108,7 @@ function trim(str) {
 function checkResponse(response) {
 	try {
 		return $.parseJSON(Strophe.unescapeNode(response));
-	}	catch(err) {
+	} catch(err) {
 		return Strophe.unescapeNode(response);
 	}
 }
