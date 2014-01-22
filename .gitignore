@@ -1,9 +1,5 @@
 /.bundle
 
-# Server logic
-/server/*.php
-/server/libs/*.php
-
 # IDE meta files
 .project
 .settings
