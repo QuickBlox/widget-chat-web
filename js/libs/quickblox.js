@@ -28,22 +28,20 @@ AuthProxy.prototype.createSession = function createSession(params, callback) {
     callback = params;
     params = {};
   }
-  
-  message = generateAuthMsg(params);
 
   // Sign message with SHA-1 using secret key and add to payload
+  message = generateAuthMsg(params);
   message = signMessage(message,  params.authSecret || config.creds.authSecret);
 
-  //if (config.debug) {console.debug('Creating session using', message, jQuery.param(message));}
   this.service.ajax({url: sessionUrl, data: message, type: 'POST', processData: false},
                     function handleProxy(err,data){
-                      if (config.debug) { console.debug('AuthProxy.createSession', err, data); }
-                      var session;
+                      if (config.debug) { console.debug('AuthProxy.createSession callback', err, data); }
                       if (data && data.session) {
-                        session = data.session;
-                        _this.session = session;
+                        _this.service.setSession(data.session);
+                        callback(err,data.session);
+                      } else {
+                        callback(err, null);
                       }
-                      callback(err,session);
                     });
 };
 
@@ -51,22 +49,22 @@ AuthProxy.prototype.createSession = function createSession(params, callback) {
 AuthProxy.prototype.destroySession = function(callback){
   var _this = this, message;
   message = {
-    token: this.session.token
+    token: this.service.getSession().token
   };
-  this.service.ajax({url: sessionUrl, type: 'DELETE'},
+  this.service.ajax({url: sessionUrl, type: 'DELETE', dataType: 'text'},
                     function(err,data){
-                      if (config.debug) {console.debug('AuthProxy destroySession callback', err, data);}
-                      if (typeof err ==='undefined'){
-                        _this.session = null;
+                      if (config.debug) {console.debug('AuthProxy.destroySession callback', err, data);}
+                      if (err === null){
+                        _this.service.setSession(null);
                       }
-                      callback(err,data);
+                      callback(err,true);
                     });
 };
 
 AuthProxy.prototype.login = function(params, callback){
   var _this = this;
-  if (this.session) {
-    params.token = this.session.token;
+  if (this.service.getSession() !== null) {
+    params.token = this.service.getSession().token;
     this.service.ajax({url: loginUrl, type: 'POST', data: params},
                       function(err, data) {
                         if (err) { callback(err, data);}
@@ -87,10 +85,10 @@ AuthProxy.prototype.login = function(params, callback){
 AuthProxy.prototype.logout = function(callback){
   var _this = this, message;
   message = {
-    token: this.session.token
+    token: this.service.getSession().token
   };
   //if (config.debug) {console.debug('Logout', message, jQuery.param(message));}
-  this.service.ajax({url: loginUrl, type: 'DELETE'}, callback);
+  this.service.ajax({url: loginUrl, dataType:'text', data:message, type: 'DELETE'}, callback);
 };
 
 AuthProxy.prototype.nonce = function nonce(){
@@ -232,6 +230,47 @@ ContentProxy.prototype.delete = function(id, callback){
   });
 };
 
+ContentProxy.prototype.createAndUpload = function(params, callback){
+  var createParams= {}, file, name, type, size, fileId, _this = this;
+  if (config.debug) { console.debug('ContentProxy.createAndUpload', params);}
+  file = params.file;
+  name = params.name || file.name;
+  type = params.type || file.type;
+  size = file.size;
+  createParams.name = name;
+  createParams.content_type = type;
+  if (params.public) { createParams.public = params.public; }
+  if (params.tag_list) { createParams.tag_list = params.tag_list; }
+  this.create(createParams, function(err,createResult){
+    if (err){ callback(err, null); }
+    else {
+      var uri = parseUri(createResult.blob_object_access.params), uploadParams = { url: uri.protocol + '://' + uri.host }, data = new FormData();
+      fileId = createResult.id;
+      data.append('key', uri.queryKey.key);
+      data.append('acl', uri.queryKey.acl);
+      data.append('success_action_status', uri.queryKey.success_action_status);
+      data.append('AWSAccessKeyId', uri.queryKey.AWSAccessKeyId);
+      data.append('Policy', decodeURIComponent(uri.queryKey.Policy));
+      data.append('Signature', decodeURIComponent(uri.queryKey.Signature));
+      data.append('Content-Type', uri.queryKey['Content-Type']);
+      data.append('file', file, createResult.name);
+      uploadParams.data = data;
+      _this.upload(uploadParams, function(err, result) {
+        if (err) { callback(err, null); }
+        else {
+          _this.markUploaded({id: fileId, size: size}, function(err, result){
+            if (err) { callback(err, null);}
+            else {
+              callback(null, createResult);
+            }
+          });
+        }
+      });
+    }
+  });
+};
+
+
 ContentProxy.prototype.upload = function(params, callback){
   this.service.ajax({url: params.url, data: params.data, dataType: 'xml',
                      contentType: false, processData: false, type: 'POST'}, function(err,xmlDoc){
@@ -257,7 +296,7 @@ ContentProxy.prototype.taggedForCurrentUser = function(callback) {
 };
 
 ContentProxy.prototype.markUploaded = function (params, callback) {
-  this.service.ajax({url: contentIdUrl(params.id) + '/complete' + config.urls.type, type: 'PUT', data: {blob: {size: params.size}}}, function(err, res){
+  this.service.ajax({url: contentIdUrl(params.id) + '/complete' + config.urls.type, type: 'PUT', data: {size: params.size}, dataType: 'text' }, function(err, res){
     if (err) { callback (err, null); }
     else { callback (null, res); }
   });
@@ -277,10 +316,10 @@ ContentProxy.prototype.getFile = function (uid, callback) {
   });
 };
 
-ContentProxy.prototype.getBlobObjectById = function (id, callback) {
+ContentProxy.prototype.getFileUrl = function (id, callback) {
  this.service.ajax({url: contentIdUrl(id) + '/getblobobjectbyid' + config.urls.type, type: 'POST'}, function (err, res) {
     if (err) { callback (err, null); }
-    else { callback (null, res); }
+    else { callback (null, res.blob_object_access.params); }
   });
 };
 
@@ -294,6 +333,40 @@ ContentProxy.prototype.update = function (params, callback) {
   });
 }
 
+
+// parseUri 1.2.2
+// (c) Steven Levithan <stevenlevithan.com>
+// MIT License
+// http://blog.stevenlevithan.com/archives/parseuri
+
+function parseUri (str) {
+	var	o   = parseUri.options,
+		m   = o.parser[o.strictMode ? "strict" : "loose"].exec(str),
+		uri = {},
+		i   = 14;
+
+	while (i--) {uri[o.key[i]] = m[i] || "";}
+
+	uri[o.q.name] = {};
+	uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
+		if ($1) {uri[o.q.name][$1] = $2;}
+	});
+
+	return uri;
+}
+
+parseUri.options = {
+	strictMode: false,
+	key: ["source","protocol","authority","userInfo","user","password","host","port","relative","path","directory","file","query","anchor"],
+	q:   {
+		name:   "queryKey",
+		parser: /(?:^|&)([^&=]*)=?([^&]*)/g
+	},
+	parser: {
+		strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
+		loose:  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
+	}
+};
 
 },{"./qbConfig":2,"./qbUtils":9}],4:[function(require,module,exports){
 /*
@@ -347,10 +420,56 @@ DataProxy.prototype.update= function(className, data, callback) {
 
 DataProxy.prototype.delete= function(className, id, callback) {
   if (config.debug) { console.debug('DataProxy.delete', className, id);}
-  this.service.ajax({url: utils.resourceUrl(dataUrl, className + '/' + id), type: 'delete'}, function(err,result){
-    if (err){ callback(err, null); }
-    else { callback (err, result); }
-  });
+  this.service.ajax({url: utils.resourceUrl(dataUrl, className + '/' + id), type: 'DELETE', dataType: 'text'},
+                    function(err,result){
+                      if (err){ callback(err, null); }
+                      else { callback (err, true); }
+                    });
+};
+
+DataProxy.prototype.uploadFile= function(className, params, callback){
+  var formData;
+  if (config.debug) { console.debug('DataProxy.uploadFile', className, params);}
+  formData = new FormData();
+  formData.append('field_name', params.field_name);
+  formData.append('file', params.file);
+  this.service.ajax({url: utils.resourceUrl(dataUrl, className + '/' + params.id + '/file'), data: formData,
+                    contentType: false, processData: false, type:'POST'}, function(err, result){
+                      if (err) { callback(err, null);}
+                      else { callback (err, result); }
+                    });
+};
+
+DataProxy.prototype.updateFile= function(className, params, callback){
+  var formData;
+  if (config.debug) { console.debug('DataProxy.updateFile', className, params);}
+  formData = new FormData();
+  formData.append('field_name', params.field_name);
+  formData.append('file', params.file);
+  this.service.ajax({url: utils.resourceUrl(dataUrl, className + '/' + params.id + '/file'), data: formData,
+                    contentType: false, processData: false, type: 'POST'}, function(err, result) {
+                      if (err) { callback (err, null); }
+                      else { callback (err, result); }
+                    });
+};
+
+DataProxy.prototype.downloadFile= function(className, params, callback){
+  if (config.debug) { console.debug('DataProxy.downloadFile', className, params);}
+  this.service.ajax({url: utils.resourceUrl(dataUrl, className + '/' + params.id + '/file'), data: 'field_name=' + params.field_name,
+                    type:'GET', contentType: false, processData:false, mimeType: 'text/plain; charset=x-user-defined', dataType: 'binary'},
+                    function(err, result) {
+                      if (err) { callback (err, null); }
+                      else { callback (err, result); }
+                    });
+};
+
+DataProxy.prototype.deleteFile= function(className, params, callback){
+  if (config.debug) { console.debug('DataProxy.deleteFile', className, params);}
+  this.service.ajax({url: utils.resourceUrl(dataUrl, className + '/' + params.id + '/file'), data: {field_name: params.field_name},
+                    dataType: 'text', type: 'DELETE'}, function(err, result) {
+                      if (err) { callback (err, null); }
+                      else { callback (err, true); }
+                    });
 };
 
 
@@ -394,8 +513,20 @@ GeoProxy.prototype.create = function(params, callback){
 };
 
 GeoProxy.prototype.update = function(params, callback){
+  var allowedProps = ['longitude', 'latitude', 'status'], prop, msg = {};
+  for (prop in params) {
+    if (params.hasOwnProperty(prop)) {
+      if (allowedProps.indexOf(prop)>0) {
+        msg[prop] = params[prop];
+      } 
+    }
+  }
   if (config.debug) { console.debug('GeoProxy.create', params);}
-  this.service.ajax({url: utils.resourceUrl(geoUrl, params.id), data: {geodata:params}, type: 'PUT'}, callback);
+  this.service.ajax({url: utils.resourceUrl(geoUrl, params.id), data: {geo_data:msg}, type: 'PUT'},
+                   function(err,res){
+                    if (err) { callback(err,null);}
+                    else { callback(err, res.geo_datum);}
+                   });
 };
 
 GeoProxy.prototype.get = function(id, callback){
@@ -417,12 +548,20 @@ GeoProxy.prototype.list = function(params, callback){
 
 GeoProxy.prototype.delete = function(id, callback){
   if (config.debug) { console.debug('GeoProxy.delete', id); }
-  this.service.ajax({url: utils.resourceUrl(geoUrl, id), type: 'DELETE'}, callback);
+  this.service.ajax({url: utils.resourceUrl(geoUrl, id), type: 'DELETE', dataType: 'text'},
+                   function(err,res){
+                    if (err) { callback(err, null);}
+                    else { callback(null, true);}
+                   });
 };
 
 GeoProxy.prototype.purge = function(days, callback){
   if (config.debug) { console.debug('GeoProxy.purge', days); }
-  this.service.ajax({url: geoUrl + config.urls.type, data: {days: days}, type: 'DELETE'}, callback);
+  this.service.ajax({url: geoUrl + config.urls.type, data: {days: days}, type: 'DELETE', dataType: 'text'},
+                   function(err, res){
+                    if (err) { callback(err, null);}
+                    else { callback(null, true);}
+                   });
 };
 
 function PlacesProxy(service) {
@@ -446,7 +585,7 @@ PlacesProxy.prototype.get = function(id, callback){
 
 PlacesProxy.prototype.update = function(place, callback){
   if (config.debug) { console.debug('PlacesProxy.update', place);}
-  this.service.ajax({url: utils.resourceUrl(placesUrl, id), data: {place: place}}, callback);
+  this.service.ajax({url: utils.resourceUrl(placesUrl, id), data: {place: place}, type: 'PUT'} , callback);
 };
 
 PlacesProxy.prototype.delete = function(id, callback){
@@ -508,7 +647,11 @@ TokensProxy.prototype.create = function(params, callback){
 TokensProxy.prototype.delete = function(id, callback) {
   var url = tokenUrl + '/' + id + config.urls.type;
   if (config.debug) { console.debug('MessageProxy.deletePushToken', id); }
-  this.service.ajax({url: url, type: 'DELETE'}, callback);
+  this.service.ajax({url: url, type: 'DELETE', dataType:'text'}, 
+                    function (err, res) {
+                      if (err) {callback(err, null);}
+                      else {callback(null, true);}
+                      });
 };
 
 // Subscriptions
@@ -530,7 +673,11 @@ SubscriptionsProxy.prototype.list = function (callback) {
 SubscriptionsProxy.prototype.delete = function(id, callback) {
   var url = subsUrl + '/'+ id + config.urls.type;
   if (config.debug) { console.debug('MessageProxy.deleteSubscription', id); }
-  this.service.ajax({url: url, type: 'DELETE'}, callback);
+  this.service.ajax({url: url, type: 'DELETE', dataType:'text'}, 
+                    function(err, res){
+                      if (err) { callback(err, null);}
+                      else { callback(null, true);}
+                    });
 };
 
 // Events
@@ -591,35 +738,58 @@ var jQuery = require('../lib/jquery-1.10.2');
 function ServiceProxy(qb){
   this.qbInst = qb;
   jQuery.support.cors = true;
+  jQuery.ajaxSetup({
+    accepts: {
+      binary: "text/plain; charset=x-user-defined"
+    },
+    contents: {
+    },
+    converters: {
+      "text binary": true // Nothing to convert
+    }
+  });
   if (config.debug) { console.debug("ServiceProxy", qb); }
 }
 
+ServiceProxy.prototype.setSession= function(session){
+  this.qbInst.session = session;
+};
+
+ServiceProxy.prototype.getSession = function(){
+  return this.qbInst.session;
+};
+
 ServiceProxy.prototype.ajax = function(params, callback) {
   var _this = this;
-  if (this.qbInst.session && this.qbInst.session.token){
-    if (params.data) {
-      if (params.data instanceof FormData) {
-        params.data.append('token', this.qbInst.session.token);
-      } else {
-        params.data.token = this.qbInst.session.token;
-      }
-    } else { 
-      params.data = {token:this.qbInst.session.token}; 
-    }
-  }
+  //if (this.qbInst.session && this.qbInst.session.token){
+    //if (params.data) {
+      //if (params.data instanceof FormData) {
+        //params.data.append('token', this.qbInst.session.token);
+      //} else {
+        //params.data.token = this.qbInst.session.token;
+      //}
+    //} else { 
+      //params.data = {token: this.qbInst.session.token}; 
+    //}
+  //}
   if (config.debug) { console.debug('ServiceProxy',  params.type || 'GET', params); }
   var ajaxCall =   {
     url: params.url,
     type: params.type || 'GET',
     dataType: params.dataType || 'json',
     data: params.data,
-    // Currently can't do this as it causes CORS issue (OPTIONS preflight check returns 404)
     beforeSend: function(jqXHR, settings){
       if (config.debug) {console.debug('ServiceProxy.ajax beforeSend', jqXHR, settings);}
-      //jqXHR.setRequestHeader('QuickBlox-REST-API-Version', '0.1.1');
+      if (settings.url.indexOf('://qbprod.s3.amazonaws.com') === -1) {
+        console.debug('setting headers on request to ' + settings.url);
+        jqXHR.setRequestHeader('QuickBlox-REST-API-Version', '0.1.1');
+        if (_this.qbInst.session && _this.qbInst.session.token) {
+          jqXHR.setRequestHeader('QB-Token', _this.qbInst.session.token);
+        }
+      }
     },
     success: function (data, status, jqHXR) {
-      if (config.debug) {console.debug('ServiceProxy.ajax success', status,data);}
+      if (config.debug) {console.debug('ServiceProxy.ajax success', status, data);}
       callback(null,data);
     },
     error: function(jqHXR, status, error) {
@@ -638,6 +808,7 @@ ServiceProxy.prototype.ajax = function(params, callback) {
   if (typeof params.async === 'boolean') { ajaxCall.async = params.async; }
   if (typeof params.cache === 'boolean') { ajaxCall.cache = params.cache; }
   if (typeof params.crossDomain === 'boolean') { ajaxCall.crossDomain = params.crossDomain; }
+  if (typeof params.mimeType === 'string') { ajaxCall.mimeType = params.mimeType; }
   jQuery.ajax( ajaxCall );
 }
 
@@ -700,22 +871,43 @@ UsersProxy.prototype.listUsers = function(params, callback){
 UsersProxy.prototype.create = function(params, callback){
   var url = baseUrl + config.urls.type;
   if (config.debug) { console.debug('UsersProxy.create', params);}
-  this.service.ajax({url: url, type: 'POST', data: {user: params}}, function(err, data){
-          if (err) { callback(err, null);}
-          else { callback(null, data.user); }
-  });
+  this.service.ajax({url: url, type: 'POST', data: {user: params}}, 
+                    function(err, data){
+                      if (err) { callback(err, null);}
+                      else { callback(null, data.user); }
+                    });
 };
 
 UsersProxy.prototype.delete = function(id, callback){
   var url = baseUrl + '/' + id + config.urls.type;
   if (config.debug) { console.debug('UsersProxy.delete', url); }
-  this.service.ajax({url: url, type: 'DELETE', data: {}}, callback);
+  this.service.ajax({url: url, type: 'DELETE', dataType: 'text' },
+                    function(err,data){
+                      if (err) { callback(err, null);}
+                      else { callback(null, true); }
+                     });
 };
 
 UsersProxy.prototype.update = function(user, callback){
-  var url = baseUrl + '/' + user.id + config.urls.type;
+  var allowedProps = ['login', 'blob_id', 'email', 'external_user_id', 'facebook_id', 'twitter_id', 'full_name',
+      'phone', 'website', 'tag_list', 'password', 'old_password'];
+  var url = baseUrl + '/' + user.id + config.urls.type, msg = {}, prop;
+  for (prop in user) {
+    if (user.hasOwnProperty(prop)) {
+      if (allowedProps.indexOf(prop)>0) {
+        msg[prop] = user[prop];
+      } 
+    }
+  }
   if (config.debug) { console.debug('UsersProxy.update', url, user); }
-  this.service.ajax({url: url, type: 'PUT', data: {user: user.data}}, callback);
+  this.service.ajax({url: url, type: 'PUT', data: {user: msg}}, 
+                    function(err,data){
+                      if (err) {callback(err, null);}
+                      else { 
+                        console.debug (data.user);
+                        callback (null, data.user);
+                      }
+                    });
 };
 
 UsersProxy.prototype.get = function(params, callback){
@@ -728,7 +920,7 @@ UsersProxy.prototype.get = function(params, callback){
     url += '/' + params + config.urls.type;
   } else if (typeof params === 'object') {
     if (params.id) {
-      url += '/' + params + config.urls.type;
+      url += '/' + params.id + config.urls.type;
     } else if (params.facebookId) {
       url += '/by_facebook_id' + config.urls.type + '?facebook_id=' + params.facebookId;
     } else if (params.login) {
@@ -744,13 +936,14 @@ UsersProxy.prototype.get = function(params, callback){
     }
   }
   if (config.debug) {console.debug('UsersProxy.get', url);}
-  this.service.ajax({url:url}, function(err,data){
-                    var user;
-                    if (data && data.user) {
-                      user = data.user;
-                    }
-                    if (config.debug) { console.debug('UserProxy.get', user); }
-                      callback(err,user);
+  this.service.ajax({url:url},
+                    function(err,data){
+                      var user;
+                      if (data && data.user) {
+                        user = data.user;
+                      }
+                      if (config.debug) { console.debug('UserProxy.get', user); }
+                        callback(err,user);
                     });
 }
 
@@ -859,51 +1052,22 @@ QuickBlox.prototype.init = function init(appId, authKey, authSecret, debug) {
 QuickBlox.prototype.config = config;
 
 QuickBlox.prototype.createSession = function (params, callback){
-  var _this = this;
-  if (typeof params === 'function' && typeof callback === 'undefined') {
-    callback = params;
-    params = {};
-  }
-  if (config.debug) {console.log('createSession', params);}
-  this.auth.createSession(params, function(err,session) {
-    if (session) {
-      _this.session = session;
-    }
-    callback(err, session);
-    });
+  this.auth.createSession(params, callback);
 };
 
 QuickBlox.prototype.destroySession = function(callback){
-  var _this = this;
   if (this.session) {
-    this.auth.destroySession(function(err, result){
-      if (typeof err === 'undefined'){
-        _this.session = null;
-      }
-      callback(err,result);
-    });
+    this.auth.destroySession(callback);
   }
 };
 
 QuickBlox.prototype.login = function (params, callback){
-  var _this = this;
-  this.auth.login(params, function (err,session) {
-    if (session) {
-      _this.session = session;
-    }
-    callback(err, session);
-  });
+  this.auth.login(params, callback);
 };
 
 QuickBlox.prototype.logout = function(callback){
-  var _this = this;
   if (this.session) {
-    this.auth.logout(function(err, result){
-      if (typeof err === 'undefined'){
-        _this.session = null;
-      }
-      callback(err,result);
-    });
+    this.auth.logout(callback);
   }
 };
 

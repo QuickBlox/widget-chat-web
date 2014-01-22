@@ -1,5 +1,4 @@
-//Smiles
-var SMILEICONS = [
+var SMILES = [
 	{
 		plain: ':)',
 		regex: /((\s):-?\)|:-?\)(\s|$))/gm,
@@ -87,7 +86,7 @@ var SMILEICONS = [
 	},
 	{
 		plain: '<(',
-		regex: /((\s)<\(|<\((\s|$))/gm,
+		regex: /((\s)&lt;\(|&lt;\((\s|$))/gm,
 		image: '18.png'
 	},
 	{
@@ -96,8 +95,8 @@ var SMILEICONS = [
 		image: '19.png'
 	},
 	{
-		plain: 'O:)',
-		regex: /((\s)O:\)|O:\)(\s|$))/gm,
+		plain: 'Ox)',
+		regex: /((\s)Ox\)|Ox\)(\s|$))/gm,
 		image: '20.png'
 	},
 	{
@@ -132,32 +131,32 @@ var SMILEICONS = [
 	},
 	{
 		plain: '<3',
-		regex: /((\s)<3|<3(\s|$))/gm,
+		regex: /((\s)&lt;3|&lt;3(\s|$))/gm,
 		image: '27.png'
 	},
-		{
+	{
 		plain: ':like:',
 		regex: /((\s):like:|:like:(\s|$))/gm,
 		image: '28.png'
 	},
-		{
+	{
 		plain: ':dislike:',
 		regex: /((\s):dislike:|:dislike:(\s|$))/gm,
 		image: '29.png'
 	},
-		{
+	{
 		plain: ':up:',
 		regex: /((\s):up:|:up:(\s|$))/gm,
 		image: '30.png'
 	},
-		{
+	{
 		plain: ':v:',
 		regex: /((\s):v:|:v:(\s|$))/gm,
 		image: '31.png'
 	},
-		{
+	{
 		plain: ':ok:',
 		regex: /((\s):ok:|:ok:(\s|$))/gm,
 		image: '32.png'
 	}
-]
+];

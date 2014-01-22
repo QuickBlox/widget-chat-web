@@ -1,0 +1,492 @@
+/**
+ * QB Group Chat Room (XMPP)
+ * version 2.1.0
+ * 
+ * author: Andrey Povelichenko <andrey.povelichenko@quickblox.com>
+ */
+
+@import url(css/reset.css);
+
+@font-face {
+	font-family: Helvetica-Light;
+	src: url(fonts/HelveticaLTStd-Light.woff) format("woff");
+}
+@font-face {
+	font-family: Helvetica-Bold;
+	src: url(fonts/HelveticaLTStd-Bold.woff) format("woff");
+}
+
+/* Global
+----------------------------------------------------------*/
+html {
+	height: 100%;
+	font-size: 62.5%;
+}
+
+/* Flexible styles */
+.html-55 {font-size: 55%;}
+.html-80 {font-size: 80%;}
+.html-90 {font-size: 90%;}
+
+body {
+	width: 100%;
+	max-width: 900px;
+	height: 100%;
+	margin: 0 auto;
+	font-family: Helvetica, Arial, sans-serif;
+}
+button {
+	width: 100%;
+	padding: 0;
+	margin-bottom: .9rem;
+	text-align: center;
+	border: 0;
+	outline: 0;
+	cursor: pointer;
+}
+button:hover {
+	opacity: 0.6;
+}
+	button span {
+		display: inline-block;
+		padding-left: 3.5rem;
+		font-size: 1.8rem;
+		line-height: 3.8rem;
+		color: #fff;
+		background: left center no-repeat;
+		background-size: 2.4rem auto;
+	}
+fieldset {
+	padding: 0 .3rem;
+}
+.flexible fieldset {
+	padding: 0;
+}
+	fieldset input {
+		width: 100%;
+		height: 3.2rem;
+		padding: .7rem;
+		margin-bottom: .7rem;
+		font-size: 1.4rem;
+		border: 0;
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+	}
+a {
+	color: #0077cb;
+}
+a:hover {
+	text-decoration: none;
+}
+
+/* Main Layout
+-----------------------------------------------------------*/
+.layout {
+	height: 100%;
+	background: #ececec;
+}
+.center {
+	max-width: 300px;
+	margin: 0 auto;
+}
+.hidden {
+	display: none;
+}
+.error {
+	border: 1px solid #ff6969;
+	box-shadow: 0 0 5px rgba(146, 146, 146, 0.75);
+}
+.visible {
+	opacity: 1 !important;
+}
+
+/* Bubbles */
+.bubbles {
+	position: relative;
+	height: 10.5rem;
+}
+.bubbles_login {
+	height: 5rem;
+}
+.flexible .bubbles_login {
+	height: 7rem;
+}
+	.bubble {
+		position: absolute;
+	}
+	.bubble:after {
+		content: "";
+		position: absolute;
+		top: 100%;
+	}
+	.bubble_green {
+		width: 40%;
+		height: 50%;
+		background: #00bf28;
+		border-radius: 0 0 1.3rem 0;
+	}
+	.bubble_green:after {
+		left: 15%;
+		border-top: 2rem solid #00bf28;
+		border-right: 3rem solid transparent;
+	}
+	.bubble_blue {
+		right: 0;
+		width: 75%;
+		height: 73%;
+		background: rgba(0, 110, 188, 0.8);
+		border-radius: 0 0 0 2.5rem;
+	}
+	.bubble_blue:after {
+		right: 20%;
+		border-top: 2.8rem solid rgba(0, 110, 188, 0.8);
+		border-left: 4rem solid transparent;
+	}
+	.bubble_light_blue {
+		right: 0;
+		width: 50%;
+		height: 32%;
+		background: rgba(255, 255, 255, 0.29);
+		border-radius: 0 0 0 1.8rem;
+	}
+	.bubble_light_blue:after {
+		right: 12%;
+		border-top: 2.5rem solid rgba(255, 255, 255, 0.29);
+		border-right: 3.5rem solid transparent;
+	}
+	
+	.bubbles_login .bubble_green {
+		height: 30%;
+	}
+	.flexible .bubbles_login .bubble_green {
+		height: 50%;
+	}
+	.bubbles_login .bubble_green:after {
+		left: 0;
+	}
+	.flexible .bubbles_login .bubble_green:after {
+		left: 15%;
+	}
+
+/* Title */
+.header {
+	margin: -1.7rem 0 1.8rem;
+}
+.header_login {
+	margin: -1rem 0 .3rem;
+}
+.flexible .header_login {
+	margin: 0 0 1.5rem;
+}
+	.header h1 {
+		display: table;
+		margin: 0 auto;
+		padding: 2.4rem 0 0 2.7rem;
+		font-family: Helvetica-Light, Helvetica, Arial, sans-serif;
+		font-size: 2.1rem;
+		line-height: 2.4rem;
+		font-weight: normal;
+		color: #333;
+		background: url(images/qb_logo.png) left top no-repeat;
+		background-size: 2.5rem auto;
+	}
+		.header h1 b {
+			font-family: Helvetica-Bold, Helvetica, Arial, sans-serif;
+		}
+
+/* Authorization */		
+.btn_fb {
+	background: #3b5998;
+}
+.btn_qb {
+	background: #0077cb;
+}
+	.btn_fb span {
+		background-image: url(images/fb_auth.png);
+	}
+	.btn_qb span {
+		background-image: url(images/qb_auth.png);
+	}
+#auth .btn_qb,
+#signup-form .btn_qb {
+	margin-bottom: 0;
+}
+	
+/* Login */
+#login-fom .not-registered {
+	display: block;
+	font-size: 1.2rem;
+	line-height: 1.5rem;
+	text-align: center;
+	color: #999;
+}
+
+/* Version */
+.version {
+	padding-left: .7rem;
+	font-size: 1rem;
+	line-height: 2.2rem;
+	color: #fff;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.bubbles_login .version {
+	padding-left: .5rem;
+	line-height: 1.6rem;
+}
+	
+/* .powered {
+		position: absolute;
+		top: 0;
+		right: 5px;
+		font-size: 11px;
+	}*/
+
+/* Connecting Layout
+-------------------------------------------------------------*/
+#connecting {
+	position: relative;
+	font-size: 1.2rem;
+}
+	.progress {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		height: 3.5rem;
+		margin: auto;
+		text-align: center;
+	}
+		.progress p {
+			margin-bottom: 1rem;
+		}
+
+/* Signup Layout
+----------------------------------------------------------*/
+#signup-form form {
+	padding-top: 1.5rem;
+}
+.flexible #signup-form form {
+	padding-top: 3.5rem;
+}
+	#signup-form input {
+		margin-bottom: .8rem;
+	}
+	.uploader-wrap {
+		position: relative;
+		margin-bottom: .8rem;
+	}
+	.flexible #signup-form input,
+	.flexible .uploader-wrap {
+		margin-bottom: 1.2rem;
+	}
+		.uploader-wrap img {
+			float: right;
+			width: 2.4rem;
+			margin: .6rem .7rem 0;
+		}
+		.uploader-wrap:hover img {
+			opacity: 0.6;
+		}
+		.uploader-wrap .uploader-text {
+			width: 75%;
+			margin-bottom: 0 !important;
+		}
+		.uploader-wrap input[type="file"] {
+			position: absolute;
+			top: 0;
+			left: 0;
+			margin-bottom: 0 !important;
+			opacity: 0;
+			cursor: pointer;
+		}
+	
+#signup-success {
+	font-size: 1.4rem;
+	line-height: 1.6rem;
+}
+
+/* Chat Layout
+----------------------------------------------------------*/
+/* Chat Header */
+.chat-header {
+	height: 3.5rem;
+	line-height: 3.5rem;
+	background: #0077cb;
+}
+	.chat-header a {
+		text-align: center;
+		text-decoration: none;
+		opacity: 0.3;
+	}
+	.chat-header a:hover {
+		opacity: 1;
+	}
+	.users {
+		float: left;
+		max-width: 5.5rem;
+		padding: 0 1rem;
+		overflow: hidden;
+	}
+		.users span {
+			display: block;
+			padding-left: 1.3rem;
+			font-size: 1.2rem;
+			color: #fff;
+			background: url(images/users.png) left center no-repeat;
+		}
+	.logout {
+		float: right;
+		width: 3.6rem;
+	}
+		.logout img {
+			vertical-align: text-bottom;
+		}
+	.chat-name {
+		overflow: hidden;
+		font-size: 1.7rem;
+		font-weight: normal;
+		color: #fff;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+	
+/* Chat Content */
+.chat-content {
+	overflow-y: auto;
+	height: 73.6%;
+	border-bottom: 2px solid #0077cb;
+}
+	.message {
+		padding: .8rem;
+		opacity: 0;
+	}
+	.message.white {
+		background: #fff;
+	}
+		.message-avatar {
+			float: left;
+			width: 3.2rem;
+			height: 3.2rem;
+			margin-right: .7rem;
+		}
+		.message-body {
+			overflow: hidden;
+			font-size: 1.3rem;
+			color: #333;
+			word-break: break-all;
+		}
+			.message-description,
+			.message-description p {
+				margin-bottom: .8rem;
+			}
+				.message-description p:last-child {
+					margin-bottom: 0;
+				}
+				.message-description a:hover {
+					opacity: 0.8;
+				}
+			.message-author,
+			.message-time {
+				font-size: 1.2rem;
+				color: #999;
+			}
+			.message-author {
+				display: block;
+				margin-bottom: .2rem;
+				font-family: Helvetica-Bold, Helvetica, Arial, sans-serif;
+			}
+
+/* Chat Footer */
+.chat-footer {
+	position: relative;
+	height: 3.6rem;
+	border: 2px solid transparent;
+	border-top: 0;
+}
+	.chat-footer #message {
+		width: 100%;
+		height: 3.4rem;
+		padding: .85rem .7rem .85rem 3.5rem;
+		font-family: Helvetica, Arial, sans-serif;
+		font-size: 1.3rem;
+		line-height: 1.7rem;
+		border: 0;
+		resize: none;
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+	}
+	.chat-footer .smile {
+		position: absolute;
+		top: 22%;
+		left: .8rem;
+		opacity: 0.6;
+	}
+	.chat-footer .smile:hover {
+		opacity: 1;
+	}
+	
+	.html-55 .chat-footer .smile {top: 17%;}
+	.html-80 .chat-footer .smile {top: 27%;}
+	.html-90 .chat-footer .smile {top: 30%;}
+
+/* Users List */
+.users-list {
+	position: relative;
+	width: 15.5rem;
+	max-height: 550%;
+	overflow-y: auto;
+	background: #fff;
+	border: 2px solid #d4d4d4;
+	border-top: 0;
+	z-index: 1;
+}
+	.users-list li {
+		display: block;
+		font-size: 1.3rem;
+		line-height: 2.5rem;
+		padding: 0 .6rem;
+		color: #333;
+		overflow: hidden;
+	}
+	.users-list-title {
+		font-family: Helvetica-Bold, Helvetica, Arial, sans-serif;
+		color: #0066cc !important;
+	}
+
+/* Smiles Collection */
+.smileicons {
+	height: 16px;
+	width: 16px;
+	vertical-align: text-bottom;
+}
+.smiles-list {
+	position: absolute;
+	top: -199%;
+	left: -.2rem;
+	width: 100%;
+	height: 6.8rem;
+	overflow: auto;
+	background: #fff;
+	border: 2px solid #d4d4d4;
+	border-bottom: 0;
+}
+	.smiles-list .smileicons {
+		padding: 7px;
+	}
+	.smiles-list .smileicons:hover {
+		background: #0077cb;
+		cursor: pointer;
+	}
+
+/* Service Messages */
+.service-message {
+	display: block;
+	padding: .8rem;
+	font-size: 1.3rem;
+	background: #fffabb;
+	word-break: break-all;
+}			
+.joined {color: #108134;}
+.left {color: #76112b;}
