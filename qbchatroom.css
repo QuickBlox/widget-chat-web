@@ -367,8 +367,7 @@ a:hover {
 	}
 		.message-avatar {
 			float: left;
-			width: 3.2rem;
-			height: 3.2rem;
+			max-width: 3.2rem;
 			margin-right: .7rem;
 		}
 		.message-body {
@@ -396,6 +395,9 @@ a:hover {
 				display: block;
 				margin-bottom: .2rem;
 				font-family: Helvetica-Bold, Helvetica, Arial, sans-serif;
+			}
+			.message-time {
+				line-height: 1.2rem;
 			}
 
 /* Chat Footer */
@@ -436,6 +438,7 @@ a:hover {
 	position: relative;
 	width: 15.5rem;
 	max-height: 550%;
+	margin-top: .1rem;
 	overflow-y: auto;
 	background: #fff;
 	border: 2px solid #d4d4d4;
@@ -457,23 +460,29 @@ a:hover {
 
 /* Smiles Collection */
 .smileicons {
-	height: 16px;
-	width: 16px;
+	max-width: 1.6rem;
+	max-height: 1.6rem;
 	vertical-align: text-bottom;
+	margin: .2rem 0;
 }
 .smiles-list {
 	position: absolute;
-	top: -199%;
-	left: -.2rem;
-	width: 100%;
+	top: -7.1rem;
+	left: -.05rem;
+	width: 99.9%;
 	height: 6.8rem;
 	overflow: auto;
 	background: #fff;
 	border: 2px solid #d4d4d4;
 	border-bottom: 0;
 }
+.html-55 .smiles-list {
+	top: -7.3rem;
+	left: -.2rem;
+}
 	.smiles-list .smileicons {
 		padding: 7px;
+		margin: 0;
 	}
 	.smiles-list .smileicons:hover {
 		background: #0077cb;

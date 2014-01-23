@@ -44,8 +44,8 @@ $(document).ready(function() {
 		$('#signUp').click(function(){ signUp(); return false; });
 		$('#dataLogin').click(function(){ prepareDataForLogin(); return false; });
 		$('#dataSignup').click(function(){ prepareDataForSignUp(); return false; });
-		$('.users').click(function(){ showUsersList(); return false; });
-		$('.smile').click(function(){ showSmiles(); return false; });
+		$('.users').click(function(){ showList('users'); return false; });
+		$('.smile').click(function(){ showList('smile'); return false; });
 		$('.smiles-list *').click(function() { choseSmile(this); });
 		$('.logout').click(function(){ logout(); return false; });
 	});
