@@ -70,26 +70,26 @@ function updateTime() {
 	setTimeout(updateTime, 60 * 1000);
 }
 
-function showUsersList() {
-	$('.users').addClass('visible');
-	$('.users-list').show();
+function showList(type) {
+	var obj = '.' + type;
+	var objList = '.' + type + '-list';
 	
-	$(document).click(function(e) {
-		if ($(e.target).is('.users, .users-list *')) return;
-		$('.users-list').hide();
-		$('.users').removeClass('visible');
-	});
-}
-
-function showSmiles() {
-	$('.smile').addClass('visible');
-	$('.smiles-list').show();
-
-	$(document).click(function(e) {
-		if ($(e.target).is('.smile, .smiles-list *')) return;
-		$('.smiles-list').hide();
-		$('.smile').removeClass('visible');
-	});
+	if (!$(obj).is('.visible')) {
+		$(obj).addClass('visible');
+		$(objList).show();
+		
+		$(document).click(function(e) {
+			if ($(e.target).is(objList, objList + ' *')) return;
+			hideList(obj, objList);
+		});
+	} else {
+		hideList(obj, objList);
+	}
+	
+	function hideList(obj, objList) {
+		$(objList).hide();
+		$(obj).removeClass('visible');
+	}
 }
 
 function choseSmile(img) {
