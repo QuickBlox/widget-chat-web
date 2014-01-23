@@ -71,15 +71,15 @@ function updateTime() {
 }
 
 function showList(type) {
-	var obj = '.' + type;
-	var objList = '.' + type + '-list';
+	var obj = type;
+	var objList = type + '-list';
 	
 	if (!$(obj).is('.visible')) {
 		$(obj).addClass('visible');
 		$(objList).show();
 		
 		$(document).click(function(e) {
-			if ($(e.target).is(objList, objList + ' *')) return;
+			if ($(e.target).is(objList + ' *')) return;
 			hideList(obj, objList);
 		});
 	} else {
