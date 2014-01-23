@@ -419,19 +419,19 @@ a:hover {
 		-moz-box-sizing: border-box;
 		box-sizing: border-box;
 	}
-	.chat-footer .smile {
+	.chat-footer .smiles {
 		position: absolute;
 		top: 22%;
 		left: .8rem;
 		opacity: 0.6;
 	}
-	.chat-footer .smile:hover {
+	.chat-footer .smiles:hover {
 		opacity: 1;
 	}
 	
-	.html-55 .chat-footer .smile {top: 17%;}
-	.html-80 .chat-footer .smile {top: 27%;}
-	.html-90 .chat-footer .smile {top: 30%;}
+	.html-55 .chat-footer .smiles {top: 17%;}
+	.html-80 .chat-footer .smiles {top: 27%;}
+	.html-90 .chat-footer .smiles {top: 30%;}
 
 /* Users List */
 .users-list {
