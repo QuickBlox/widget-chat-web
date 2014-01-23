@@ -367,8 +367,7 @@ a:hover {
 	}
 		.message-avatar {
 			float: left;
-			width: 3.2rem;
-			height: 3.2rem;
+			max-width: 3.2rem;
 			margin-right: .7rem;
 		}
 		.message-body {
