@@ -63,10 +63,7 @@ function getSmiles() {
 }
 
 function updateTime() {
-	$('.message-time').each(function() {
-		$(this).text($.timeago($(this).data('time')));
-	});
-	
+	$('.message-time').timeago().removeAttr('title');
 	setTimeout(updateTime, 60 * 1000);
 }
 

@@ -1,6 +1,6 @@
 /**
  * QB Group Chat Room (XMPP)
- * version 2.1.0
+ * version 2.1.1
  * 
  * author: Andrey Povelichenko <andrey.povelichenko@quickblox.com>
  */
@@ -397,7 +397,7 @@ a:hover {
 				font-family: Helvetica-Bold, Helvetica, Arial, sans-serif;
 			}
 			.message-time {
-				line-height: 1.2rem;
+				line-height: 1.3rem;
 			}
 
 /* Chat Footer */
