@@ -1,6 +1,6 @@
 /**
  * QB Group Chat Room (XMPP)
- * version 2.1.0
+ * version 2.1.1
  * 
  * author: Andrey Povelichenko <andrey.povelichenko@quickblox.com>
  */
@@ -380,7 +380,7 @@ function getMessage(stanza, room) {
 	html += '<div class="message-body">';
 	html += '<div class="message-description">' + (response.message ? parser(response.message) : parser(response)) + '</div>';
 	html += '<footer><span class="message-author">' + author + '</span>';
-	html += '<span class="message-time" data-time="' + time + '">' + $.timeago(time) + '</span></footer>';
+	html += '<time class="message-time" datetime="' + time + '">' + $.timeago(time) + '</time></footer>';
 	html += '</div></section>';
 	
 	$('.chat-content').append(html).find('.message:odd').addClass('white');
