@@ -373,7 +373,7 @@ function getMessage(stanza, room) {
 	
 	response = checkResponse(response);
 	author = getAuthorName(author);
-	time = time ? time : new Date();
+	time = time ? time : (new Date()).toISOString();
 	
 	html = '<section class="message">';
 	html += '<img class="message-avatar" src="' + (response.avatar ? response.avatar : defaultAvatar) + '" alt="avatar">';
