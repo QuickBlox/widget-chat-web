@@ -42,12 +42,12 @@ $(document).ready(function() {
 		$('#authFB').click(function(){ authFB() });
 		$('#authQB').click(function(){ authQB() });
 		$('#signUp').click(function(){ signUp(); return false; });
-		$('#dataLogin').click(function(){ prepareDataForLogin(); return false; });
-		$('#dataSignup').click(function(){ prepareDataForSignUp(); return false; });
+		$('.logout').click(function(){ logout(); return false; });
+		$('.smiles-list *').click(function() { choseSmile(this); });
 		$('.users').click(function(){ showList('.users'); return false; });
 		$('.smiles').click(function(){ showList('.smiles'); return false; });
-		$('.smiles-list *').click(function() { choseSmile(this); });
-		$('.logout').click(function(){ logout(); return false; });
+		$('#dataLogin').click(function(){ prepareDataForLogin(); return false; });
+		$('#dataSignup').click(function(){ prepareDataForSignUp(); return false; });
 	});
 });
 
@@ -338,7 +338,7 @@ function getRoster(users, room) {
 	
 	$(occupants).each(function() {
 		var user = Strophe.unescapeNode(users[this].nick);
-		$('.users-list').append('<li class="user">' + user + '</li>');
+		$('.users-list').append('<li class="user show-actions" onclick="showActionsToolbar()">' + user + '</li>');
 	});
   
   return true;
@@ -375,7 +375,7 @@ function getMessage(stanza, room) {
 	author = getAuthorName(author);
 	time = time ? time : (new Date()).toISOString();
 	
-	html = '<section class="message">';
+	html = '<section class="message show-actions" onclick="showActionsToolbar()">';
 	html += '<img class="message-avatar" src="' + (response.avatar ? response.avatar : defaultAvatar) + '" alt="avatar">';
 	html += '<div class="message-body">';
 	html += '<div class="message-description">' + (response.message ? parser(response.message) : parser(response)) + '</div>';
@@ -384,7 +384,7 @@ function getMessage(stanza, room) {
 	html += '</div></section>';
 	
 	$('.chat-content').append(html).find('.message:odd').addClass('white');
-	$('.chat-content .message:last').fadeTo(500, 1);
+	$('.chat-content .message:last').fadeTo(300, 1);
 	$('.chat-content').scrollTo('.message:last', 0);
 
 	return true;

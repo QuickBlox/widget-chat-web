@@ -110,8 +110,8 @@ function checkResponse(response) {
 	}
 }
 
-function getAuthorName(JID) {
-	return Strophe.unescapeNode(Strophe.getResourceFromJid(JID));
+function getAuthorName(jid) {
+	return Strophe.unescapeNode(Strophe.getResourceFromJid(jid));
 }
 
 function parser(str) {
@@ -119,15 +119,24 @@ function parser(str) {
 		var url = (/^[a-z]+:/i).test(match) ? match : 'http://' + match;
 		var url_text = match;
 		
-		return '<a href="' + escapeHTML(url) + '" target="_blank">' + escapeHTML(url_text) + '</a>';
+		return '<a href="' + escapeHTML(url) + '" target="_blank" class="hide-actions">' + escapeHTML(url_text) + '</a>';
 	});
-
+	
 	$(SMILES).each(function(i) {
 		str = str.replace(SMILES[i].regex, '<img class="smileicons" alt="icons" src="images/smiles/' + SMILES[i].image + '">');
 	});
 	return str;
-		
+	
 	function escapeHTML(s) {
 		return s.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 	}
+}
+
+function showActionsToolbar() {
+	$(document).click(function(e) {
+		if ($(e.target).is('.hide-actions'))
+			$('.actions-wrap').hide();
+		else if ($(e.target).is('.show-actions, .show-actions *'))
+			$('.actions-wrap').show();
+	});
 }
