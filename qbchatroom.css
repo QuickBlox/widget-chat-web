@@ -467,6 +467,11 @@ a:hover {
 		font-family: Helvetica-Bold, Helvetica, Arial, sans-serif;
 		color: #0066cc !important;
 	}
+	.message:hover,
+	.user:hover {
+		background: #cdeaff;
+		cursor: pointer;
+	}
 
 /* Smiles Collection */
 .smileicons {
@@ -507,4 +512,4 @@ a:hover {
 .left {color: #76112b;}
 
 /* Actions Menu */
-/*background: #cdeaff;*/
+

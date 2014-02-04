@@ -116,18 +116,18 @@ function getAuthorName(JID) {
 
 function parser(str) {
 	var str = ('<p>' + escapeHTML(str)).replace(/\n\n/g, '<p>').replace(/\n/g, '<br>').replace(URL_REGEXP, function(match) {
-		var url = (/^[a-z]+:/i).test(match) ? match : "http://" + match;
+		var url = (/^[a-z]+:/i).test(match) ? match : 'http://' + match;
 		var url_text = match;
 		
-		return "<a href=\""+escapeHTML(url)+"\" target=\"_blank\">"+escapeHTML(url_text)+"</a>";
+		return '<a href="' + escapeHTML(url) + '" target="_blank">' + escapeHTML(url_text) + '</a>';
 	});
 
 	$(SMILES).each(function(i) {
-		str = str.replace(SMILES[i].regex, '$2<img class="smileicons" alt="$1" src="images/smiles/' + SMILES[i].image + '">$3');
+		str = str.replace(SMILES[i].regex, '<img class="smileicons" alt="icons" src="images/smiles/' + SMILES[i].image + '">');
 	});
 	return str;
 		
 	function escapeHTML(s) {
-		return s.replace(/</g,"&lt;").replace(/>/g,"&gt;");
+		return s.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 	}
 }

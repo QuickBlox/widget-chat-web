@@ -338,7 +338,7 @@ function getRoster(users, room) {
 	
 	$(occupants).each(function() {
 		var user = Strophe.unescapeNode(users[this].nick);
-		$('.users-list').append('<li>' + user + '</li>');
+		$('.users-list').append('<li class="user">' + user + '</li>');
 	});
   
   return true;
