@@ -338,7 +338,7 @@ function getRoster(users, room) {
 	
 	$(occupants).each(function() {
 		var user = Strophe.unescapeNode(users[this].nick);
-		$('.users-list').append('<li class="user show-actions" onclick="showActionsToolbar()">' + user + '</li>');
+		$('.users-list').append('<li class="show-actions">' + user + '</li>');
 	});
   
   return true;
@@ -375,7 +375,7 @@ function getMessage(stanza, room) {
 	author = getAuthorName(author);
 	time = time ? time : (new Date()).toISOString();
 	
-	html = '<section class="message show-actions" onclick="showActionsToolbar()">';
+	html = '<section class="message show-actions">';
 	html += '<img class="message-avatar" src="' + (response.avatar ? response.avatar : defaultAvatar) + '" alt="avatar">';
 	html += '<div class="message-body">';
 	html += '<div class="message-description">' + (response.message ? parser(response.message) : parser(response)) + '</div>';

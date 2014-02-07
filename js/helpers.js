@@ -13,6 +13,7 @@ function connectSuccess() {
 	$('#chat').show();
 	$('#chat .chat-content').html('');
 	$('#chat #message').val('');
+	showActionsToolbar();
 }
 
 function signUpFailure() {
