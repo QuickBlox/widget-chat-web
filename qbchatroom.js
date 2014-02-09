@@ -36,6 +36,7 @@ $(document).ready(function() {
 		changeInputFileBehavior();
 		changeHeightChatBlock();
 		getSmiles();
+		clickBehavior();
 		updateTime();
 		sendMesage();
 		
@@ -331,21 +332,27 @@ function rawInput(data) {console.log('RECV: ' + data);}
 function rawOutput(data) {console.log('SENT: ' + data);}
 
 function getRoster(users, room) {
+	console.log(users);
+	
 	var occupants = Object.keys(users);
+	//var qbUsers = new Array(occupants.length);
 	
 	$('.users-count').text(occupants.length);
 	$('.users-list').html('<li class="users-list-title">Occupants</li>');
 	
-	$(occupants).each(function() {
+	$(occupants).each(function(i) {
+		//qbUsers[i] = Strophe.getNodeFromJid(users[this].jid).split("-")[0];
 		var user = Strophe.unescapeNode(users[this].nick);
-		$('.users-list').append('<li class="show-actions">' + user + '</li>');
+		$('.users-list').append('<li class="user show-actions" onclick="showActionsToolbar()">' + user + '</li>');
 	});
+	//console.log(qbUsers);
   
   return true;
 }
 
 function getPresence(stanza, room) {
 	console.log('[XMPP] Presence');
+	console.log(stanza);
 	
 	var messagesCount = $('.message').length;
 	var type = $(stanza).attr('type');
@@ -364,6 +371,7 @@ function getPresence(stanza, room) {
 
 function getMessage(stanza, room) {
 	console.log('[XMPP] Message');
+	console.log(stanza);
 	var html;
 	
 	var defaultAvatar = 'images/avatar_default.png';
@@ -375,7 +383,7 @@ function getMessage(stanza, room) {
 	author = getAuthorName(author);
 	time = time ? time : (new Date()).toISOString();
 	
-	html = '<section class="message show-actions">';
+	html = '<section class="message show-actions" onclick="showActionsToolbar()">';
 	html += '<img class="message-avatar" src="' + (response.avatar ? response.avatar : defaultAvatar) + '" alt="avatar">';
 	html += '<div class="message-body">';
 	html += '<div class="message-description">' + (response.message ? parser(response.message) : parser(response)) + '</div>';

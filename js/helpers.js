@@ -13,7 +13,6 @@ function connectSuccess() {
 	$('#chat').show();
 	$('#chat .chat-content').html('');
 	$('#chat #message').val('');
-	showActionsToolbar();
 }
 
 function signUpFailure() {
@@ -63,36 +62,46 @@ function getSmiles() {
 	});
 }
 
-function updateTime() {
-	$('.message-time').timeago().removeAttr('title');
-	setTimeout(updateTime, 60 * 1000);
+function clickBehavior() {
+	$(document).click(function(e) {
+		if ($(e.target).is('.hide-actions, .hide-actions *')) {
+			$('.actions-wrap').hide();
+		}
+		else if ($(e.target).is('.show-actions, .show-actions *')) {
+			if ($(e.target).is('.user') || !$('.users').is('.visible') && !$('.smiles').is('.visible'))
+				$('.actions-wrap').show();
+		}
+		if (!$(e.target).is('.users, .users-list-title')) {
+			$('.users').removeClass('visible');
+			$('.users-list').hide();
+		}
+		if (!$(e.target).is('.smiles, .smiles-list, .smiles-list *')) {
+			$('.smiles').removeClass('visible');
+			$('.smiles-list').hide();
+		}
+	});
 }
 
-function showList(type) {
-	var obj = type;
-	var objList = type + '-list';
+function showList(obj) {
+	var objList = obj + '-list';
 	
-	if (!$(obj).is('.visible')) {
+	if ($(obj).is('.visible')) {
+		$(obj).removeClass('visible');
+		$(objList).hide();
+	} else {
 		$(obj).addClass('visible');
 		$(objList).show();
-		
-		$(document).click(function(e) {
-			if ($(e.target).is(objList + ' *')) return;
-			hideList(obj, objList);
-		});
-	} else {
-		hideList(obj, objList);
-	}
-	
-	function hideList(obj, objList) {
-		$(objList).hide();
-		$(obj).removeClass('visible');
 	}
 }
 
 function choseSmile(img) {
 	var tmp = $('#message').val() + ' ' + $(img).data('plain') + ' ';
 	$('#message').val(tmp);
+}
+
+function updateTime() {
+	$('.message-time').timeago().removeAttr('title');
+	setTimeout(updateTime, 60 * 1000);
 }
 
 function trim(str) {
@@ -107,7 +116,7 @@ function checkResponse(response) {
 	try {
 		return $.parseJSON(Strophe.unescapeNode(response));
 	} catch(err) {
-		return Strophe.unescapeNode(response);
+		return response;
 	}
 }
 
@@ -134,10 +143,9 @@ function parser(str) {
 }
 
 function showActionsToolbar() {
-	$(document).click(function(e) {
-		if ($(e.target).is('.hide-actions'))
-			$('.actions-wrap').hide();
-		else if ($(e.target).is('.show-actions, .show-actions *'))
-			$('.actions-wrap').show();
-	});
+	var html = '<a href="#" class="btn btn_action"><span>Reply</span></a>';
+	html += '<a href="#" class="btn btn_action"><span>Private message</span></a>';
+	html += '<a href="#" class="btn btn_action"><span>View profile</span></a>';
+	
+	$('.actions').html(html);
 }
