@@ -13,6 +13,8 @@ function connectSuccess() {
 	$('#chat').show();
 	$('#chat .chat-content').html('');
 	$('#chat #message').val('');
+	createMessagesLoadingIcon();
+	isLogout = false;
 }
 
 function signUpFailure() {
@@ -48,12 +50,14 @@ function changeInputFileBehavior() {
 
 function changeHeightChatBlock() {
 	var fixHeight = 2;
+	var fixUsersListHeight = 27;
 	var chatHeaderHeight = $('.chat-header').height();
 	var chatFooterHeight = $('.chat-footer').height();
 	var chatContentHeight;
 	
 	chatContentHeight = WIDGET_HEIGHT - chatHeaderHeight - chatFooterHeight - fixHeight;
 	$('.chat-content').height(chatContentHeight);
+	$('.users-list').css('max-height', chatContentHeight - fixUsersListHeight);
 }
 
 function getSmiles() {
@@ -71,7 +75,7 @@ function clickBehavior() {
 			if ($(e.target).is('.user') || !$('.users').is('.visible') && !$('.smiles').is('.visible'))
 				$('.actions-wrap').show();
 		}
-		if (!$(e.target).is('.users, .users-list-title')) {
+		if (!$(e.target).is('.users, .users-list-title, .loading_users, .loading_users *')) {
 			$('.users').removeClass('visible');
 			$('.users-list').hide();
 		}
@@ -112,16 +116,16 @@ function trim(str) {
 	return str;
 }
 
+function getQBId(jid) {
+	return Strophe.unescapeNode(Strophe.getResourceFromJid(jid));
+}
+
 function checkResponse(response) {
 	try {
 		return $.parseJSON(Strophe.unescapeNode(response));
 	} catch(err) {
 		return response;
 	}
-}
-
-function getAuthorName(jid) {
-	return Strophe.unescapeNode(Strophe.getResourceFromJid(jid));
 }
 
 function parser(str) {
@@ -142,10 +146,16 @@ function parser(str) {
 	}
 }
 
-function showActionsToolbar() {
-	var html = '<a href="#" class="btn btn_action"><span>Reply</span></a>';
-	html += '<a href="#" class="btn btn_action"><span>Private message</span></a>';
-	html += '<a href="#" class="btn btn_action"><span>View profile</span></a>';
-	
-	$('.actions').html(html);
+function createUsersLoadingIcon() {
+	$('.users-list').append('<li class="loading_users"><div id="floatingCirclesG_users"></div></li>');
+	for (var i = 1; i < 9; i++) {
+		$('#floatingCirclesG_users').append('<div class="f_circleG_users" id="frotateG_0'+i+'_users"></div>');
+	}
+}
+
+function createMessagesLoadingIcon() {
+	$('.chat-content').append('<div class="loading_messages"><div id="floatingCirclesG_messages"></div></div>');
+	for (var i = 1; i < 9; i++) {
+		$('#floatingCirclesG_messages').append('<div class="f_circleG_messages" id="frotateG_0'+i+'_messages"></div>');
+	}
 }

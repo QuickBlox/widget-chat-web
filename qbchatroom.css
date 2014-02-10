@@ -6,6 +6,7 @@
  */
 
 @import url(css/reset.css);
+@import url(css/animation_loading.css);
 
 @font-face {
 	font-family: Helvetica-Light;
@@ -366,8 +367,19 @@ fieldset {
 /* Chat Content */
 .chat-content {
 	overflow-y: auto;
+	width: 100%;
 	height: 73.6%;
 	border-bottom: 2px solid #0077cb;
+}
+.loading_messages {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 50px;
+	height: 50px;
+	margin: auto;
 }
 	.message {
 		padding: .8rem;
@@ -448,7 +460,6 @@ fieldset {
 .users-list {
 	position: relative;
 	width: 15.5rem;
-	max-height: 550%;
 	overflow-y: auto;
 	background: #fff;
 	border: 2px solid #d4d4d4;
