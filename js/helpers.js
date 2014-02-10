@@ -128,15 +128,20 @@ function checkResponse(response) {
 	}
 }
 
-function parser(str) {
+function parser(str, time) {
 	var quote;
+	var signal = $('#signal')[0];
 	
 	// parser of invalid xml symbols
 	str = escapeHTML(str);
 	
 	// parser of quote
 	quote = str.split(' ')[0].charAt(0) == '@' && str.split(' ')[0];
-	str = quote ? str.replace(quote, '<b>' + quote.replace("%20", ' ') + '</b>') : str;
+	if (quote) {
+		str = str.replace(quote, '<b>' + escapeSpace(quote) + '</b>');
+		if (escapeSpace(quote.split('@')[1]) == chatUser.nick && !time)
+			signal.play();
+	}
 	
 	// parser of paragraphs
 	str = ('<p>' + str).replace(/\n\n/g, '<p>').replace(/\n/g, '<br>');
@@ -157,6 +162,9 @@ function parser(str) {
 	
 	function escapeHTML(s) {
 		return s.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+	}
+	function escapeSpace(s) {
+		return s.replace("%20", ' ');
 	}
 }
 

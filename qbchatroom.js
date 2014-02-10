@@ -373,13 +373,13 @@ function getMessage(stanza, room) {
 	
 	qb = getQBId(author);
 	response = checkResponse(response);
-	time = time || (new Date()).toISOString();
 	
-	message = response.message ? parser(response.message) : parser(response);
+	message = response.message ? parser(response.message, time) : parser(response, time);
 	nick = response.nick || qb;
 	avatar = response.avatar || defaultAvatar;
 	fb = response.fb || '';
 	icon = response.fb ? 'images/fb_auth.png' : 'images/qb_auth.png';
+	time = time || (new Date()).toISOString();
 	
 	html = '<section class="message show-actions" data-qb="' + qb + '" data-fb="' + fb + '" onclick="showActionsToolbar(this)">';
 	//html += '<img class="message-icon" src="' + icon + '" alt="icon">';
