@@ -129,16 +129,30 @@ function checkResponse(response) {
 }
 
 function parser(str) {
-	var str = ('<p>' + escapeHTML(str)).replace(/\n\n/g, '<p>').replace(/\n/g, '<br>').replace(URL_REGEXP, function(match) {
+	var quote;
+	
+	// parser of invalid xml symbols
+	str = escapeHTML(str);
+	
+	// parser of quote
+	quote = str.split(' ')[0].charAt(0) == '@' && str.split(' ')[0];
+	str = quote ? str.replace(quote, '<b>' + quote.replace("%20", ' ') + '</b>') : str;
+	
+	// parser of paragraphs
+	str = ('<p>' + str).replace(/\n\n/g, '<p>').replace(/\n/g, '<br>');
+	
+	// parser of links
+	str = str.replace(URL_REGEXP, function(match) {
 		var url = (/^[a-z]+:/i).test(match) ? match : 'http://' + match;
 		var url_text = match;
-		
 		return '<a href="' + escapeHTML(url) + '" target="_blank" class="hide-actions">' + escapeHTML(url_text) + '</a>';
 	});
 	
+	// parser of smiles
 	$(SMILES).each(function(i) {
 		str = str.replace(SMILES[i].regex, '<img class="smileicons" alt="icons" src="images/smiles/' + SMILES[i].image + '">');
 	});
+	
 	return str;
 	
 	function escapeHTML(s) {
@@ -158,4 +172,9 @@ function createMessagesLoadingIcon() {
 	for (var i = 1; i < 9; i++) {
 		$('#floatingCirclesG_messages').append('<div class="f_circleG_messages" id="frotateG_0'+i+'_messages"></div>');
 	}
+}
+
+function quote(link) {
+	var quote = '@' + $(link).data('nick').replace(/ /g, "%20") + ' ';
+	$('#message').focus().val(quote);
 }

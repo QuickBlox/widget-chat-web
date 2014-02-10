@@ -468,7 +468,7 @@ function showActionsToolbar(info) {
 	var fb = $(info).data('fb');
 	var nick = $(info).find('.message-author').text() || $(info).text();
 	
-	html = '<a href="#" class="btn btn_action" data-nick="' + nick + '"><span>Reply</span></a>';
+	html = '<a href="#" class="btn btn_action" data-nick="' + nick + '" onclick="quote(this); return false;"><span>Reply</span></a>';
 	html += '<a href="#" class="btn btn_action" data-qb="' + qb + '"><span>Private message</span></a>';
 	html += fb ? '<a href="https://facebook.com/' + fb + '" class="btn btn_action" target="_blank"><span>View profile</span></a>' : '';
 	
