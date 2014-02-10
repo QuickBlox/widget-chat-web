@@ -337,7 +337,7 @@ function getRoster(users, room) {
 	var usersCount = Object.keys(users).length;
 	$('.users-count').text(usersCount);
 	if (!isOccupantsGet) getOccupants();
-  return true;
+	return true;
 }
 
 function getPresence(stanza, room) {
@@ -364,7 +364,7 @@ function getPresence(stanza, room) {
 
 function getMessage(stanza, room) {
 	console.log('[XMPP] Message');
-	var html, qb, message, nick, avatar, fb;
+	var html, qb, message, nick, avatar, fb, icon;
 	
 	var defaultAvatar = 'images/avatar_default.png';
 	var author = $(stanza).attr('from');
@@ -379,8 +379,10 @@ function getMessage(stanza, room) {
 	nick = response.nick || qb;
 	avatar = response.avatar || defaultAvatar;
 	fb = response.fb || '';
+	icon = response.fb ? 'images/fb_auth.png' : 'images/qb_auth.png';
 	
 	html = '<section class="message show-actions" data-qb="' + qb + '" data-fb="' + fb + '" onclick="showActionsToolbar(this)">';
+	//html += '<img class="message-icon" src="' + icon + '" alt="icon">';
 	html += '<img class="message-avatar" src="' + avatar + '" alt="avatar">';
 	html += '<div class="message-body">';
 	html += '<div class="message-description">' + message + '</div>';
@@ -451,7 +453,8 @@ function getOccupants() {
 					var qb = this.user.id;
 					var fb = this.user.facebook_id || '';
 					var name = this.user.full_name;
-					$('.users-list').append('<li class="user show-actions" data-qb="' + qb + '" data-fb="' + fb + '" onclick="showActionsToolbar(this)">' + name + '</li>');
+					var iconClass = this.user.facebook_id ? 'user_fb_icon' : 'user_qb_icon';
+					$('.users-list').append('<li class="user show-actions ' + iconClass + '" data-qb="' + qb + '" data-fb="' + fb + '" onclick="showActionsToolbar(this)">' + name + '</li>');
 					storageUsersKeys[String(qb)] = name;
 				});
 			});
