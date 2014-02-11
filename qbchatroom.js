@@ -5,9 +5,11 @@
  * author: Andrey Povelichenko <andrey.povelichenko@quickblox.com>
  */
 
-var storage, params, connection;
+var storage, params, connection, storageUsersKeys = {};
 var isFBConnected = false;
 var isSubscribeEnabled = false;
+var isGettingOccupantsStarted = false;
+var isLogout = false;
 var chatUser = {
 	nick: null,
 	avatar: null,
@@ -36,18 +38,19 @@ $(document).ready(function() {
 		changeInputFileBehavior();
 		changeHeightChatBlock();
 		getSmiles();
+		clickBehavior();
 		updateTime();
 		sendMesage();
 		
 		$('#authFB').click(function(){ authFB() });
 		$('#authQB').click(function(){ authQB() });
 		$('#signUp').click(function(){ signUp(); return false; });
-		$('#dataLogin').click(function(){ prepareDataForLogin(); return false; });
-		$('#dataSignup').click(function(){ prepareDataForSignUp(); return false; });
+		$('.logout').click(function(){ logout(); return false; });
+		$('.smiles-list *').click(function() { choseSmile(this); });
 		$('.users').click(function(){ showList('.users'); return false; });
 		$('.smiles').click(function(){ showList('.smiles'); return false; });
-		$('.smiles-list *').click(function() { choseSmile(this); });
-		$('.logout').click(function(){ logout(); return false; });
+		$('#dataLogin').click(function(){ prepareDataForLogin(); return false; });
+		$('#dataSignup').click(function(){ prepareDataForSignUp(); return false; });
 	});
 });
 
@@ -311,7 +314,7 @@ function connectChat(chatUser, storage) {
 			if (storage) localStorage['qbAuth'] = JSON.stringify(storage);
 			
 			connectSuccess();
-			connection.muc.join(CHAT.room_jid, chatUser.nick, getMessage, getPresence, getRoster);
+			connection.muc.join(CHAT.room_jid, String(chatUser.qb.id), getMessage, getPresence, getRoster);
 			break;
 		case Strophe.Status.DISCONNECTING:
 			console.log('[Connection] Disconnecting');
@@ -327,90 +330,201 @@ function connectChat(chatUser, storage) {
 	});
 }
 
-function rawInput(data) {console.log('RECV: ' + data);}
-function rawOutput(data) {console.log('SENT: ' + data);}
+function rawInput(data) {/*console.log('RECV: ' + data);*/}
+function rawOutput(data) {/*console.log('SENT: ' + data);*/}
 
 function getRoster(users, room) {
-	var occupants = Object.keys(users);
-	
-	$('.users-count').text(occupants.length);
-	$('.users-list').html('<li class="users-list-title">Occupants</li>');
-	
-	$(occupants).each(function() {
-		var user = Strophe.unescapeNode(users[this].nick);
-		$('.users-list').append('<li>' + user + '</li>');
-	});
-  
-  return true;
+	var usersCount = Object.keys(users).length;
+	$('.users-count').text(usersCount);
+	if (!isGettingOccupantsStarted) getOccupants();
+	return true;
 }
 
 function getPresence(stanza, room) {
 	console.log('[XMPP] Presence');
+	var qb, nick;
 	
-	var messagesCount = $('.message').length;
+	var user = $(stanza).attr('from');
 	var type = $(stanza).attr('type');
-	var user = getAuthorName($(stanza).attr('from'));
-	
-	if (messagesCount > 0 && type && user != 'admin') {
-		$('.chat-content').append('<span class="service-message left">' + user + ' has left this chat.</span>');
-		$('.chat-content').scrollTo('.left:last', 0);
-	} else if (messagesCount > 0 && user != 'admin') {
-		$('.chat-content').append('<span class="service-message joined">' + user + ' has joined the chat.</span>');
-		$('.chat-content').scrollTo('.joined:last', 0);
+	qb = getQBId(user);
+
+	if (type) {
+		nick = storageUsersKeys[qb];
+		delete storageUsersKeys[qb];
+		$('.user:contains(' + nick + ')').remove();
+		
+		$('.chat-content').append('<span class="service-message left">' + nick + ' has left this chat.</span>');
+		$('.chat-content').scrollTo('*:last', 0);
+		
+		if (qb == chatUser.qb.id && !isLogout) location.reload();
+	} else if (Object.keys(storageUsersKeys).length > 0) {
+		getOneOccupant(qb);
 	}
-	
+
 	return true;
+	
+	function getOneOccupant(id) {
+		QB.users.get({id: id}, function(err, result) {
+			if (err) console.log(err.detail);
+			nick = createUserItem(result);
+			$('.chat-content').append('<span class="service-message joined">' + nick + ' has joined the chat.</span>');
+			$('.chat-content').scrollTo('*:last', 0);
+		});
+	}
 }
 
 function getMessage(stanza, room) {
-	console.log('[XMPP] Message');
-	var html;
-	
+	var html, qb, message, nick, avatar, fb, icon;
 	var defaultAvatar = 'images/avatar_default.png';
-	var response = $(stanza).find('body').context.textContent;
+	
 	var author = $(stanza).attr('from');
+	var response = $(stanza).find('body').context.textContent;
 	var time = $(stanza).find('delay').attr('stamp');
 	
-	response = checkResponse(response);
-	author = getAuthorName(author);
-	time = time ? time : (new Date()).toISOString();
+	var composing = $(stanza).find('composing')[0];
+	var paused = $(stanza).find('paused')[0];
 	
-	html = '<section class="message">';
-	html += '<img class="message-avatar" src="' + (response.avatar ? response.avatar : defaultAvatar) + '" alt="avatar">';
-	html += '<div class="message-body">';
-	html += '<div class="message-description">' + (response.message ? parser(response.message) : parser(response)) + '</div>';
-	html += '<footer><span class="message-author">' + author + '</span>';
-	html += '<time class="message-time" datetime="' + time + '">' + $.timeago(time) + '</time></footer>';
-	html += '</div></section>';
+	qb = getQBId(author);
 	
-	$('.chat-content').append(html).find('.message:odd').addClass('white');
-	$('.chat-content .message:last').fadeTo(500, 1);
-	$('.chat-content').scrollTo('.message:last', 0);
-
+	if (!response && composing || paused) {
+		showComposing(composing, qb);
+	} else {
+		console.log('[XMPP] Message');
+		response = checkResponse(response);
+		
+		message = response.message ? parser(response.message, time) : parser(response, time);
+		nick = response.nick || qb;
+		avatar = response.avatar || defaultAvatar;
+		fb = response.fb || '';
+		time = time || (new Date()).toISOString();
+		//icon = response.fb ? 'images/fb_auth.png' : 'images/qb_auth.png';
+		
+		html = '<section class="message show-actions" data-qb="' + qb + '" data-fb="' + fb + '" onclick="showActionsToolbar(this)">';
+		//html += '<img class="message-icon" src="' + icon + '" alt="icon">';
+		html += '<img class="message-avatar" src="' + avatar + '" alt="avatar">';
+		html += '<div class="message-body">';
+		html += '<div class="message-description">' + message + '</div>';
+		html += '<footer><span class="message-author">' + nick + '</span>';
+		html += '<time class="message-time" datetime="' + time + '">' + $.timeago(time) + '</time></footer>';
+		html += '</div></section>';
+		
+		$('.loading_messages').remove();
+		if ($('.typing').length > 0)
+			$('.chat-content .typing:first').before(html);
+		else
+			$('.chat-content').append(html);
+		$('.chat-content .message:odd').addClass('white');
+		$('.chat-content .message:last').fadeTo(300, 1);
+	}
+	
+	$('.chat-content').scrollTo('*:last', 0);
 	return true;
+	
+	function showComposing(start, id) {
+		if (start && id != chatUser.qb.id) {
+			nick = storageUsersKeys[id];
+			$('.chat-content').append('<span class="typing" data-qbID="' + id + '">' + nick + ' ...</span>');
+		} else {
+			$('.typing[data-qbID='+id+']').remove();
+		}
+	}
 }
 
 function sendMesage() {
 	var message, post;
+	var isComposing = false;
 	
 	$('#message').keydown(function(event) {
+		if (!isComposing) {
+			isComposing = true;
+			connection.chatstates.sendComposing(CHAT.room_jid, 'groupchat');
+			setTimeout(paused, 5 * 1000);
+		}
+		
 		if (event.keyCode == 13 && !event.shiftKey) {
 			post = $('#message').val();
 			
 			if (trim(post)) {
-				message = {message: post, avatar: chatUser.avatar};
+				paused();
+				
+				message = {
+					message: post,
+					nick: chatUser.nick,
+					avatar: chatUser.avatar,
+					fb: chatUser.fb.id
+				};
+				
 				message = Strophe.escapeNode(JSON.stringify(message));
 				connection.muc.groupchat(CHAT.room_jid, message);
-				
 				$('#message').val('');
 			}
+			
 			return false;
+		}
+	});
+	
+	function paused() {
+		isComposing = false;
+		connection.chatstates.sendPaused(CHAT.room_jid, 'groupchat');
+	}
+}
+
+function getOccupants() {
+	var requestCount, ids = [], limit = 100;
+	isGettingOccupantsStarted = true;
+	
+	$('.users-list').html('<li class="users-list-title">Occupants</li>');
+	createUsersLoadingIcon();
+	
+	connection.muc.queryOccupants(CHAT.room_jid, function(response) {
+		var ocuppants = $(response).find('item');
+		for (var i = 0; i < ocuppants.length; i++) {
+			ids.push($(ocuppants[i]).attr('name'));
+		}
+		
+		requestCount = ids.length / limit;
+		for (var i = 1, c = 0; c < requestCount; i++, c++) {
+			params = {
+				filter: {
+					type: 'id',
+					value: ids
+				},
+				perPage: limit,
+				pageNo: i
+			};
+			
+			QB.users.listUsers(params, function(err, result) {
+				if (err) console.log(err.detail);
+				$('.loading_users').remove();
+				
+				$(result.items).each(function() {
+					createUserItem(this.user);
+				});
+			});
 		}
 	});
 }
 
+function showActionsToolbar(info) {
+	var html;
+	var qb = $(info).data('qb');
+	var fb = $(info).data('fb');
+	var nick = $(info).find('.message-author').text() || $(info).text();
+	
+	html = '<a href="#" class="btn btn_action" data-nick="' + nick + '" onclick="quote(this); return false;"><span>Reply</span></a>';
+	html += '<a href="#" class="btn btn_action" data-qb="' + qb + '"><span>Private message</span></a>';
+	html += fb ? '<a href="https://facebook.com/' + fb + '" class="btn btn_action" target="_blank"><span>View profile</span></a>' : '';
+	
+	$('.actions').html(html);
+}
+
 function logout() {
-	connection.muc.leave(CHAT.room_jid, chatUser.nick);
+	isLogout = true;
+	isGettingOccupantsStarted = false;
+	
+	disconnectChat(CHAT.room_jid, String(chatUser.qb.id));
+	
+	storageUsersKeys = {};
 	localStorage.removeItem('qbAuth');
 	if (chatUser.fb.id) {
 		FB.logout();
@@ -424,13 +538,10 @@ function logout() {
 	chatUser.qb.token = null;
 	chatUser.fb.id = null;
 	chatUser.fb.access_token = null;
-	
-	/*
-	 * TODO:
-	 * Disconnect from chat must be implemented
-	 * in callback of MUC leave function
-	 */
-	setTimeout(function() {
-		connection.disconnect();
-	}, 1500);
+}
+
+function disconnectChat(room, nick) {
+	connection.muc.leave(room, nick);
+	connection.flush();
+	connection.disconnect();
 }

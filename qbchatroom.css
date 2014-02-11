@@ -6,6 +6,7 @@
  */
 
 @import url(css/reset.css);
+@import url(css/animation_loading.css);
 
 @font-face {
 	font-family: Helvetica-Light;
@@ -35,27 +36,12 @@ body {
 	margin: 0 auto;
 	font-family: Helvetica, Arial, sans-serif;
 }
-button {
-	width: 100%;
-	padding: 0;
-	margin-bottom: .9rem;
-	text-align: center;
-	border: 0;
-	outline: 0;
-	cursor: pointer;
+a {
+	color: #0077cb;
 }
-button:hover {
-	opacity: 0.6;
+a:hover {
+	text-decoration: none;
 }
-	button span {
-		display: inline-block;
-		padding-left: 3.5rem;
-		font-size: 1.8rem;
-		line-height: 3.8rem;
-		color: #fff;
-		background: left center no-repeat;
-		background-size: 2.4rem auto;
-	}
 fieldset {
 	padding: 0 .3rem;
 }
@@ -72,12 +58,27 @@ fieldset {
 		-moz-box-sizing: border-box;
 		box-sizing: border-box;
 	}
-a {
-	color: #0077cb;
+.btn {
+	width: 100%;
+	padding: 0;
+	margin-bottom: .9rem;
+	text-align: center;
+	border: 0;
+	outline: 0;
+	cursor: pointer;
 }
-a:hover {
-	text-decoration: none;
+.btn:hover {
+	opacity: 0.6;
 }
+	.btn span {
+		display: inline-block;
+		padding-left: 3.5rem;
+		font-size: 1.8rem;
+		line-height: 3.8rem;
+		color: #fff;
+		background: left center no-repeat;
+		background-size: 2.4rem auto;
+	}
 
 /* Main Layout
 -----------------------------------------------------------*/
@@ -366,16 +367,36 @@ a:hover {
 /* Chat Content */
 .chat-content {
 	overflow-y: auto;
+	width: 100%;
 	height: 73.6%;
 	border-bottom: 2px solid #0077cb;
 }
+.loading_messages {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 50px;
+	height: 50px;
+	margin: auto;
+}
 	.message {
+		position: relative;
 		padding: .8rem;
 		opacity: 0;
 	}
 	.message.white {
 		background: #fff;
 	}
+		.message-icon {
+			position: absolute;
+			top: 4.3rem;
+			left: 2.3rem;
+			width: 1rem;
+			padding: .5rem;
+			background: #77C7FF;
+		}
 		.message-avatar {
 			float: left;
 			max-width: 3.2rem;
@@ -448,8 +469,6 @@ a:hover {
 .users-list {
 	position: relative;
 	width: 15.5rem;
-	max-height: 550%;
-	margin-top: .1rem;
 	overflow-y: auto;
 	background: #fff;
 	border: 2px solid #d4d4d4;
@@ -479,17 +498,13 @@ a:hover {
 .smiles-list {
 	position: absolute;
 	top: -7.1rem;
-	left: -.05rem;
-	width: 99.9%;
-	height: 6.8rem;
-	overflow: auto;
+	left: -2px;
+	width: 100%;
+	height: 6.7rem;
+	overflow-y: auto;
 	background: #fff;
 	border: 2px solid #d4d4d4;
 	border-bottom: 0;
-}
-.html-55 .smiles-list {
-	top: -7.3rem;
-	left: -.2rem;
 }
 	.smiles-list .smileicons {
 		padding: 7px;
@@ -501,12 +516,53 @@ a:hover {
 	}
 
 /* Service Messages */
-.service-message {
+.service-message,
+.typing {
 	display: block;
 	padding: .8rem;
-	font-size: 1.3rem;
+	font-size: 1.1rem;
 	background: #fffabb;
 	word-break: break-all;
 }			
+
 .joined {color: #108134;}
 .left {color: #76112b;}
+
+.typing {
+	color: #999;
+	background: #fff;
+}
+
+/* Actions Toolbar */
+.show-actions:hover {
+	background: #cdeaff;
+	cursor: pointer;
+}
+#chat {
+	position: relative;
+}
+.actions-wrap {
+	position: absolute;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.6);
+}
+	.actions {
+		position: absolute;
+		bottom: 0;
+		width: 100%;
+		background: #ececec;
+	}
+		.btn_action {
+			display: block;
+			margin-bottom: 0;
+			background: #0077cb;
+			border-top: 1px solid #d4d4d4;
+		}
+			.btn_action span {
+				padding-left: 0;
+				font-size: 1.7rem;
+				line-height: 3.5rem;
+				background: none;
+			}

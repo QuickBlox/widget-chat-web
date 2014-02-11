@@ -39,8 +39,8 @@
 		
 		<div id="auth">
 			<div class="center">
-				<button id="authFB" class="btn_fb"><span>Login with FB</span></button>
-				<button id="authQB" class="btn_qb"><span>Login with QB</span></button>
+				<button id="authFB" class="btn btn_fb"><span>Login with FB</span></button>
+				<button id="authQB" class="btn btn_qb"><span>Login with QB</span></button>
 			</div>
 		</div>
 		
@@ -50,7 +50,7 @@
 					<input id="login" type="text" placeholder="Login or email">
 					<input id="pass" type="password" placeholder="Password">
 				</fieldset>
-				<button id="dataLogin" class="btn_qb"><span>Connect</span></button>
+				<button id="dataLogin" class="btn btn_qb"><span>Connect</span></button>
 				<span class="not-registered">Not registered yet?<br>
 					<a href="#" id="signUp">Register an account QuickBlox</a>
 				</span>
@@ -78,7 +78,7 @@
 					<input id="signup_avatar" type="file" accept="image/*">
 				</div>
 			</fieldset>
-			<button id="dataSignup" class="btn_qb"><span>Register</span></button>
+			<button id="dataSignup" class="btn btn_qb"><span>Register</span></button>
 		</form>
 	</div>
 	
@@ -90,7 +90,7 @@
 		<header class="chat-header">
 			<a href="#" class="users"><span class="users-count">0</span></a>
 			<a href="#" class="logout"><img src="images/logout.png" alt="logout"></a>
-			<h2 class="chat-name">Group Chat</h2>
+			<h2 class="chat-name">Chat Room</h2>
 			<ul class="users-list hidden"></ul>
 		</header>
 		
@@ -99,15 +99,25 @@
 		<footer class="chat-footer">
 			<form action="#" id="send-message-form">
 				<textarea id="message" placeholder="Enter Message" rows="1"></textarea>
-				<a href="#" class="smiles"><img src="images/smile.png" alt="smile"></a>
-				<div class="smiles-list hidden"></div>
 			</form>
+			<a href="#" class="smiles"><img src="images/smile.png" alt="smile"></a>
+			<div class="smiles-list hidden"></div>
 		</footer>
+		
+		<div class="actions-wrap hide-actions hidden">
+			<div class="actions"></div>
+		</div>
 	</div>
+	
+	<audio id="signal">
+		<source src="audio/signal.ogg"></source>
+		<source src="audio/signal.mp3"></source>
+	</audio>
 	
 	<script src="js/libs/quickblox.js"></script>
 	<script src="js/libs/strophe.js"></script>
 	<script src="js/libs/strophe.muc.js"></script>
+	<script src="js/libs/strophe.chatstates.js"></script>
 	<script src="js/libs/jquery.timeago.js"></script>
 	<script src="js/libs/jquery.scrollTo-min.js"></script>
 	

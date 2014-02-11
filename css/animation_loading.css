@@ -1,0 +1,147 @@
+/* Animation of loading
+----------------------------------------------------------------*/
+#floatingCirclesG_users,
+#floatingCirclesG_messages {
+	position: relative;
+	width: 32px;
+	height: 32px;
+	margin: 0 auto;
+	-webkit-transform: scale(0.6);
+	transform: scale(0.6);
+}
+#floatingCirclesG_messages {
+	width: 50px;
+	height: 50px;
+}
+	.f_circleG_users,
+	.f_circleG_messages {
+		position: absolute;
+		width: 6px;
+		height: 6px;
+		background-color: #fff;
+		border-radius: 3px;
+		-webkit-animation-name: f_fadeG_users;
+		-webkit-animation-duration: 0.8s;
+		-webkit-animation-iteration-count: infinite;
+		-webkit-animation-direction: linear;
+		animation-name: f_fadeG_users;
+		animation-duration: 0.8s;
+		animation-iteration-count: infinite;
+		animation-direction: linear;
+	}
+	.f_circleG_messages {
+		width: 9px;
+		height: 9px;
+		background-color: #ececec;
+		border-radius: 5px;
+		-webkit-animation-name: f_fadeG_messages;
+		animation-name: f_fadeG_messages;
+	}
+	
+	#frotateG_01_users,
+	#frotateG_01_messages {
+		left: 0;
+		top: 13px;
+		-webkit-animation-delay: 0.3s;
+		animation-delay: 0.3s;
+	}
+	#frotateG_02_users,
+	#frotateG_02_messages {
+		left: 4px;
+		top: 4px;
+		-webkit-animation-delay: 0.4s;
+		animation-delay: 0.4s;
+	}
+	#frotateG_03_users,
+	#frotateG_03_messages {
+		left: 13px;
+		top: 0;
+		-webkit-animation-delay: 0.5s;
+		animation-delay: 0.5s;
+	}
+	#frotateG_04_users,
+	#frotateG_04_messages {
+		right: 4px;
+		top: 4px;
+		-webkit-animation-delay: 0.6s;
+		animation-delay: 0.6s;
+	}
+	#frotateG_05_users,
+	#frotateG_05_messages {
+		right: 0;
+		top: 13px;
+		-webkit-animation-delay: 0.7s;
+		animation-delay: 0.7s;
+	}
+	#frotateG_06_users,
+	#frotateG_06_messages {
+		right: 4px;
+		bottom: 4px;
+		-webkit-animation-delay: 0.8s;
+		animation-delay: 0.8s;
+	}
+	#frotateG_07_users,
+	#frotateG_07_messages {
+		left: 13px;
+		bottom: 0;
+		-webkit-animation-delay: 0.9s;
+		animation-delay: 0.9s;
+	}
+	#frotateG_08_users,
+	#frotateG_08_messages {
+		left: 4px;
+		bottom: 4px;
+		-webkit-animation-delay: 1s;
+		animation-delay: 1s;
+	}
+	
+	#frotateG_01_messages {
+		left: 0;
+		top: 20px;
+	}
+	#frotateG_02_messages {
+		left: 6px;
+		top: 6px;
+	}
+	#frotateG_03_messages {
+		left: 20px;
+		top: 0;
+	}
+	#frotateG_04_messages {
+		right: 6px;
+		top: 6px;
+	}
+	#frotateG_05_messages {
+		right: 0;
+		top: 20px;
+	}
+	#frotateG_06_messages {
+		right: 6px;
+		bottom: 6px;
+	}
+	#frotateG_07_messages {
+		left: 20px;
+		bottom: 0;
+	}
+	#frotateG_08_messages {
+		left: 6px;
+		bottom: 6px;
+	}
+
+@-webkit-keyframes f_fadeG_users {
+	0% {background-color: #0077cb}
+	100% {background-color: #fff}
+}
+@keyframes f_fadeG_users {
+	0% {background-color: #0077cb}
+	100% {background-color: #fff}
+}
+
+@-webkit-keyframes f_fadeG_messages {
+	0% {background-color: #0077cb}
+	100% {background-color: #ececec}
+}
+@keyframes f_fadeG_messages {
+	0% {background-color: #0077cb}
+	100% {background-color: #ececec}
+}
