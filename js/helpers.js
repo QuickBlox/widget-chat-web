@@ -9,12 +9,12 @@ function connectFailure() {
 }
 
 function connectSuccess() {
+	isLogout = false;
 	$('#connecting').hide();
 	$('#chat').show();
 	$('#chat .chat-content').html('');
 	$('#chat #message').val('');
 	createMessagesLoadingIcon();
-	isLogout = false;
 }
 
 function signUpFailure() {
@@ -35,6 +35,7 @@ function signUpSuccess() {
 }
 
 function logoutSuccess() {
+	if (!isLogout) location.reload();
 	$('.bubbles').removeClass('bubbles_login');
 	$('.header').removeClass('header_login');
 	$('#chat, #login-fom').hide();
@@ -180,6 +181,17 @@ function createMessagesLoadingIcon() {
 	for (var i = 1; i < 9; i++) {
 		$('#floatingCirclesG_messages').append('<div class="f_circleG_messages" id="frotateG_0'+i+'_messages"></div>');
 	}
+}
+
+function createUserItem(user) {
+	var qb = user.id;
+	var fb = user.facebook_id || '';
+	var name = user.full_name;
+	//var iconClass = user.facebook_id ? 'user_fb_icon' : 'user_qb_icon';
+	
+	$('.users-list').append('<li class="user show-actions" data-qb="' + qb + '" data-fb="' + fb + '" onclick="showActionsToolbar(this)">' + name + '</li>');
+	storageUsersKeys[String(qb)] = name;
+	return name;
 }
 
 function quote(link) {

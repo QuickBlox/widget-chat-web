@@ -8,7 +8,7 @@
 var storage, params, connection, storageUsersKeys = {};
 var isFBConnected = false;
 var isSubscribeEnabled = false;
-var isOccupantsGet = false;
+var isGettingOccupantsStarted = false;
 var isLogout = false;
 var chatUser = {
 	nick: null,
@@ -336,7 +336,7 @@ function rawOutput(data) {/*console.log('SENT: ' + data);*/}
 function getRoster(users, room) {
 	var usersCount = Object.keys(users).length;
 	$('.users-count').text(usersCount);
-	if (!isOccupantsGet) getOccupants();
+	if (!isGettingOccupantsStarted) getOccupants();
 	return true;
 }
 
@@ -346,27 +346,38 @@ function getPresence(stanza, room) {
 	
 	var user = $(stanza).attr('from');
 	var type = $(stanza).attr('type');
-	
 	qb = getQBId(user);
-	nick = storageUsersKeys[qb];
-	
-	if (nick && type) {
-		if (qb == chatUser.qb.id && !isLogout) location.reload();
+
+	if (type) {
+		nick = storageUsersKeys[qb];
+		delete storageUsersKeys[qb];
+		$('.user:contains(' + nick + ')').remove();
+		
 		$('.chat-content').append('<span class="service-message left">' + nick + ' has left this chat.</span>');
-		$('.chat-content').scrollTo('.left:last', 0);
-	} else if (nick) {
-		$('.chat-content').append('<span class="service-message joined">' + nick + ' has joined the chat.</span>');
-		$('.chat-content').scrollTo('.joined:last', 0);
+		$('.chat-content').scrollTo('span:last-child', 0);
+		
+		if (qb == chatUser.qb.id && !isLogout) location.reload();
+	} else if (Object.keys(storageUsersKeys).length > 0) {
+		getOneOccupant(qb);
 	}
-	
+
 	return true;
+	
+	function getOneOccupant(id) {
+		QB.users.get({id: id}, function(err, result) {
+			if (err) console.log(err.detail);
+			nick = createUserItem(result);
+			$('.chat-content').append('<span class="service-message joined">' + nick + ' has joined the chat.</span>');
+			$('.chat-content').scrollTo('span:last-child', 0);
+		});
+	}
 }
 
 function getMessage(stanza, room) {
 	console.log('[XMPP] Message');
 	var html, qb, message, nick, avatar, fb, icon;
-	
 	var defaultAvatar = 'images/avatar_default.png';
+	
 	var author = $(stanza).attr('from');
 	var response = $(stanza).find('body').context.textContent;
 	var time = $(stanza).find('delay').attr('stamp');
@@ -378,8 +389,8 @@ function getMessage(stanza, room) {
 	nick = response.nick || qb;
 	avatar = response.avatar || defaultAvatar;
 	fb = response.fb || '';
-	icon = response.fb ? 'images/fb_auth.png' : 'images/qb_auth.png';
 	time = time || (new Date()).toISOString();
+	//icon = response.fb ? 'images/fb_auth.png' : 'images/qb_auth.png';
 	
 	html = '<section class="message show-actions" data-qb="' + qb + '" data-fb="' + fb + '" onclick="showActionsToolbar(this)">';
 	//html += '<img class="message-icon" src="' + icon + '" alt="icon">';
@@ -418,6 +429,7 @@ function sendMesage() {
 				
 				$('#message').val('');
 			}
+			
 			return false;
 		}
 	});
@@ -425,7 +437,7 @@ function sendMesage() {
 
 function getOccupants() {
 	var requestCount, ids = [], limit = 100;
-	isOccupantsGet = true;
+	isGettingOccupantsStarted = true;
 	
 	$('.users-list').html('<li class="users-list-title">Occupants</li>');
 	createUsersLoadingIcon();
@@ -448,14 +460,11 @@ function getOccupants() {
 			};
 			
 			QB.users.listUsers(params, function(err, result) {
+				if (err) console.log(err.detail);
 				$('.loading_users').remove();
+				
 				$(result.items).each(function() {
-					var qb = this.user.id;
-					var fb = this.user.facebook_id || '';
-					var name = this.user.full_name;
-					var iconClass = this.user.facebook_id ? 'user_fb_icon' : 'user_qb_icon';
-					$('.users-list').append('<li class="user show-actions ' + iconClass + '" data-qb="' + qb + '" data-fb="' + fb + '" onclick="showActionsToolbar(this)">' + name + '</li>');
-					storageUsersKeys[String(qb)] = name;
+					createUserItem(this.user);
 				});
 			});
 		}
@@ -477,8 +486,11 @@ function showActionsToolbar(info) {
 
 function logout() {
 	isLogout = true;
+	isGettingOccupantsStarted = false;
+	
 	disconnectChat(CHAT.room_jid, String(chatUser.qb.id));
 	
+	storageUsersKeys = {};
 	localStorage.removeItem('qbAuth');
 	if (chatUser.fb.id) {
 		FB.logout();
@@ -492,9 +504,6 @@ function logout() {
 	chatUser.qb.token = null;
 	chatUser.fb.id = null;
 	chatUser.fb.access_token = null;
-	
-	storageUsersKeys = {};
-	isOccupantsGet = false;
 }
 
 function disconnectChat(room, nick) {
