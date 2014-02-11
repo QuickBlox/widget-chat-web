@@ -1,12 +1,12 @@
 /* Insert your QB application credentials
 -----------------------------------------------*/
 var QBAPP = {
-	app_id: 3907,
-	auth_key: 'jRVze-6OzVDh-WX',
-	auth_secret: 'uX8dZDexGW8TrEe'
+	app_id: 6566,
+	auth_key: 'pm6CarZjJQC9c3b',
+	auth_secret: 'pFPBSJD8t2xY5Br'
 };
 var CHAT = {
-	room_jid: '3907_demo_room@muc.chat.quickblox.com',
+	room_jid: '6566_test@muc.chat.quickblox.com',
 	server: 'chat.quickblox.com',
 	bosh_server: 'http://chat.quickblox.com:5280'
 };
