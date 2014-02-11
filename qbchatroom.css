@@ -516,15 +516,22 @@ fieldset {
 	}
 
 /* Service Messages */
-.service-message {
+.service-message,
+.typing {
 	display: block;
 	padding: .8rem;
-	font-size: 1.3rem;
+	font-size: 1.1rem;
 	background: #fffabb;
 	word-break: break-all;
 }			
+
 .joined {color: #108134;}
 .left {color: #76112b;}
+
+.typing {
+	color: #999;
+	background: #fff;
+}
 
 /* Actions Toolbar */
 .show-actions:hover {

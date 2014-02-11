@@ -354,7 +354,7 @@ function getPresence(stanza, room) {
 		$('.user:contains(' + nick + ')').remove();
 		
 		$('.chat-content').append('<span class="service-message left">' + nick + ' has left this chat.</span>');
-		$('.chat-content').scrollTo('span:last-child', 0);
+		$('.chat-content').scrollTo('*:last', 0);
 		
 		if (qb == chatUser.qb.id && !isLogout) location.reload();
 	} else if (Object.keys(storageUsersKeys).length > 0) {
@@ -368,13 +368,12 @@ function getPresence(stanza, room) {
 			if (err) console.log(err.detail);
 			nick = createUserItem(result);
 			$('.chat-content').append('<span class="service-message joined">' + nick + ' has joined the chat.</span>');
-			$('.chat-content').scrollTo('span:last-child', 0);
+			$('.chat-content').scrollTo('*:last', 0);
 		});
 	}
 }
 
 function getMessage(stanza, room) {
-	console.log('[XMPP] Message');
 	var html, qb, message, nick, avatar, fb, icon;
 	var defaultAvatar = 'images/avatar_default.png';
 	
@@ -382,41 +381,72 @@ function getMessage(stanza, room) {
 	var response = $(stanza).find('body').context.textContent;
 	var time = $(stanza).find('delay').attr('stamp');
 	
+	var composing = $(stanza).find('composing')[0];
+	var paused = $(stanza).find('paused')[0];
+	
 	qb = getQBId(author);
-	response = checkResponse(response);
 	
-	message = response.message ? parser(response.message, time) : parser(response, time);
-	nick = response.nick || qb;
-	avatar = response.avatar || defaultAvatar;
-	fb = response.fb || '';
-	time = time || (new Date()).toISOString();
-	//icon = response.fb ? 'images/fb_auth.png' : 'images/qb_auth.png';
+	if (!response && composing || paused) {
+		showComposing(composing, qb);
+	} else {
+		console.log('[XMPP] Message');
+		response = checkResponse(response);
+		
+		message = response.message ? parser(response.message, time) : parser(response, time);
+		nick = response.nick || qb;
+		avatar = response.avatar || defaultAvatar;
+		fb = response.fb || '';
+		time = time || (new Date()).toISOString();
+		//icon = response.fb ? 'images/fb_auth.png' : 'images/qb_auth.png';
+		
+		html = '<section class="message show-actions" data-qb="' + qb + '" data-fb="' + fb + '" onclick="showActionsToolbar(this)">';
+		//html += '<img class="message-icon" src="' + icon + '" alt="icon">';
+		html += '<img class="message-avatar" src="' + avatar + '" alt="avatar">';
+		html += '<div class="message-body">';
+		html += '<div class="message-description">' + message + '</div>';
+		html += '<footer><span class="message-author">' + nick + '</span>';
+		html += '<time class="message-time" datetime="' + time + '">' + $.timeago(time) + '</time></footer>';
+		html += '</div></section>';
+		
+		$('.loading_messages').remove();
+		if ($('.typing').length > 0)
+			$('.chat-content .typing:first').before(html);
+		else
+			$('.chat-content').append(html);
+		$('.chat-content .message:odd').addClass('white');
+		$('.chat-content .message:last').fadeTo(300, 1);
+	}
 	
-	html = '<section class="message show-actions" data-qb="' + qb + '" data-fb="' + fb + '" onclick="showActionsToolbar(this)">';
-	//html += '<img class="message-icon" src="' + icon + '" alt="icon">';
-	html += '<img class="message-avatar" src="' + avatar + '" alt="avatar">';
-	html += '<div class="message-body">';
-	html += '<div class="message-description">' + message + '</div>';
-	html += '<footer><span class="message-author">' + nick + '</span>';
-	html += '<time class="message-time" datetime="' + time + '">' + $.timeago(time) + '</time></footer>';
-	html += '</div></section>';
-	
-	$('.loading_messages').remove();
-	$('.chat-content').append(html).find('.message:odd').addClass('white');
-	$('.chat-content .message:last').fadeTo(300, 1);
-	$('.chat-content').scrollTo('.message:last', 0);
-
+	$('.chat-content').scrollTo('*:last', 0);
 	return true;
+	
+	function showComposing(start, id) {
+		if (start && id != chatUser.qb.id) {
+			nick = storageUsersKeys[id];
+			$('.chat-content').append('<span class="typing" data-qbID="' + id + '">' + nick + ' ...</span>');
+		} else {
+			$('.typing[data-qbID='+id+']').remove();
+		}
+	}
 }
 
 function sendMesage() {
 	var message, post;
+	var isComposing = false;
 	
 	$('#message').keydown(function(event) {
+		if (!isComposing) {
+			isComposing = true;
+			connection.chatstates.sendComposing(CHAT.room_jid, 'groupchat');
+			setTimeout(paused, 5 * 1000);
+		}
+		
 		if (event.keyCode == 13 && !event.shiftKey) {
 			post = $('#message').val();
 			
 			if (trim(post)) {
+				paused();
+				
 				message = {
 					message: post,
 					nick: chatUser.nick,
@@ -426,13 +456,17 @@ function sendMesage() {
 				
 				message = Strophe.escapeNode(JSON.stringify(message));
 				connection.muc.groupchat(CHAT.room_jid, message);
-				
 				$('#message').val('');
 			}
 			
 			return false;
 		}
 	});
+	
+	function paused() {
+		isComposing = false;
+		connection.chatstates.sendPaused(CHAT.room_jid, 'groupchat');
+	}
 }
 
 function getOccupants() {
