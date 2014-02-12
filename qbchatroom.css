@@ -174,9 +174,6 @@ fieldset {
 	.flexible .bubbles_login .bubble_green {
 		height: 50%;
 	}
-	.flexible .bubbles_login .bubble_green:after {
-		left: 15%;
-	}
 
 /* Title */
 .header {
