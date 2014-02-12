@@ -39,7 +39,7 @@ function logoutSuccess() {
 	$('.header').removeClass('header_login');
 	$('#chat, #login-fom').hide();
 	$('#main, #auth').show();
-	if (!switches.isLogout) location.reload();
+	if (!switches.isLogout) window.location.reload();
 }
 
 function changeInputFileBehavior() {
