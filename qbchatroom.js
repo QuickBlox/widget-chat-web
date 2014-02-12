@@ -25,8 +25,6 @@ var chatUser = {
 };
 
 $(document).ready(function() {
-	QB.init(QBAPP.appID, QBAPP.authKey, QBAPP.authSecret);
-	
 	$.ajaxSetup({ cache: true });
 	$.getScript('https://connect.facebook.net/en_EN/all.js', function() {
 		FB.init({
@@ -83,10 +81,6 @@ function getFBUser(accessToken) {
 	FB.api('/me', function(response) {
 		chatUser.fbID = response.id;
 		chatUser.fbAccessToken = accessToken;
-		
-		chatUser.name = response.name;
-		chatUser.avatar = 'https://graph.facebook.com/' + response.id + '/picture/';
-		
 		createSession();
 	});
 }
@@ -150,6 +144,7 @@ function createSession(storage) {
 		params = {login: storage.login, password: storage.pass};
 	}
 	
+	QB.init(QBAPP.appID, QBAPP.authKey, QBAPP.authSecret);
 	QB.createSession(params, function(err, result) {
 		if (err) {
 			console.log(err.detail);
@@ -168,10 +163,9 @@ function getQBUser(user_id, storage) {
 			connectFailure();
 		} else {
 			chatUser.qbID = String(result.id);
+			chatUser.name = result.full_name;
 			
-			if (!chatUser.name)	chatUser.name = result.full_name;
-			
-			if (!chatUser.avatar && result.blob_id) {
+			if (result.blob_id) {
 				QB.content.getFileUrl(result.blob_id, function(err, result) {
 					if (err) {
 						console.log(err.detail);
@@ -180,6 +174,8 @@ function getQBUser(user_id, storage) {
 						chatUser.avatar = result;
 					}
 				});
+			} else {
+				chatUser.avatar = chatUser.fbID ? 'https://graph.facebook.com/' + chatUser.fbID + '/picture/' : null;
 			}
 			
 			connectChat(chatUser, storage);
