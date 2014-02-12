@@ -404,7 +404,7 @@ fieldset {
 		}
 		.message-body {
 			overflow: hidden;
-			font-size: 1.3rem;
+			font-size: 1.2rem;
 			color: #333;
 			word-break: break-all;
 		}
@@ -444,7 +444,7 @@ fieldset {
 		height: 3.4rem;
 		padding: .85rem .7rem .85rem 3.5rem;
 		font-family: Helvetica, Arial, sans-serif;
-		font-size: 1.3rem;
+		font-size: 1.2rem;
 		line-height: 1.7rem;
 		border: 0;
 		resize: none;
@@ -477,7 +477,7 @@ fieldset {
 }
 	.users-list li {
 		display: block;
-		font-size: 1.3rem;
+		font-size: 1.2rem;
 		line-height: 2.5rem;
 		padding: 0 .6rem;
 		color: #333;
@@ -552,7 +552,12 @@ fieldset {
 		position: absolute;
 		bottom: 0;
 		width: 100%;
+	}
+	.action-group {
 		background: #ececec;
+	}
+	.action-group:first-child {
+		margin-bottom: 1rem;
 	}
 		.btn_action {
 			display: block;
@@ -565,4 +570,12 @@ fieldset {
 				font-size: 1.7rem;
 				line-height: 3.5rem;
 				background: none;
+			}
+		.btn_cancel {
+			background: #ececec;
+			border-top: 0;
+		}
+			.btn_cancel span {
+				line-height: 3.8rem;
+				color: #000;
 			}
