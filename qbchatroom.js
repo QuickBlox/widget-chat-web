@@ -360,7 +360,7 @@ function getPresence(stanza, room) {
 		$('.chat-content').append('<span class="service-message left">' + name + ' has left this chat.</span>');
 		$('.chat-content').scrollTo('*:last', 0);
 		
-		if (qbID == chatUser.qbID && !switches.isLogout) location.reload();
+		if (qbID == chatUser.qbID && !switches.isLogout) window.location.reload();
 	} else if (storageLength > 0) {
 		getOneOccupant(qbID);
 	}
