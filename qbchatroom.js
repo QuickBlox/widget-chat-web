@@ -5,27 +5,27 @@
  * author: Andrey Povelichenko <andrey.povelichenko@quickblox.com>
  */
 
-var storage, params, connection, storageUsersKeys = {};
-var isFBConnected = false;
-var isSubscribeEnabled = false;
-var isGettingOccupantsStarted = false;
-var isLogout = false;
+var storage, params, connection, presenceIDs = {}, namesOccupants = {};
+
+var switches = {
+	isLogout: false,
+	isComposing: false,
+	isFBConnected: false,
+	isSubscribeEnabled: false,
+	isReceivingOccupants: false
+};
+
 var chatUser = {
-	nick: null,
+	name: null,
 	avatar: null,
-	qb: {
-		id: null,
-		blob_id: null,
-		token: null
-	},
-	fb: {
-		id: null,
-		access_token: null
-	}
+	qbID: null,
+	qbToken: null,
+	fbID: null,
+	fbAccessToken: null
 };
 
 $(document).ready(function() {
-	QB.init(QBAPP.app_id, QBAPP.auth_key, QBAPP.auth_secret);
+	QB.init(QBAPP.appID, QBAPP.authKey, QBAPP.authSecret);
 	
 	$.ajaxSetup({ cache: true });
 	$.getScript('https://connect.facebook.net/en_EN/all.js', function() {
@@ -57,20 +57,20 @@ $(document).ready(function() {
 /* Authorization Module
 --------------------------------------------------------------------------*/
 function autoLogin() {
-	if (localStorage['qbAuth']) {
+	if (localStorage['QBAuth']) {
 		// Autologin as QB user
-		storage = $.parseJSON(localStorage['qbAuth']);
+		storage = $.parseJSON(localStorage['QBAuth']);
 		createSession(storage);
 	} else {
 		// Autologin as FB user
 		subscribeFBStatusEvent();
-		isFBConnected = true;
-		isSubscribeEnabled = true;
+		switches.isFBConnected = true;
+		switches.isSubscribeEnabled = true;
 	}
 }
 
 function subscribeFBStatusEvent() {
-	if (!isSubscribeEnabled) {
+	if (!switches.isSubscribeEnabled) {
 		FB.Event.subscribe('auth.statusChange', function(response) {
 			console.log('FB ' + response.status);
 			if (response.status == 'connected')
@@ -81,10 +81,10 @@ function subscribeFBStatusEvent() {
 
 function getFBUser(accessToken) {
 	FB.api('/me', function(response) {
-		chatUser.fb.id = response.id;
-		chatUser.fb.access_token = accessToken;
+		chatUser.fbID = response.id;
+		chatUser.fbAccessToken = accessToken;
 		
-		chatUser.nick = response.name;
+		chatUser.name = response.name;
 		chatUser.avatar = 'https://graph.facebook.com/' + response.id + '/picture/';
 		
 		createSession();
@@ -96,7 +96,7 @@ function authFB() {
 		console.log('FB ' + response.status);
 		switch (response.status) {
 		case 'connected':
-			if (!isFBConnected)
+			if (!switches.isFBConnected)
 				getFBUser(response.authResponse.accessToken);
 			break;
 		case 'not_authorized':
@@ -109,7 +109,7 @@ function authFB() {
 	});
 	
 	subscribeFBStatusEvent();
-	isSubscribeEnabled = true;
+	switches.isSubscribeEnabled = true;
 }
 
 function authQB() {
@@ -139,9 +139,9 @@ function createSession(storage) {
 	$('#main').hide();
 	$('#connecting').show();
 	
-	if (chatUser.fb.access_token) {
+	if (chatUser.fbID) {
 		// via Facebook
-		params = {provider: 'facebook', keys: {token: chatUser.fb.access_token}};
+		params = {provider: 'facebook', keys: {token: chatUser.fbAccessToken}};
 	} else if (storage.login.indexOf('@') > 0) {
 		// via QB email and password
 		params = {email: storage.login, password: storage.pass};
@@ -155,7 +155,7 @@ function createSession(storage) {
 			console.log(err.detail);
 			connectFailure();
 		} else {
-			chatUser.qb.token = result.token;
+			chatUser.qbToken = result.token;
 			getQBUser(result.user_id, storage);
 		}
 	});
@@ -167,13 +167,12 @@ function getQBUser(user_id, storage) {
 			console.log(err.detail);
 			connectFailure();
 		} else {
-			chatUser.qb.id = result.id;
-			chatUser.qb.blob_id = result.blob_id;
+			chatUser.qbID = String(result.id);
 			
-			if (!chatUser.nick)	chatUser.nick = result.full_name;
+			if (!chatUser.name)	chatUser.name = result.full_name;
 			
-			if (!chatUser.avatar && chatUser.qb.blob_id) {
-				QB.content.getFileUrl(chatUser.qb.blob_id, function(err, result) {
+			if (!chatUser.avatar && result.blob_id) {
+				QB.content.getFileUrl(result.blob_id, function(err, result) {
 					if (err) {
 						console.log(err.detail);
 						connectFailure();
@@ -279,13 +278,13 @@ function assignBlobToUser(blob, user) {
 	});
 }
 
-/* Chat Module
+/* Group Chat Module
 -----------------------------------------------------------------------*/
 function connectChat(chatUser, storage) {
-	var userJID = chatUser.qb.id + "-" + QBAPP.app_id + "@" + CHAT.server;
-	var userPass = chatUser.fb.id ? chatUser.qb.token : storage.pass;
+	var userJID = chatUser.qbID + "-" + QBAPP.appID + "@" + CHAT.server;
+	var userPass = chatUser.fbID ? chatUser.qbToken : storage.pass;
 	
-	connection = new Strophe.Connection(CHAT.bosh_server);
+	connection = new Strophe.Connection(CHAT.bosh);
 	connection.rawInput = rawInput;
 	connection.rawOutput = rawOutput;
 	
@@ -311,10 +310,10 @@ function connectChat(chatUser, storage) {
 		case Strophe.Status.CONNECTED:
 			console.log('[Connection] Connected');
 			
-			if (storage) localStorage['qbAuth'] = JSON.stringify(storage);
+			if (storage) localStorage['QBAuth'] = JSON.stringify(storage);
 			
 			connectSuccess();
-			connection.muc.join(CHAT.room_jid, String(chatUser.qb.id), getMessage, getPresence, getRoster);
+			connection.muc.join(CHAT.roomJID, chatUser.qbID, getMessage, getPresence, getRoster);
 			break;
 		case Strophe.Status.DISCONNECTING:
 			console.log('[Connection] Disconnecting');
@@ -336,75 +335,71 @@ function rawOutput(data) {/*console.log('SENT: ' + data);*/}
 function getRoster(users, room) {
 	var usersCount = Object.keys(users).length;
 	$('.users-count').text(usersCount);
-	if (!isGettingOccupantsStarted) getOccupants();
+	if (!switches.isReceivingOccupants) getOccupants();
 	return true;
 }
 
 function getPresence(stanza, room) {
 	console.log('[XMPP] Presence');
-	var qb, nick;
+	var user, type, qbID, name, storageLength = Object.keys(namesOccupants).length;
 	
-	var user = $(stanza).attr('from');
-	var type = $(stanza).attr('type');
-	qb = getQBId(user);
+	user = $(stanza).attr('from');
+	type = $(stanza).attr('type');
+	qbID = getID(user);
+	
+	if (type)
+		delete presenceIDs[qbID];
+	else
+		presenceIDs[qbID] = true;
 
-	if (type) {
-		nick = storageUsersKeys[qb];
-		delete storageUsersKeys[qb];
-		$('.user:contains(' + nick + ')').remove();
+	if (type && storageLength > 0) {
+		name = namesOccupants[qbID];
+		delete namesOccupants[qbID];
+		$('.user:contains(' + name + ')').remove();
 		
-		$('.chat-content').append('<span class="service-message left">' + nick + ' has left this chat.</span>');
+		$('.chat-content').append('<span class="service-message left">' + name + ' has left this chat.</span>');
 		$('.chat-content').scrollTo('*:last', 0);
 		
-		if (qb == chatUser.qb.id && !isLogout) location.reload();
-	} else if (Object.keys(storageUsersKeys).length > 0) {
-		getOneOccupant(qb);
+		if (qbID == chatUser.qbID && !switches.isLogout) location.reload();
+	} else if (storageLength > 0) {
+		getOneOccupant(qbID);
 	}
 
 	return true;
-	
-	function getOneOccupant(id) {
-		QB.users.get({id: id}, function(err, result) {
-			if (err) console.log(err.detail);
-			nick = createUserItem(result);
-			$('.chat-content').append('<span class="service-message joined">' + nick + ' has joined the chat.</span>');
-			$('.chat-content').scrollTo('*:last', 0);
-		});
-	}
 }
 
 function getMessage(stanza, room) {
-	var html, qb, message, nick, avatar, fb, icon;
-	var defaultAvatar = 'images/avatar_default.png';
+	var html, author, response, time, composing, paused;
+	var qbID, message, name, avatar, fbID, icon, defaultAvatar = 'images/avatar_default.png';
+
+	author = $(stanza).attr('from');
+	response = $(stanza).find('body').context.textContent;
+	time = $(stanza).find('delay').attr('stamp');
 	
-	var author = $(stanza).attr('from');
-	var response = $(stanza).find('body').context.textContent;
-	var time = $(stanza).find('delay').attr('stamp');
+	composing = $(stanza).find('composing')[0];
+	paused = $(stanza).find('paused')[0];
 	
-	var composing = $(stanza).find('composing')[0];
-	var paused = $(stanza).find('paused')[0];
-	
-	qb = getQBId(author);
+	qbID = getID(author);
 	
 	if (!response && composing || paused) {
-		showComposing(composing, qb);
+		showComposing(composing, qbID);
 	} else {
 		console.log('[XMPP] Message');
 		response = checkResponse(response);
 		
 		message = response.message ? parser(response.message, time) : parser(response, time);
-		nick = response.nick || qb;
+		name = response.name || qbID;
 		avatar = response.avatar || defaultAvatar;
-		fb = response.fb || '';
+		fbID = response.fb || '';
 		time = time || (new Date()).toISOString();
 		//icon = response.fb ? 'images/fb_auth.png' : 'images/qb_auth.png';
 		
-		html = '<section class="message show-actions" data-qb="' + qb + '" data-fb="' + fb + '" onclick="showActionsToolbar(this)">';
+		html = '<section class="message show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '" onclick="showActionToolbar(this)">';
 		//html += '<img class="message-icon" src="' + icon + '" alt="icon">';
 		html += '<img class="message-avatar" src="' + avatar + '" alt="avatar">';
 		html += '<div class="message-body">';
 		html += '<div class="message-description">' + message + '</div>';
-		html += '<footer><span class="message-author">' + nick + '</span>';
+		html += '<footer><span class="message-author">' + name + '</span>';
 		html += '<time class="message-time" datetime="' + time + '">' + $.timeago(time) + '</time></footer>';
 		html += '</div></section>';
 		
@@ -419,71 +414,22 @@ function getMessage(stanza, room) {
 	
 	$('.chat-content').scrollTo('*:last', 0);
 	return true;
-	
-	function showComposing(start, id) {
-		if (start && id != chatUser.qb.id) {
-			nick = storageUsersKeys[id];
-			$('.chat-content').append('<span class="typing" data-qbID="' + id + '">' + nick + ' ...</span>');
-		} else {
-			$('.typing[data-qbID='+id+']').remove();
-		}
-	}
-}
-
-function sendMesage() {
-	var message, post;
-	var isComposing = false;
-	
-	$('#message').keydown(function(event) {
-		if (!isComposing) {
-			isComposing = true;
-			connection.chatstates.sendComposing(CHAT.room_jid, 'groupchat');
-			setTimeout(paused, 5 * 1000);
-		}
-		
-		if (event.keyCode == 13 && !event.shiftKey) {
-			post = $('#message').val();
-			
-			if (trim(post)) {
-				paused();
-				
-				message = {
-					message: post,
-					nick: chatUser.nick,
-					avatar: chatUser.avatar,
-					fb: chatUser.fb.id
-				};
-				
-				message = Strophe.escapeNode(JSON.stringify(message));
-				connection.muc.groupchat(CHAT.room_jid, message);
-				$('#message').val('');
-			}
-			
-			return false;
-		}
-	});
-	
-	function paused() {
-		isComposing = false;
-		connection.chatstates.sendPaused(CHAT.room_jid, 'groupchat');
-	}
 }
 
 function getOccupants() {
-	var requestCount, ids = [], limit = 100;
-	isGettingOccupantsStarted = true;
+	var ocuppants, requestsCount, ids = [], limit = 100;
+	switches.isReceivingOccupants = true;
 	
 	$('.users-list').html('<li class="users-list-title">Occupants</li>');
-	createUsersLoadingIcon();
+	createAnimatedLoadingUsers();
 	
-	connection.muc.queryOccupants(CHAT.room_jid, function(response) {
-		var ocuppants = $(response).find('item');
-		for (var i = 0; i < ocuppants.length; i++) {
+	connection.muc.queryOccupants(CHAT.roomJID, function(response) {
+		ocuppants = $(response).find('item');
+		for (var i = 0; i < ocuppants.length; i++)
 			ids.push($(ocuppants[i]).attr('name'));
-		}
 		
-		requestCount = ids.length / limit;
-		for (var i = 1, c = 0; c < requestCount; i++, c++) {
+		requestsCount = ids.length / limit;
+		for (var i = 1, c = 0; c < requestsCount; i++, c++) {
 			params = {
 				filter: {
 					type: 'id',
@@ -496,52 +442,171 @@ function getOccupants() {
 			QB.users.listUsers(params, function(err, result) {
 				if (err) console.log(err.detail);
 				$('.loading_users').remove();
+				if ($('.message').length == 0)
+					$('.loading_messages').remove();
 				
 				$(result.items).each(function() {
-					createUserItem(this.user);
+					var id = String(this.user.id);
+					if (presenceIDs[id]) {
+						delete presenceIDs[id];
+						createUserList(this.user);
+					}
 				});
+				
+				ids = Object.keys(presenceIDs);
+				for (var i = 0; i < ids.length; i++)
+					getOneOccupant(ids[i]);
 			});
 		}
 	});
 }
 
-function showActionsToolbar(info) {
-	var html;
-	var qb = $(info).data('qb');
-	var fb = $(info).data('fb');
-	var nick = $(info).find('.message-author').text() || $(info).text();
+function getOneOccupant(id) {
+	var name;
 	
-	html = '<a href="#" class="btn btn_action" data-nick="' + nick + '" onclick="quote(this); return false;"><span>Reply</span></a>';
-	html += '<a href="#" class="btn btn_action" data-qb="' + qb + '"><span>Private message</span></a>';
-	html += fb ? '<a href="https://facebook.com/' + fb + '" class="btn btn_action" target="_blank"><span>View profile</span></a>' : '';
+	QB.users.get({id: id}, function(err, result) {
+		if (err) console.log(err.detail);
+		name = createUserList(result);
+		$('.chat-content').append('<span class="service-message joined">' + name + ' has joined the chat.</span>');
+		$('.chat-content').scrollTo('*:last', 0);
+	});
+}
+
+function sendMesage() {
+	var message, post;
+	
+	$('#message').keydown(function(event) {
+		if (!switches.isComposing)
+			sendComposing();
+		
+		if (event.keyCode == 13 && !event.shiftKey) {
+			post = $('#message').val();
+			if (trim(post)) {
+				sendPaused();
+				
+				message = {
+					message: post,
+					name: chatUser.name,
+					avatar: chatUser.avatar,
+					fb: chatUser.fbID
+				};
+				
+				message = Strophe.escapeNode(JSON.stringify(message));
+				connection.muc.groupchat(CHAT.roomJID, message);
+				$('#message').val('');
+			}
+			return false;
+		}
+	});
+	
+	function sendComposing() {
+		switches.isComposing = true;
+		connection.chatstates.sendComposing(CHAT.roomJID, 'groupchat');
+		setTimeout(sendPaused, 5000);
+	}
+	
+	function sendPaused() {
+		switches.isComposing = false;
+		connection.chatstates.sendPaused(CHAT.roomJID, 'groupchat');
+	}
+}
+
+function logout() {
+	switches.isLogout = true;
+	disconnectChat(chatUser.qbID);
+	
+	if (chatUser.fbID) {
+		FB.logout();
+		switches.isFBConnected = false;
+	}
+	
+	chatUser = {};
+	presenceIDs = {};
+	namesOccupants = {};
+	switches.isReceivingOccupants = false;
+	localStorage.removeItem('QBAuth');
+}
+
+function disconnectChat(nick) {
+	connection.muc.leave(CHAT.roomJID, nick);
+	connection.flush();
+	connection.disconnect();
+}
+
+/* Additional Features
+-------------------------------------------------------------------------*/
+function createUserList(user) {
+	var qbID, fbID, name;
+	
+	qbID = String(user.id);
+	fbID = user.facebook_id || '';
+	name = user.full_name;
+	//var iconClass = user.facebook_id ? 'user_fb_icon' : 'user_qb_icon';
+	
+	$('.users-list').append('<li class="user show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '" onclick="showActionToolbar(this)">' + name + '</li>');
+	namesOccupants[qbID] = name;
+	return name;
+}
+
+function showComposing(isShown, qbID) {
+	var name, txt, obj = $('.typing');
+	
+	if (Object.keys(namesOccupants).length == 0) return;
+	
+	name = namesOccupants[qbID];
+	if (isShown && qbID != chatUser.qbID) {
+		if (obj.length > 0)
+			obj.text(addTypingMessage(obj, name));
+		else
+			$('.chat-content').append('<span class="typing">' + name + ' ...</span>');
+	} else {
+		txt = obj.text(removeTypingMessage(obj, name));
+		if (txt.length == 0) obj.remove();
+	}
+}
+
+function showActionToolbar(info) {
+	var html, qbID, fbID, name;
+	
+	qbID = $(info).data('qb');
+	fbID = $(info).data('fb');
+	name = $(info).find('.message-author').text() || $(info).text();
+	
+	html = '<div class="action-group">';
+	if (qbID != chatUser.qbID) {
+		html += '<button class="btn btn_action" data-name="' + name + '" onclick="makeQuote(this)"><span>Reply</span></button>';
+		html += '<button class="btn btn_action" data-qb="' + qbID + '"><span>Private message</span></button>';
+	}
+	html += fbID ? '<a href="https://facebook.com/' + fbID + '" target="_blank" class="btn btn_action"><span>View profile</span></a>' : '';
+	html += '</div><div class="action-group">';
+	html += '<button class="btn btn_action btn_cancel"><span>Cancel</span></button>';
+	html += '</div>';
 	
 	$('.actions').html(html);
 }
 
-function logout() {
-	isLogout = true;
-	isGettingOccupantsStarted = false;
+function makeQuote(btn) {
+	var name, quote;
 	
-	disconnectChat(CHAT.room_jid, String(chatUser.qb.id));
-	
-	storageUsersKeys = {};
-	localStorage.removeItem('qbAuth');
-	if (chatUser.fb.id) {
-		FB.logout();
-		isFBConnected = false;
-	}
-	
-	chatUser.nick = null;
-	chatUser.avatar = null;
-	chatUser.qb.id = null;
-	chatUser.qb.blob_id = null;
-	chatUser.qb.token = null;
-	chatUser.fb.id = null;
-	chatUser.fb.access_token = null;
+	name = $(btn).data('name').replace(/ /g, "%20");
+	quote = '@'.concat(name).concat(' ');
+	$('#message').focus().val(quote);
 }
 
-function disconnectChat(room, nick) {
-	connection.muc.leave(room, nick);
-	connection.flush();
-	connection.disconnect();
+function takeQuote(str, time) {
+	var quote, signal = $('#signal')[0];
+	
+	quote = str.split(' ')[0].charAt(0) == '@' && str.split(' ')[0];
+	
+	if (quote) {
+		if (escapeSpace(quote.split('@')[1]) == chatUser.name && !time)
+			signal.play();
+		return str.replace(quote, '<b>' + escapeSpace(quote) + '</b>');
+	} else {
+		return str;
+	}
+	
+	function escapeSpace(s) {
+		return s.replace("%20", ' ');
+	}
 }

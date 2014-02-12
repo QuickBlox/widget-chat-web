@@ -9,12 +9,12 @@ function connectFailure() {
 }
 
 function connectSuccess() {
-	isLogout = false;
+	switches.isLogout = false;
 	$('#connecting').hide();
 	$('#chat').show();
 	$('#chat .chat-content').html('');
 	$('#chat #message').val('');
-	createMessagesLoadingIcon();
+	createAnimatedLoadingMessages();
 }
 
 function signUpFailure() {
@@ -35,11 +35,11 @@ function signUpSuccess() {
 }
 
 function logoutSuccess() {
-	if (!isLogout) location.reload();
 	$('.bubbles').removeClass('bubbles_login');
 	$('.header').removeClass('header_login');
 	$('#chat, #login-fom').hide();
 	$('#main, #auth').show();
+	if (!switches.isLogout) location.reload();
 }
 
 function changeInputFileBehavior() {
@@ -117,7 +117,7 @@ function trim(str) {
 	return str;
 }
 
-function getQBId(jid) {
+function getID(jid) {
 	return Strophe.unescapeNode(Strophe.getResourceFromJid(jid));
 }
 
@@ -130,27 +130,18 @@ function checkResponse(response) {
 }
 
 function parser(str, time) {
-	var quote;
-	var signal = $('#signal')[0];
+	var url, url_text;
 	
-	// parser of invalid xml symbols
 	str = escapeHTML(str);
-	
-	// parser of quote
-	quote = str.split(' ')[0].charAt(0) == '@' && str.split(' ')[0];
-	if (quote) {
-		str = str.replace(quote, '<b>' + escapeSpace(quote) + '</b>');
-		if (escapeSpace(quote.split('@')[1]) == chatUser.nick && !time)
-			signal.play();
-	}
+	str = takeQuote(str, time);
 	
 	// parser of paragraphs
 	str = ('<p>' + str).replace(/\n\n/g, '<p>').replace(/\n/g, '<br>');
 	
 	// parser of links
 	str = str.replace(URL_REGEXP, function(match) {
-		var url = (/^[a-z]+:/i).test(match) ? match : 'http://' + match;
-		var url_text = match;
+		url = (/^[a-z]+:/i).test(match) ? match : 'http://' + match;
+		url_text = match;
 		return '<a href="' + escapeHTML(url) + '" target="_blank" class="hide-actions">' + escapeHTML(url_text) + '</a>';
 	});
 	
@@ -164,37 +155,24 @@ function parser(str, time) {
 	function escapeHTML(s) {
 		return s.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 	}
-	function escapeSpace(s) {
-		return s.replace("%20", ' ');
-	}
 }
 
-function createUsersLoadingIcon() {
+function createAnimatedLoadingUsers() {
 	$('.users-list').append('<li class="loading_users"><div id="floatingCirclesG_users"></div></li>');
-	for (var i = 1; i < 9; i++) {
+	for (var i = 1; i < 9; i++)
 		$('#floatingCirclesG_users').append('<div class="f_circleG_users" id="frotateG_0'+i+'_users"></div>');
-	}
 }
 
-function createMessagesLoadingIcon() {
+function createAnimatedLoadingMessages() {
 	$('.chat-content').append('<div class="loading_messages"><div id="floatingCirclesG_messages"></div></div>');
-	for (var i = 1; i < 9; i++) {
+	for (var i = 1; i < 9; i++)
 		$('#floatingCirclesG_messages').append('<div class="f_circleG_messages" id="frotateG_0'+i+'_messages"></div>');
-	}
 }
 
-function createUserItem(user) {
-	var qb = user.id;
-	var fb = user.facebook_id || '';
-	var name = user.full_name;
-	//var iconClass = user.facebook_id ? 'user_fb_icon' : 'user_qb_icon';
-	
-	$('.users-list').append('<li class="user show-actions" data-qb="' + qb + '" data-fb="' + fb + '" onclick="showActionsToolbar(this)">' + name + '</li>');
-	storageUsersKeys[String(qb)] = name;
-	return name;
+function addTypingMessage(obj, name) {
+	return obj.text().split(' ...')[0].concat(', ').concat(name).concat(' ...');
 }
 
-function quote(link) {
-	var quote = '@' + $(link).data('nick').replace(/ /g, "%20") + ' ';
-	$('#message').focus().val(quote);
+function removeTypingMessage(obj, name) {
+	return obj.text().replace(', ' + name, '').replace(name + ', ', '').replace(name + ' ...', '');
 }
