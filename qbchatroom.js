@@ -549,7 +549,7 @@ function createUserList(user) {
 }
 
 function showComposing(isShown, qbID) {
-	var name, txt, obj = $('.typing');
+	var name, obj = $('.typing');
 	
 	if (Object.keys(namesOccupants).length == 0) return;
 	
@@ -560,8 +560,8 @@ function showComposing(isShown, qbID) {
 		else
 			$('.chat-content').append('<span class="typing">' + name + ' ...</span>');
 	} else {
-		txt = obj.text(removeTypingMessage(obj, name));
-		if (txt.length == 0) obj.remove();
+		obj.text(removeTypingMessage(obj, name));
+		if (obj.text().length == 0) obj.remove();
 	}
 }
 
