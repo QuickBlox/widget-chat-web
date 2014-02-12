@@ -162,7 +162,7 @@ function createSession(storage) {
 }
 
 function getQBUser(user_id, storage) {
-	QB.users.get({id: user_id}, function(err, result) {
+	QB.users.get(user_id, function(err, result) {
 		if (err) {
 			console.log(err.detail);
 			connectFailure();
@@ -464,7 +464,7 @@ function getOccupants() {
 function getOneOccupant(id) {
 	var name;
 	
-	QB.users.get({id: id}, function(err, result) {
+	QB.users.get(parseInt(id), function(err, result) {
 		if (err) console.log(err.detail);
 		name = createUserList(result);
 		$('.chat-content').append('<span class="service-message joined">' + name + ' has joined the chat.</span>');
