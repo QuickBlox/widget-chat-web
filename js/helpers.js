@@ -47,6 +47,10 @@ function logoutSuccess() {
 	if (!switches.isLogout) window.location.reload();
 }
 
+function scrollToMessage() {
+	$('.chat-content').scrollTo('*:last', 0);
+}
+
 function changeInputFileBehavior() {
 	$('.uploader-wrap input:file').change(function() {
 		var file = $(this).val();

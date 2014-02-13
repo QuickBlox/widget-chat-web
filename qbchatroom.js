@@ -10,8 +10,7 @@ var params, connection, chatUser = {}, presenceIDs = {}, namesOccupants = {};
 var switches = {
 	isLogout: false,
 	isComposing: false,
-	isFBconnected: false,
-	isReceivingOccupants: false
+	isFBconnected: false
 };
 
 $(document).ready(function() {
@@ -286,8 +285,11 @@ function connectChat(chatUser) {
 			console.log('[Connection] Connected');
 			connectSuccess();
 			
-			localStorage['QBChatUser'] = JSON.stringify(chatUser);
+			getOccupants();
 			connection.muc.join(CHAT.roomJID, chatUser.qbID, getMessage, getPresence, getRoster);
+			setTimeout(scrollToMessage, 7000);
+			localStorage['QBChatUser'] = JSON.stringify(chatUser);
+			
 			break;
 		case Strophe.Status.DISCONNECTING:
 			console.log('[Connection] Disconnecting');
@@ -352,7 +354,6 @@ function logout() {
 	chatUser = {};
 	presenceIDs = {};
 	namesOccupants = {};
-	switches.isReceivingOccupants = false;
 	localStorage.removeItem('QBChatUser');
 }
 
@@ -367,13 +368,12 @@ function disconnectChat(nick) {
 function getRoster(users, room) {
 	var usersCount = Object.keys(users).length;
 	$('.users-count').text(usersCount);
-	if (!switches.isReceivingOccupants) getOccupants();
 	return true;
 }
 
 function getPresence(stanza, room) {
 	console.log('[XMPP] Presence');
-	var user, type, qbID, name, storageLength = Object.keys(namesOccupants).length;
+	var user, type, qbID, name;
 	
 	user = $(stanza).attr('from');
 	type = $(stanza).attr('type');
@@ -384,31 +384,31 @@ function getPresence(stanza, room) {
 	else
 		presenceIDs[qbID] = true;
 	
-	if (storageLength == 0) return true;
+	if (!namesOccupants[qbID]) return true;
 	
+	name = namesOccupants[qbID];
 	if (type) {
-		name = namesOccupants[qbID];
 		delete namesOccupants[qbID];
 		$('.user:contains(' + name + ')').remove();
-		
 		$('.chat-content').append('<span class="service-message left">' + name + ' has left this chat.</span>');
-		$('.chat-content').scrollTo('*:last', 0);
 		
-		if (qbID == chatUser.qbID && !switches.isLogout) window.location.reload();
+		if (qbID == chatUser.qbID && !switches.isLogout)
+			window.location.reload();
 	} else {
 		getOneOccupant(qbID);
+		$('.chat-content').append('<span class="service-message joined">' + name + ' has joined the chat.</span>');
 	}
-
+	
 	return true;
 }
 
 function getMessage(stanza, room) {
-	var html, author, response, time, composing, paused;
+	var html, author, response, createTime, messageTime, composing, paused;
 	var qbID, message, name, avatar, fbID, icon, defaultAvatar = 'images/avatar_default.png';
 
 	author = $(stanza).attr('from');
 	response = $(stanza).find('body').context.textContent;
-	time = $(stanza).find('delay').attr('stamp');
+	createTime = $(stanza).find('delay').attr('stamp');
 	
 	composing = $(stanza).find('composing')[0];
 	paused = $(stanza).find('paused')[0];
@@ -419,32 +419,38 @@ function getMessage(stanza, room) {
 		showComposing(composing, qbID);
 	} else {
 		console.log('[XMPP] Message');
-		response = checkResponse(response);
 		
-		message = response.message ? parser(response.message, time) : parser(response, time);
+		response = checkResponse(response);
+		messageTime = createTime || (new Date()).toISOString();
+		
+		message = response.message || response;
 		name = response.name || qbID;
 		avatar = response.avatar || defaultAvatar;
 		fbID = response.fb || '';
-		time = time || (new Date()).toISOString();
 		//icon = response.fb ? 'images/fb_auth.png' : 'images/qb_auth.png';
 		
 		html = '<section class="message show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '" onclick="showActionToolbar(this)">';
 		//html += '<img class="message-icon" src="' + icon + '" alt="icon">';
 		html += '<img class="message-avatar" src="' + avatar + '" alt="avatar">';
 		html += '<div class="message-body">';
-		html += '<div class="message-description">' + message + '</div>';
+		html += '<div class="message-description">' + parser(message, createTime) + '</div>';
 		html += '<footer><span class="message-author">' + name + '</span>';
-		html += '<time class="message-time" datetime="' + time + '">' + $.timeago(time) + '</time></footer>';
+		html += '<time class="message-time" datetime="' + messageTime + '">' + $.timeago(messageTime) + '</time></footer>';
 		html += '</div></section>';
 		
 		$('.loading_messages').remove();
-		if ($('.typing').length > 0)
-			$('.chat-content .typing:first').before(html);
+		if ($('span').is('.typing'))
+			$('.chat-content .typing').before(html);
 		else
 			$('.chat-content').append(html);
+			
 		$('.chat-content .message:odd').addClass('white');
-		$('.chat-content .message:last').fadeTo(300, 1);
-		$('.chat-content').scrollTo('*:last', 0);
+		if (createTime) {
+			$('.chat-content .message:last').fadeTo(0, 1);
+		} else {
+			$('.chat-content .message:last').fadeTo(300, 1);
+			scrollToMessage();
+		}
 	}
 	
 	return true;
@@ -452,7 +458,6 @@ function getMessage(stanza, room) {
 
 function getOccupants() {
 	var ocuppants, requestsCount, ids = [], limit = 100;
-	switches.isReceivingOccupants = true;
 	
 	$('.users-list').html('<li class="users-list-title">Occupants</li>');
 	createAnimatedLoadingUsers();
@@ -475,10 +480,9 @@ function getOccupants() {
 			
 			QB.users.listUsers(params, function(err, result) {
 				if (err) console.log(err.detail);
-				$('.loading_users').remove();
-				if ($('.message').length == 0)
-					$('.loading_messages').remove();
 				
+				$('.loading_users, .loading_messages').remove();
+
 				$(result.items).each(function() {
 					var id = String(this.user.id);
 					if (presenceIDs[id]) {
@@ -496,13 +500,9 @@ function getOccupants() {
 }
 
 function getOneOccupant(id) {
-	var name;
-	
 	QB.users.get(parseInt(id), function(err, result) {
 		if (err) console.log(err.detail);
-		name = createUserList(result);
-		$('.chat-content').append('<span class="service-message joined">' + name + ' has joined the chat.</span>');
-		$('.chat-content').scrollTo('*:last', 0);
+		createUserList(result);
 	});
 }
 
@@ -518,13 +518,12 @@ function createUserList(user) {
 	
 	$('.users-list').append('<li class="user show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '" onclick="showActionToolbar(this)">' + name + '</li>');
 	namesOccupants[qbID] = name;
-	return name;
 }
 
 function showComposing(isShown, qbID) {
 	var name, obj = $('.typing');
 	
-	if (Object.keys(namesOccupants).length == 0) return true;
+	if (!namesOccupants[qbID]) return true;
 	
 	name = namesOccupants[qbID];
 	if (isShown && qbID != chatUser.qbID) {
