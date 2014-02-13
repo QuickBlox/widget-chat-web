@@ -61,7 +61,7 @@ function subscribeFBStatusEvent() {
 		switch (response.status) {
 		case 'connected':
 			createSession(null, response.authResponse.accessToken);
-			switches.isFBconnected = true;
+			setTimeout(function() {switches.isFBconnected = true}, 1000);
 			break;
 		case 'not_authorized':
 			FB.login();
