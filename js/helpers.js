@@ -2,10 +2,15 @@
 -----------------------------------------------------------------------*/
 var URL_REGEXP = /\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/gi;
 
+function connecting() {
+	$('#main').hide();
+	$('#connecting').show();
+}
+
 function connectFailure() {
 	$('#connecting').hide();
 	$('#main').show();
-	$('#login-fom input').addClass('error');
+	$('#login-form input').addClass('error');
 }
 
 function connectSuccess() {
@@ -30,14 +35,14 @@ function signUpSuccess() {
 	function backToLogin() {
 		$('#signup-success').hide();
 		$('#main').show();
-		$('#login-fom input').val('').removeClass('error');
+		$('#login-form input').val('').removeClass('error');
 	}
 }
 
 function logoutSuccess() {
 	$('.bubbles').removeClass('bubbles_login');
 	$('.header').removeClass('header_login');
-	$('#chat, #login-fom').hide();
+	$('#chat, #login-form').hide();
 	$('#main, #auth').show();
 	if (!switches.isLogout) window.location.reload();
 }

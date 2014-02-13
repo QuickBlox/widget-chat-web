@@ -5,23 +5,12 @@
  * author: Andrey Povelichenko <andrey.povelichenko@quickblox.com>
  */
 
-var storage, params, connection, presenceIDs = {}, namesOccupants = {};
+var params, connection, chatUser = {}, presenceIDs = {}, namesOccupants = {};
 
 var switches = {
 	isLogout: false,
 	isComposing: false,
-	isFBConnected: false,
-	isSubscribeEnabled: false,
 	isReceivingOccupants: false
-};
-
-var chatUser = {
-	name: null,
-	avatar: null,
-	qbID: null,
-	qbToken: null,
-	fbID: null,
-	fbAccessToken: null
 };
 
 $(document).ready(function() {
@@ -29,10 +18,11 @@ $(document).ready(function() {
 	$.getScript('https://connect.facebook.net/en_EN/all.js', function() {
 		FB.init({
 			appId: FBAPP_ID,
-			cookie: true
+			status: false
 		});
 		
 		autoLogin();
+		subscribeFBStatusEvent();
 		changeInputFileBehavior();
 		changeHeightChatBlock();
 		getSmiles();
@@ -55,33 +45,22 @@ $(document).ready(function() {
 /* Authorization Module
 --------------------------------------------------------------------------*/
 function autoLogin() {
-	if (localStorage['QBAuth']) {
-		// Autologin as QB user
-		storage = $.parseJSON(localStorage['QBAuth']);
-		createSession(storage);
+	if (localStorage['QBChatUser']) {
+		connecting();
+		chatUser = $.parseJSON(localStorage['QBChatUser']);
+		connectChat(chatUser);
+		
+		QB.init(chatUser.qbToken);
 	} else {
-		// Autologin as FB user
-		subscribeFBStatusEvent();
-		switches.isFBConnected = true;
-		switches.isSubscribeEnabled = true;
+		QB.init(QBAPP.appID, QBAPP.authKey, QBAPP.authSecret);
 	}
 }
 
 function subscribeFBStatusEvent() {
-	if (!switches.isSubscribeEnabled) {
-		FB.Event.subscribe('auth.statusChange', function(response) {
-			console.log('FB ' + response.status);
-			if (response.status == 'connected')
-				getFBUser(response.authResponse.accessToken);
-		});
-	}
-}
-
-function getFBUser(accessToken) {
-	FB.api('/me', function(response) {
-		chatUser.fbID = response.id;
-		chatUser.fbAccessToken = accessToken;
-		createSession();
+	FB.Event.subscribe('auth.statusChange', function(response) {
+		console.log('FB ' + response.status);
+		if (response.status == 'connected')
+			createSession(null, response.authResponse.accessToken);
 	});
 }
 
@@ -90,8 +69,7 @@ function authFB() {
 		console.log('FB ' + response.status);
 		switch (response.status) {
 		case 'connected':
-			if (!switches.isFBConnected)
-				getFBUser(response.authResponse.accessToken);
+			createSession(null, response.authResponse.accessToken);
 			break;
 		case 'not_authorized':
 			FB.login();
@@ -101,22 +79,21 @@ function authFB() {
 			break;
 		}
 	});
-	
-	subscribeFBStatusEvent();
-	switches.isSubscribeEnabled = true;
 }
 
 function authQB() {
 	$('.bubbles').addClass('bubbles_login');
 	$('.header').addClass('header_login');
 	$('#auth').hide();
-	$('#login-fom').show();
-	$('#login-fom input').val('').removeClass('error');
+	$('#login-form').show();
+	$('#login-form input').val('').removeClass('error');
 }
 
 /* QB Module (find the user)
 -----------------------------------------------------------------------------*/
 function prepareDataForLogin() {
+	var storage;
+	
 	storage = {
 		login: $('#login').val(),
 		pass: $('#pass').val()
@@ -129,13 +106,12 @@ function prepareDataForLogin() {
 		connectFailure();
 }
 
-function createSession(storage) {
-	$('#main').hide();
-	$('#connecting').show();
+function createSession(storage, accessToken) {
+	connecting();
 	
-	if (chatUser.fbID) {
+	if (accessToken) {
 		// via Facebook
-		params = {provider: 'facebook', keys: {token: chatUser.fbAccessToken}};
+		params = {provider: 'facebook', keys: {token: accessToken}};
 	} else if (storage.login.indexOf('@') > 0) {
 		// via QB email and password
 		params = {email: storage.login, password: storage.pass};
@@ -144,25 +120,26 @@ function createSession(storage) {
 		params = {login: storage.login, password: storage.pass};
 	}
 	
-	QB.init(QBAPP.appID, QBAPP.authKey, QBAPP.authSecret);
 	QB.createSession(params, function(err, result) {
 		if (err) {
 			console.log(err.detail);
 			connectFailure();
 		} else {
-			chatUser.qbToken = result.token;
-			getQBUser(result.user_id, storage);
+			getQBUser(result.user_id, result.token, storage.pass);
 		}
 	});
 }
 
-function getQBUser(user_id, storage) {
+function getQBUser(user_id, token, pass) {
 	QB.users.get(user_id, function(err, result) {
 		if (err) {
 			console.log(err.detail);
 			connectFailure();
 		} else {
-			chatUser.qbID = String(result.id);
+			chatUser.qbID = String(user_id);
+			chatUser.qbToken = token;
+			chatUser.qbPass = pass;
+			chatUser.fbID = result.facebook_id;
 			chatUser.name = result.full_name;
 			
 			if (result.blob_id) {
@@ -178,7 +155,7 @@ function getQBUser(user_id, storage) {
 				chatUser.avatar = chatUser.fbID ? 'https://graph.facebook.com/' + chatUser.fbID + '/picture/' : null;
 			}
 			
-			connectChat(chatUser, storage);
+			connectChat(chatUser);
 		}
 	});
 }
@@ -251,7 +228,7 @@ function createBlob(file, data) {
 		} else {
 			user_id = result.id;
 			
-			QB.content.createAndUpload({file: file, public: true}, function(err, result) {
+			QB.content.createAndUpload({file: file, 'public': true}, function(err, result) {
 				if (err) {
 					console.log(err.detail);
 					signUpFailure();
@@ -274,11 +251,11 @@ function assignBlobToUser(blob, user) {
 	});
 }
 
-/* Group Chat Module
+/* One to One Chat Module
 -----------------------------------------------------------------------*/
-function connectChat(chatUser, storage) {
+function connectChat(chatUser) {
 	var userJID = chatUser.qbID + "-" + QBAPP.appID + "@" + CHAT.server;
-	var userPass = chatUser.fbID ? chatUser.qbToken : storage.pass;
+	var userPass = chatUser.qbPass || chatUser.qbToken;
 	
 	connection = new Strophe.Connection(CHAT.bosh);
 	connection.rawInput = rawInput;
@@ -305,10 +282,9 @@ function connectChat(chatUser, storage) {
 			break;
 		case Strophe.Status.CONNECTED:
 			console.log('[Connection] Connected');
-			
-			if (storage) localStorage['QBAuth'] = JSON.stringify(storage);
-			
 			connectSuccess();
+			
+			localStorage['QBChatUser'] = JSON.stringify(chatUser);
 			connection.muc.join(CHAT.roomJID, chatUser.qbID, getMessage, getPresence, getRoster);
 			break;
 		case Strophe.Status.DISCONNECTING:
@@ -328,6 +304,64 @@ function connectChat(chatUser, storage) {
 function rawInput(data) {/*console.log('RECV: ' + data);*/}
 function rawOutput(data) {/*console.log('SENT: ' + data);*/}
 
+function sendMesage() {
+	var message, post;
+	
+	$('#message').keydown(function(event) {
+		if (!switches.isComposing)
+			sendComposing();
+		
+		if (event.keyCode == 13 && !event.shiftKey) {
+			post = $('#message').val();
+			if (trim(post)) {
+				sendPaused();
+				
+				message = {
+					message: post,
+					name: chatUser.name,
+					avatar: chatUser.avatar,
+					fb: chatUser.fbID
+				};
+				
+				message = Strophe.escapeNode(JSON.stringify(message));
+				connection.muc.groupchat(CHAT.roomJID, message);
+				$('#message').val('');
+			}
+			return false;
+		}
+	});
+	
+	function sendComposing() {
+		switches.isComposing = true;
+		connection.chatstates.sendComposing(CHAT.roomJID, 'groupchat');
+		setTimeout(sendPaused, 5000);
+	}
+	
+	function sendPaused() {
+		switches.isComposing = false;
+		connection.chatstates.sendPaused(CHAT.roomJID, 'groupchat');
+	}
+}
+
+function logout() {
+	switches.isLogout = true;
+	disconnectChat(chatUser.qbID);
+	
+	chatUser = {};
+	presenceIDs = {};
+	namesOccupants = {};
+	switches.isReceivingOccupants = false;
+	localStorage.removeItem('QBChatUser');
+}
+
+function disconnectChat(nick) {
+	connection.muc.leave(CHAT.roomJID, nick);
+	connection.flush();
+	connection.disconnect();
+}
+
+/* Group Chat Room Module
+-----------------------------------------------------------------------*/
 function getRoster(users, room) {
 	var usersCount = Object.keys(users).length;
 	$('.users-count').text(usersCount);
@@ -347,8 +381,10 @@ function getPresence(stanza, room) {
 		delete presenceIDs[qbID];
 	else
 		presenceIDs[qbID] = true;
-
-	if (type && storageLength > 0) {
+	
+	if (storageLength == 0) return true;
+	
+	if (type) {
 		name = namesOccupants[qbID];
 		delete namesOccupants[qbID];
 		$('.user:contains(' + name + ')').remove();
@@ -357,7 +393,7 @@ function getPresence(stanza, room) {
 		$('.chat-content').scrollTo('*:last', 0);
 		
 		if (qbID == chatUser.qbID && !switches.isLogout) window.location.reload();
-	} else if (storageLength > 0) {
+	} else {
 		getOneOccupant(qbID);
 	}
 
@@ -468,67 +504,6 @@ function getOneOccupant(id) {
 	});
 }
 
-function sendMesage() {
-	var message, post;
-	
-	$('#message').keydown(function(event) {
-		if (!switches.isComposing)
-			sendComposing();
-		
-		if (event.keyCode == 13 && !event.shiftKey) {
-			post = $('#message').val();
-			if (trim(post)) {
-				sendPaused();
-				
-				message = {
-					message: post,
-					name: chatUser.name,
-					avatar: chatUser.avatar,
-					fb: chatUser.fbID
-				};
-				
-				message = Strophe.escapeNode(JSON.stringify(message));
-				connection.muc.groupchat(CHAT.roomJID, message);
-				$('#message').val('');
-			}
-			return false;
-		}
-	});
-	
-	function sendComposing() {
-		switches.isComposing = true;
-		connection.chatstates.sendComposing(CHAT.roomJID, 'groupchat');
-		setTimeout(sendPaused, 5000);
-	}
-	
-	function sendPaused() {
-		switches.isComposing = false;
-		connection.chatstates.sendPaused(CHAT.roomJID, 'groupchat');
-	}
-}
-
-function logout() {
-	switches.isLogout = true;
-	disconnectChat(chatUser.qbID);
-	
-	if (chatUser.fbID) {
-		FB.logout();
-		switches.isFBConnected = false;
-	}
-	
-	chatUser = {};
-	presenceIDs = {};
-	namesOccupants = {};
-	switches.isReceivingOccupants = false;
-	localStorage.removeItem('QBAuth');
-}
-
-function disconnectChat(nick) {
-	connection.muc.leave(CHAT.roomJID, nick);
-	connection.flush();
-	connection.disconnect();
-}
-
 /* Additional Features
 -------------------------------------------------------------------------*/
 function createUserList(user) {
@@ -547,7 +522,7 @@ function createUserList(user) {
 function showComposing(isShown, qbID) {
 	var name, obj = $('.typing');
 	
-	if (Object.keys(namesOccupants).length == 0) return;
+	if (Object.keys(namesOccupants).length == 0) return true;
 	
 	name = namesOccupants[qbID];
 	if (isShown && qbID != chatUser.qbID) {
