@@ -60,8 +60,8 @@ function subscribeFBStatusEvent() {
 		console.log('FB ' + response.status);
 		switch (response.status) {
 		case 'connected':
-			switches.isFBconnected = true;
 			createSession(null, response.authResponse.accessToken);
+			switches.isFBconnected = true;
 			break;
 		case 'not_authorized':
 			FB.login();
