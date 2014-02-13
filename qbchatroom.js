@@ -57,14 +57,6 @@ function autoLogin() {
 function subscribeFBStatusEvent() {
 	FB.Event.subscribe('auth.statusChange', function(response) {
 		console.log('FB ' + response.status);
-		if (response.status == 'connected')
-			createSession(null, response.authResponse.accessToken);
-	});
-}
-
-function authFB() {
-	FB.getLoginStatus(function(response) {
-		console.log('FB ' + response.status);
 		switch (response.status) {
 		case 'connected':
 			createSession(null, response.authResponse.accessToken);
@@ -72,11 +64,15 @@ function authFB() {
 		case 'not_authorized':
 			FB.login();
 			break;
-		default:
+		case 'unknown':
 			FB.login();
 			break;
 		}
 	});
+}
+
+function authFB() {
+	FB.getLoginStatus();
 }
 
 function authQB() {
