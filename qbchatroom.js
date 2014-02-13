@@ -287,7 +287,7 @@ function connectChat(chatUser) {
 			
 			getOccupants();
 			connection.muc.join(CHAT.roomJID, chatUser.qbID, getMessage, getPresence, getRoster);
-			setTimeout(scrollToMessage, 7000);
+			setTimeout(scrollToMessage, 9000);
 			localStorage['QBChatUser'] = JSON.stringify(chatUser);
 			
 			break;
