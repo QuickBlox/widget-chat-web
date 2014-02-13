@@ -392,7 +392,6 @@ function getPresence(stanza, room) {
 		$('.user:contains(' + name + ')').remove();
 		
 		$('.chat-content').append('<span class="service-message left">' + name + ' has left this chat.</span>');
-		$('.chat-content').scrollTo('*:last', 0);
 		
 		if (qbID == chatUser.qbID && !switches.isLogout) window.location.reload();
 	} else {
@@ -502,7 +501,6 @@ function getOneOccupant(id) {
 		if (err) console.log(err.detail);
 		name = createUserList(result);
 		$('.chat-content').append('<span class="service-message joined">' + name + ' has joined the chat.</span>');
-		$('.chat-content').scrollTo('*:last', 0);
 	});
 }
 
