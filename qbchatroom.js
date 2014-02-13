@@ -10,6 +10,7 @@ var params, connection, chatUser = {}, presenceIDs = {}, namesOccupants = {};
 var switches = {
 	isLogout: false,
 	isComposing: false,
+	isFBconnected: false,
 	isReceivingOccupants: false
 };
 
@@ -59,6 +60,7 @@ function subscribeFBStatusEvent() {
 		console.log('FB ' + response.status);
 		switch (response.status) {
 		case 'connected':
+			switches.isFBconnected = true;
 			createSession(null, response.authResponse.accessToken);
 			break;
 		case 'not_authorized':
@@ -72,7 +74,10 @@ function subscribeFBStatusEvent() {
 }
 
 function authFB() {
-	FB.getLoginStatus();
+	FB.getLoginStatus(function(response) {
+		if (response.status == 'connected' && switches.isFBconnected)
+			createSession(null, response.authResponse.accessToken);
+	});
 }
 
 function authQB() {
