@@ -124,7 +124,7 @@ function createSession(storage, accessToken) {
 			console.log(err.detail);
 			connectFailure();
 		} else {
-			getQBUser(result.user_id, result.token, storage.pass);
+			getQBUser(result.user_id, result.token, (storage ? storage.pass : null));
 		}
 	});
 }
