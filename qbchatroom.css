@@ -403,7 +403,7 @@ fieldset {
 			overflow: hidden;
 			font-size: 1.2rem;
 			color: #333;
-			word-break: break-all;
+			word-wrap: break-word;
 		}
 			.message-description,
 			.message-description p {
@@ -519,7 +519,7 @@ fieldset {
 	padding: .8rem;
 	font-size: 1.1rem;
 	background: #fffabb;
-	word-break: break-all;
+	word-wrap: break-word;
 }			
 
 .joined {color: #108134;}

@@ -66,7 +66,6 @@ function subscribeFBStatusEvent() {
 
 function authFB() {
 	FB.getLoginStatus(function(response) {
-		console.log('FB ' + response.status);
 		switch (response.status) {
 		case 'connected':
 			if (switches.isFBconnected)
@@ -445,9 +444,9 @@ function getMessage(stanza, room) {
 			$('.chat-content').append(html);
 		$('.chat-content .message:odd').addClass('white');
 		$('.chat-content .message:last').fadeTo(300, 1);
+		$('.chat-content').scrollTo('*:last', 0);
 	}
 	
-	$('.chat-content').scrollTo('*:last', 0);
 	return true;
 }
 
