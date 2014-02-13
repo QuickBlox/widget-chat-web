@@ -48,11 +48,9 @@ function autoLogin() {
 	if (localStorage['QBChatUser']) {
 		connecting();
 		chatUser = $.parseJSON(localStorage['QBChatUser']);
-		connectChat(chatUser);
 		
 		QB.init(chatUser.qbToken);
-	} else {
-		QB.init(QBAPP.appID, QBAPP.authKey, QBAPP.authSecret);
+		connectChat(chatUser);
 	}
 }
 
@@ -120,6 +118,7 @@ function createSession(storage, accessToken) {
 		params = {login: storage.login, password: storage.pass};
 	}
 	
+	QB.init(QBAPP.appID, QBAPP.authKey, QBAPP.authSecret);
 	QB.createSession(params, function(err, result) {
 		if (err) {
 			console.log(err.detail);
@@ -194,6 +193,7 @@ function createUser() {
 		password: $('#signup_pass').val()
 	};
 	
+	QB.init(QBAPP.appID, QBAPP.authKey, QBAPP.authSecret);
 	QB.createSession(function(err, result) {
 		if (err) {
 			console.log(err.detail);
