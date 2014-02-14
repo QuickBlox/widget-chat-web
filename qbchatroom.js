@@ -36,10 +36,16 @@ $(document).ready(function() {
 		$('#signUp').click(function(){ signUp(); return false; });
 		$('.logout').click(function(){ logout(); return false; });
 		$('.smiles-list *').click(function() { choseSmile(this); });
-		$('.users').click(function(){ showList('.users'); return false; });
 		$('.smiles').click(function(){ showList('.smiles'); return false; });
 		$('#dataLogin').click(function(){ prepareDataForLogin(); return false; });
 		$('#dataSignup').click(function(){ prepareDataForSignUp(); return false; });
+		
+		$('.users').click(function(){ 
+			showList('.users');
+			if (!switches.isOccupantsDownloaded)
+				getOccupants();
+			return false;
+		});
 	});
 });
 
@@ -166,9 +172,6 @@ function getUsersList(data) {
 			if (err.message == 'Unauthorized')
 				recoverySession(data);
 		} else {
-			$('.loading_users, .loading_messages').remove();
-			switches.isOccupantsDownloaded = true;
-			
 			$(result.items).each(function() {
 				createUsersList(this.user);
 			});
@@ -311,10 +314,10 @@ function connectChat(chatUser) {
 			connectSuccess();
 			
 			connection.muc.join(CHAT.roomJID, chatUser.qbID, getMessage, getPresence, getRoster);
-			setTimeout(getOccupants, 1000);
-			setTimeout(scrollToMessage, 10 * 1000);
 			localStorage['QBChatUser'] = JSON.stringify(chatUser);
 			
+			setTimeout(function() {$('.loading_messages').remove()}, 2 * 1000);
+			setTimeout(scrollToMessage, 10 * 1000);
 			break;
 		case Strophe.Status.DISCONNECTING:
 			console.log('[Connection] Disconnecting');
@@ -404,17 +407,19 @@ function getPresence(stanza, room) {
 	type = $(stanza).attr('type');
 	qbID = getID(user);
 	
-	if (!type) namesOccupants[qbID] = true;
-	if (!switches.isOccupantsDownloaded) return true;
-	
 	if (type) {
-		name = namesOccupants[qbID];
+		if (typeof(namesOccupants[qbID]) == "string") {
+			name = namesOccupants[qbID];
+			$('.chat-content').append('<span class="service-message left">' + name + ' has left this chat.</span>');
+			scrollToMessage();
+			
+			$('.user[data-qb=' + qbID + ']').remove();
+		}
 		delete namesOccupants[qbID];
-		$('.user[data-qb=' + qbID + ']').remove();
-		$('.chat-content').append('<span class="service-message left">' + name + ' has left this chat.</span>');
-		scrollToMessage();
 	} else {
-		getOneOccupant(qbID);
+		namesOccupants[qbID] = true;
+		if (switches.isOccupantsDownloaded)
+			getOneOccupant(qbID);
 	}
 	
 	if (type && qbID == chatUser.qbID && !switches.isLogout)
@@ -426,7 +431,9 @@ function getPresence(stanza, room) {
 function getMessage(stanza, room) {
 	var html, author, response, createTime, messageTime, composing, paused;
 	var qbID, message, name, avatar, fbID, icon, defaultAvatar = 'images/avatar_default.png';
-
+	/*if (!switches.isOccupantsDownloaded)
+		getOccupants();*/
+	
 	author = $(stanza).attr('from');
 	response = $(stanza).find('body').context.textContent;
 	createTime = $(stanza).find('delay').attr('stamp');
@@ -435,8 +442,10 @@ function getMessage(stanza, room) {
 	paused = $(stanza).find('paused')[0];
 	
 	qbID = getID(author);
+	console.log(author);
 	
 	if (!response && composing || paused) {
+		console.log(qbID);
 		showComposing(composing, qbID);
 	} else {
 		console.log('[XMPP] Message');
@@ -479,6 +488,7 @@ function getMessage(stanza, room) {
 
 function getOccupants() {
 	var requestsCount, limit = 100, ids = Object.keys(namesOccupants);
+	switches.isOccupantsDownloaded = true;
 	
 	requestsCount = ids.length / limit;
 	for (var i = 1, c = 0; c < requestsCount; i++, c++) {
@@ -501,8 +511,10 @@ function getOneOccupant(id) {
 			console.log(err.detail);
 		} else {
 			createUsersList(result);
-			$('.chat-content').append('<span class="service-message joined">' + result.full_name + ' has joined the chat.</span>');
-			scrollToMessage();
+			if ($('section').is('.message')) {
+				$('.chat-content').append('<span class="service-message joined">' + result.full_name + ' has joined the chat.</span>');
+				scrollToMessage();
+			}
 		}
 	});
 }
@@ -517,26 +529,35 @@ function createUsersList(user) {
 	name = user.full_name;
 	//var iconClass = user.facebook_id ? 'user_fb_icon' : 'user_qb_icon';
 	
-	$('.users-list').append('<li class="user show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '" onclick="showActionToolbar(this)">' + name + '</li>');
 	namesOccupants[qbID] = name;
+	$('.loading_users').remove();
+	$('.users-list').append('<li class="user show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '" onclick="showActionToolbar(this)">' + name + '</li>');
 }
 
 function showComposing(composing, qbID) {
-	var name, obj = $('.typing');
-	if (!switches.isOccupantsDownloaded) return false;
+	//var name, obj = $('.typing');
+	concole.log(qbID);
+	/*if (typeof(namesOccupants[qbID]) != "string") return false;
 	
 	name = namesOccupants[qbID];
 	if (composing && qbID != chatUser.qbID) {
-		if ($('span').is('.typing'))
-			obj.text(addTypingMessage(obj, name));
-		else {
+		if ($('span').is('.typing')) {
+			if (obj.text().indexOf(name) > 0) {
+				console.log("yes");
+				obj.text(removeTypingMessage(obj, name));
+			}
+			else {
+				console.log("not");
+				obj.text(addTypingMessage(obj, name));
+			}
+		} else {
 			$('.chat-content').append('<span class="typing">' + name + ' ...</span>');
 			scrollToMessage();
 		}
 	} else {
 		obj.text(removeTypingMessage(obj, name));
 		if (obj.text().length == 0) obj.remove();
-	}
+	}*/
 }
 
 function showActionToolbar(info) {
