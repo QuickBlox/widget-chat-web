@@ -399,7 +399,7 @@ function getRoster(users, room) {
 function getPresence(stanza, room) {
 	console.log('[XMPP] Presence');
 	var user, type, qbID, name;
-	if (!switches.isOccupantsDownloaded) return false;
+	if (!switches.isOccupantsDownloaded) return true;
 	
 	user = $(stanza).attr('from');
 	type = $(stanza).attr('type');
