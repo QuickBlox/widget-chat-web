@@ -19,6 +19,8 @@ function connectSuccess() {
 	$('#chat').show();
 	$('#chat .chat-content').html('');
 	$('#chat #message').val('');
+	$('.users-list').html('<li class="users-list-title">Occupants</li>');
+	createAnimatedLoadingUsers();
 	createAnimatedLoadingMessages();
 }
 
@@ -59,11 +61,10 @@ function changeInputFileBehavior() {
 }
 
 function changeHeightChatBlock() {
-	var fixHeight = 2;
-	var fixUsersListHeight = 27;
-	var chatHeaderHeight = $('.chat-header').height();
-	var chatFooterHeight = $('.chat-footer').height();
-	var chatContentHeight;
+	var chatHeaderHeight, chatContentHeight, chatFooterHeight, fixHeight = 2, fixUsersListHeight = 27;
+	
+	chatHeaderHeight = $('.chat-header').height();
+	chatFooterHeight = $('.chat-footer').height();
 	
 	chatContentHeight = WIDGET_HEIGHT - chatHeaderHeight - chatFooterHeight - fixHeight;
 	$('.chat-content').height(chatContentHeight);

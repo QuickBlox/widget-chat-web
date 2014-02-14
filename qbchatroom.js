@@ -5,12 +5,13 @@
  * author: Andrey Povelichenko <andrey.povelichenko@quickblox.com>
  */
 
-var params, connection, chatUser = {}, presenceIDs = {}, namesOccupants = {};
+var params, connection, chatUser = {}, namesOccupants = {};
 
 var switches = {
 	isLogout: false,
 	isComposing: false,
-	isFBconnected: false
+	isFBconnected: false,
+	isOccupantsDownloaded: false
 };
 
 $(document).ready(function() {
@@ -91,9 +92,7 @@ function authQB() {
 /* QB Module (find the user)
 -----------------------------------------------------------------------------*/
 function prepareDataForLogin() {
-	var storage;
-	
-	storage = {
+	var storage = {
 		login: $('#login').val(),
 		pass: $('#pass').val()
 	};
@@ -138,7 +137,7 @@ function getQBUser(user_id, token, pass) {
 		} else {
 			chatUser.qbID = String(user_id);
 			chatUser.qbToken = token;
-			chatUser.qbPass = pass;
+			chatUser.qbPass = pass || token;
 			chatUser.fbID = result.facebook_id;
 			chatUser.name = result.full_name;
 			
@@ -157,6 +156,32 @@ function getQBUser(user_id, token, pass) {
 			
 			connectChat(chatUser);
 		}
+	});
+}
+
+function getListUsers(data) {
+	QB.users.listUsers(data, function(err, result) {
+		if (err) {
+			console.log(err.detail);
+			if (err.message == 'Unauthorized')
+				recoverySession(data);
+		} else {
+			$('.loading_users').remove();
+			switches.isOccupantsDownloaded = true;
+			
+			$(result.items).each(function() {
+				createUserList(this.user);
+			});
+		}
+	});
+}
+
+function recoverySession(data) {
+	QB.init(QBAPP.appID, QBAPP.authKey, QBAPP.authSecret);
+	QB.createSession(function(err, result) {
+		chatUser.qbToken = result.token;
+		localStorage['QBChatUser'] = JSON.stringify(chatUser);
+		getListUsers(data);
 	});
 }
 
@@ -256,7 +281,7 @@ function assignBlobToUser(blob, user) {
 -----------------------------------------------------------------------*/
 function connectChat(chatUser) {
 	var userJID = chatUser.qbID + "-" + QBAPP.appID + "@" + CHAT.server;
-	var userPass = chatUser.qbPass || chatUser.qbToken;
+	var userPass = chatUser.qbPass;
 	
 	connection = new Strophe.Connection(CHAT.bosh);
 	connection.rawInput = rawInput;
@@ -285,9 +310,9 @@ function connectChat(chatUser) {
 			console.log('[Connection] Connected');
 			connectSuccess();
 			
-			getOccupants();
 			connection.muc.join(CHAT.roomJID, chatUser.qbID, getMessage, getPresence, getRoster);
-			setTimeout(scrollToMessage, 7000);
+			setTimeout(getOccupants, 1000);
+			setTimeout(scrollToMessage, 10 * 1000);
 			localStorage['QBChatUser'] = JSON.stringify(chatUser);
 			
 			break;
@@ -338,7 +363,7 @@ function sendMesage() {
 	function sendComposing() {
 		switches.isComposing = true;
 		connection.chatstates.sendComposing(CHAT.roomJID, 'groupchat');
-		setTimeout(sendPaused, 5000);
+		setTimeout(sendPaused, 5 * 1000);
 	}
 	
 	function sendPaused() {
@@ -352,8 +377,8 @@ function logout() {
 	disconnectChat(chatUser.qbID);
 	
 	chatUser = {};
-	presenceIDs = {};
 	namesOccupants = {};
+	switches.isOccupantsDownloaded = false;
 	localStorage.removeItem('QBChatUser');
 }
 
@@ -374,30 +399,24 @@ function getRoster(users, room) {
 function getPresence(stanza, room) {
 	console.log('[XMPP] Presence');
 	var user, type, qbID, name;
+	if (!switches.isOccupantsDownloaded) return true;
 	
 	user = $(stanza).attr('from');
 	type = $(stanza).attr('type');
 	qbID = getID(user);
 	
-	if (type)
-		delete presenceIDs[qbID];
-	else
-		presenceIDs[qbID] = true;
-	
-	if (!namesOccupants[qbID]) return true;
-	
-	name = namesOccupants[qbID];
 	if (type) {
+		name = namesOccupants[qbID];
 		delete namesOccupants[qbID];
-		$('.user:contains(' + name + ')').remove();
+		$('.user[data-qb=' + qbID + ']').remove();
 		$('.chat-content').append('<span class="service-message left">' + name + ' has left this chat.</span>');
-		
-		if (qbID == chatUser.qbID && !switches.isLogout)
-			window.location.reload();
+		scrollToMessage();
 	} else {
 		getOneOccupant(qbID);
-		$('.chat-content').append('<span class="service-message joined">' + name + ' has joined the chat.</span>');
 	}
+	
+	if (type && qbID == chatUser.qbID && !switches.isLogout)
+			window.location.reload();
 	
 	return true;
 }
@@ -437,16 +456,17 @@ function getMessage(stanza, room) {
 		html += '<footer><span class="message-author">' + name + '</span>';
 		html += '<time class="message-time" datetime="' + messageTime + '">' + $.timeago(messageTime) + '</time></footer>';
 		html += '</div></section>';
-		
-		$('.loading_messages').remove();
+
 		if ($('span').is('.typing'))
 			$('.chat-content .typing').before(html);
 		else
 			$('.chat-content').append(html);
-			
+		
+		$('.loading_messages').remove();
 		$('.chat-content .message:odd').addClass('white');
 		if (createTime) {
 			$('.chat-content .message:last').fadeTo(0, 1);
+			//if ($('.message').length < 7) scrollToHeader();
 		} else {
 			$('.chat-content .message:last').fadeTo(300, 1);
 			scrollToMessage();
@@ -459,9 +479,6 @@ function getMessage(stanza, room) {
 function getOccupants() {
 	var ocuppants, requestsCount, ids = [], limit = 100;
 	
-	$('.users-list').html('<li class="users-list-title">Occupants</li>');
-	createAnimatedLoadingUsers();
-	
 	connection.muc.queryOccupants(CHAT.roomJID, function(response) {
 		ocuppants = $(response).find('item');
 		for (var i = 0; i < ocuppants.length; i++)
@@ -469,6 +486,7 @@ function getOccupants() {
 		
 		requestsCount = ids.length / limit;
 		for (var i = 1, c = 0; c < requestsCount; i++, c++) {
+			
 			params = {
 				filter: {
 					type: 'id',
@@ -478,31 +496,20 @@ function getOccupants() {
 				pageNo: i
 			};
 			
-			QB.users.listUsers(params, function(err, result) {
-				if (err) console.log(err.detail);
-				
-				$('.loading_users, .loading_messages').remove();
-
-				$(result.items).each(function() {
-					var id = String(this.user.id);
-					if (presenceIDs[id]) {
-						delete presenceIDs[id];
-						createUserList(this.user);
-					}
-				});
-				
-				ids = Object.keys(presenceIDs);
-				for (var i = 0; i < ids.length; i++)
-					getOneOccupant(ids[i]);
-			});
+			getListUsers(params);
 		}
 	});
 }
 
 function getOneOccupant(id) {
 	QB.users.get(parseInt(id), function(err, result) {
-		if (err) console.log(err.detail);
-		createUserList(result);
+		if (err) {
+			console.log(err.detail);
+		} else {
+			createUserList(result);
+			$('.chat-content').append('<span class="service-message joined">' + result.full_name + ' has joined the chat.</span>');
+			scrollToMessage();
+		}
 	});
 }
 
@@ -523,14 +530,16 @@ function createUserList(user) {
 function showComposing(isShown, qbID) {
 	var name, obj = $('.typing');
 	
-	if (!namesOccupants[qbID]) return true;
+	if (!namesOccupants[qbID]) return false;
 	
 	name = namesOccupants[qbID];
 	if (isShown && qbID != chatUser.qbID) {
-		if (obj.length > 0)
+		if ($('span').is('.typing'))
 			obj.text(addTypingMessage(obj, name));
-		else
+		else {
 			$('.chat-content').append('<span class="typing">' + name + ' ...</span>');
+			scrollToMessage();
+		}
 	} else {
 		obj.text(removeTypingMessage(obj, name));
 		if (obj.text().length == 0) obj.remove();
