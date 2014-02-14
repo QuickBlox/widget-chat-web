@@ -1042,7 +1042,7 @@ QuickBlox.prototype.init = function init(appId, authKey, authSecret, debug) {
   } else if (typeof appId === 'string' && typeof authKey === 'undefined' && typeof authSecret === 'undefined') {
     this.session = { token: appId };
     appId = null;
-    debug = true;
+    debug = false;
   }
   config.creds.appId = appId;
   config.creds.authKey = authKey;
