@@ -159,18 +159,18 @@ function getQBUser(user_id, token, pass) {
 	});
 }
 
-function getListUsers(data) {
+function getUsersList(data) {
 	QB.users.listUsers(data, function(err, result) {
 		if (err) {
 			console.log(err.detail);
 			if (err.message == 'Unauthorized')
 				recoverySession(data);
 		} else {
-			$('.loading_users').remove();
+			$('.loading_users, .loading_messages').remove();
 			switches.isOccupantsDownloaded = true;
 			
 			$(result.items).each(function() {
-				createUserList(this.user);
+				createUsersList(this.user);
 			});
 		}
 	});
@@ -181,7 +181,7 @@ function recoverySession(data) {
 	QB.createSession(function(err, result) {
 		chatUser.qbToken = result.token;
 		localStorage['QBChatUser'] = JSON.stringify(chatUser);
-		getListUsers(data);
+		getUsersList(data);
 	});
 }
 
@@ -399,7 +399,7 @@ function getRoster(users, room) {
 function getPresence(stanza, room) {
 	console.log('[XMPP] Presence');
 	var user, type, qbID, name;
-	if (!switches.isOccupantsDownloaded) return true;
+	if (!switches.isOccupantsDownloaded) return false;
 	
 	user = $(stanza).attr('from');
 	type = $(stanza).attr('type');
@@ -466,7 +466,6 @@ function getMessage(stanza, room) {
 		$('.chat-content .message:odd').addClass('white');
 		if (createTime) {
 			$('.chat-content .message:last').fadeTo(0, 1);
-			//if ($('.message').length < 7) scrollToHeader();
 		} else {
 			$('.chat-content .message:last').fadeTo(300, 1);
 			scrollToMessage();
@@ -496,7 +495,7 @@ function getOccupants() {
 				pageNo: i
 			};
 			
-			getListUsers(params);
+			getUsersList(params);
 		}
 	});
 }
@@ -506,7 +505,7 @@ function getOneOccupant(id) {
 		if (err) {
 			console.log(err.detail);
 		} else {
-			createUserList(result);
+			createUsersList(result);
 			$('.chat-content').append('<span class="service-message joined">' + result.full_name + ' has joined the chat.</span>');
 			scrollToMessage();
 		}
@@ -515,7 +514,7 @@ function getOneOccupant(id) {
 
 /* Additional Features
 -------------------------------------------------------------------------*/
-function createUserList(user) {
+function createUsersList(user) {
 	var qbID, fbID, name;
 	
 	qbID = String(user.id);
@@ -527,13 +526,12 @@ function createUserList(user) {
 	namesOccupants[qbID] = name;
 }
 
-function showComposing(isShown, qbID) {
+function showComposing(composing, qbID) {
 	var name, obj = $('.typing');
-	
-	if (!namesOccupants[qbID]) return false;
+	if (!switches.isOccupantsDownloaded) return false;
 	
 	name = namesOccupants[qbID];
-	if (isShown && qbID != chatUser.qbID) {
+	if (composing && qbID != chatUser.qbID) {
 		if ($('span').is('.typing'))
 			obj.text(addTypingMessage(obj, name));
 		else {
