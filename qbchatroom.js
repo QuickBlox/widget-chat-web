@@ -399,11 +399,13 @@ function getRoster(users, room) {
 function getPresence(stanza, room) {
 	console.log('[XMPP] Presence');
 	var user, type, qbID, name;
-	if (!switches.isOccupantsDownloaded) return true;
 	
 	user = $(stanza).attr('from');
 	type = $(stanza).attr('type');
 	qbID = getID(user);
+	
+	if (!type) namesOccupants[qbID] = true;
+	if (!switches.isOccupantsDownloaded) return true;
 	
 	if (type) {
 		name = namesOccupants[qbID];
@@ -416,7 +418,7 @@ function getPresence(stanza, room) {
 	}
 	
 	if (type && qbID == chatUser.qbID && !switches.isLogout)
-			window.location.reload();
+		window.location.reload();
 	
 	return true;
 }
@@ -476,28 +478,21 @@ function getMessage(stanza, room) {
 }
 
 function getOccupants() {
-	var ocuppants, requestsCount, ids = [], limit = 100;
+	var requestsCount, limit = 100, ids = Object.keys(namesOccupants);
 	
-	connection.muc.queryOccupants(CHAT.roomJID, function(response) {
-		ocuppants = $(response).find('item');
-		for (var i = 0; i < ocuppants.length; i++)
-			ids.push($(ocuppants[i]).attr('name'));
+	requestsCount = ids.length / limit;
+	for (var i = 1, c = 0; c < requestsCount; i++, c++) {
+		params = {
+			filter: {
+				type: 'id',
+				value: ids
+			},
+			perPage: limit,
+			pageNo: i
+		};
 		
-		requestsCount = ids.length / limit;
-		for (var i = 1, c = 0; c < requestsCount; i++, c++) {
-			
-			params = {
-				filter: {
-					type: 'id',
-					value: ids
-				},
-				perPage: limit,
-				pageNo: i
-			};
-			
-			getUsersList(params);
-		}
-	});
+		getUsersList(params);
+	}
 }
 
 function getOneOccupant(id) {
