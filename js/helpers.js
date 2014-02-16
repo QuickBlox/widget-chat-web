@@ -14,12 +14,12 @@ function connectFailure() {
 }
 
 function connectSuccess() {
-	switches.isLogout = false;
 	$('#connecting').hide();
 	$('#chat').show();
 	$('#chat .chat-content').html('');
 	$('#chat #message').val('');
 	$('.users-list').html('<li class="users-list-title">Occupants</li>');
+	switches.isLogout = false;
 	createAnimatedLoadingUsers();
 	createAnimatedLoadingMessages();
 }
@@ -180,9 +180,10 @@ function createAnimatedLoadingMessages() {
 }
 
 function addTypingMessage(obj, name) {
-	return obj.text().split(' ...')[0].concat(', ').concat(name).concat(' ...');
+	obj.text(obj.text().split(' ...')[0].concat(', ').concat(name).concat(' ...'));
 }
 
 function removeTypingMessage(obj, name) {
-	return obj.text().replace(', ' + name, '').replace(name + ', ', '').replace(name + ' ...', '');
+	obj.text(obj.text().replace(', ' + name, '').replace(name + ', ', '').replace(name + ' ...', ''));
+	if (obj.text().length == 0) obj.remove();
 }
