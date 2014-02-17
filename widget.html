@@ -58,13 +58,6 @@
 		</div>
 	</div>
 	
-	<div id="connecting" class="layout hidden">
-		<span class="progress">
-			<p>Connecting. Please wait...</p>
-			<progress></progress>
-		</span>
-	</div>
-	
 	<div id="signup-form" class="layout hidden">
 		<form action="#" class="center" enctype="multipart/form-data">
 			<fieldset>
@@ -86,7 +79,14 @@
 		<span class="progress">Thanks for your<br>registration!</span>
 	</div>
 	
-	<div id="chat" class="layout hidden">
+	<div id="connecting" class="layout hidden">
+		<span class="progress">
+			<p>Connecting. Please wait...</p>
+			<progress></progress>
+		</span>
+	</div>
+	
+	<div id="chat-group" class="chat layout hidden">
 		<header class="chat-header">
 			<a href="#" class="users"><span class="users-count">0</span></a>
 			<a href="#" class="logout"><img src="images/logout.png" alt="logout"></a>
@@ -97,16 +97,15 @@
 		<section class="chat-content"></section>
 		
 		<footer class="chat-footer">
-			<form action="#" id="send-message-form">
-				<textarea id="message" placeholder="Enter Message" rows="1"></textarea>
-			</form>
+			<textarea class="send-message" placeholder="Enter Message" rows="1"></textarea>
 			<a href="#" class="smiles"><img src="images/smile.png" alt="smile"></a>
-			<div class="smiles-list hidden"></div>
 		</footer>
-		
-		<div class="actions-wrap hide-actions hidden">
-			<div class="actions"></div>
-		</div>
+	</div>
+	
+	<div id="smiles-list" class="hidden"></div>
+	
+	<div id="actions-wrap" class="hide-actions hidden">
+		<div class="actions"></div>
 	</div>
 	
 	<audio id="signal">
