@@ -35,13 +35,13 @@ $(document).ready(function() {
 		$('#authQB').click(function(){ authQB() });
 		$('#signUp').click(function(){ signUp(); return false; });
 		$('.logout').click(function(){ logout(); return false; });
-		$('.smiles-list *').click(function() { choseSmile(this); });
-		$('.smiles').click(function(){ showList('.smiles'); return false; });
+		$('#smiles-list *').click(function() { choseSmile(this); });
+		$('.smiles').click(function(){ showList('smiles'); return false; });
 		$('#dataLogin').click(function(){ prepareDataForLogin(); return false; });
 		$('#dataSignup').click(function(){ prepareDataForSignUp(); return false; });
 		
 		$('.users').click(function(){ 
-			showList('.users');
+			showList('users');
 			if (!switches.isOccupantsDownloaded)
 				getOccupants();
 			return false;
@@ -338,12 +338,12 @@ function rawOutput(data) {/*console.log('SENT: ' + data);*/}
 function sendMesage() {
 	var message, post;
 	
-	$('#message').keydown(function(event) {
+	$('.send-message').keydown(function(event) {
 		if (!switches.isComposing)
 			sendComposing();
 		
 		if (event.keyCode == 13 && !event.shiftKey) {
-			post = $('#message').val();
+			post = $(this).val();
 			if (trim(post)) {
 				sendPaused();
 				
@@ -356,7 +356,7 @@ function sendMesage() {
 				
 				message = Strophe.escapeNode(JSON.stringify(message));
 				connection.muc.groupchat(CHAT.roomJID, message);
-				$('#message').val('');
+				$(this).val('');
 			}
 			return false;
 		}
@@ -394,7 +394,7 @@ function disconnectChat(nick) {
 -----------------------------------------------------------------------*/
 function getRoster(users, room) {
 	var usersCount = Object.keys(users).length;
-	$('.users-count').text(usersCount);
+	$('#chat-group .users-count').text(usersCount);
 	return true;
 }
 
@@ -467,19 +467,19 @@ function getMessage(stanza, room) {
 		html += '<time class="message-time" datetime="' + messageTime + '">' + $.timeago(messageTime) + '</time></footer>';
 		html += '</div></section>';
 		
-		if ($('span').is('.typing'))
-			$('.chat-content .typing').before(html);
+		if ($('#chat-group span').is('.typing'))
+			$('#chat-group .typing').before(html);
 		else if ($('.service-message:last').data('time') > messageTime)
-			$('.chat-content .service-message:first').before(html);		
+			$('.service-message:first').before(html);		
 		else
-			$('.chat-content').append(html);
+			$('#chat-group .chat-content').append(html);
 		
 		$('.loading_messages').remove();
-		$('.chat-content .message:odd').addClass('white');
+		$('.message:odd').addClass('white');
 		if (createTime)
-			$('.chat-content .message:last').fadeTo(0, 1);
+			$('#chat-group .message:last').fadeTo(0, 1);
 		else
-			$('.chat-content .message:last').fadeTo(300, 1);
+			$('#chat-group .message:last').fadeTo(300, 1);
 			
 		scrollToMessage();
 	}
@@ -512,8 +512,10 @@ function getOneOccupant(id, time) {
 			console.log(err.detail);
 		} else {
 			createUsersList(result);
-			$('.chat-content').append('<span class="service-message joined" data-time="' + time + '">' + result.full_name + ' has joined the chat.</span>');
-			scrollToMessage();
+			if ($('#chat-group .message').length > 1) { // fix showing of presences
+				$('#chat-group .chat-content').append('<span class="service-message joined" data-time="' + time + '">' + result.full_name + ' has joined the chat.</span>');
+				scrollToMessage();
+			}
 		}
 	});
 }
@@ -529,7 +531,7 @@ function createUsersList(user) {
 	//var iconClass = user.facebook_id ? 'user_fb_icon' : 'user_qb_icon';
 	
 	$('.loading_users').remove();
-	$('.users-list').append('<li class="user show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '" onclick="showActionToolbar(this)">' + name + '</li>');
+	$('#chat-group .users-list').append('<li class="user show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '" onclick="showActionToolbar(this)">' + name + '</li>');
 	namesOccupants[qbID] = name;
 }
 
@@ -541,10 +543,10 @@ function showComposing(composing, qbID) {
 	removeTypingMessage(obj, name);
 	
 	if (composing && qbID != chatUser.qbID) {
-		if ($('span').is('.typing'))
+		if ($('.chat:visible span').is('.typing'))
 			addTypingMessage(obj, name);
 		else {
-			$('.chat-content').append('<span class="typing">' + name + ' ...</span>');
+			$('.chat:visible .chat-content').append('<span class="typing">' + name + ' ...</span>');
 			scrollToMessage();
 		}
 	}
@@ -560,7 +562,7 @@ function showActionToolbar(info) {
 	html = '<div class="action-group">';
 	if (qbID != chatUser.qbID) {
 		html += '<button class="btn btn_action" data-name="' + name + '" onclick="makeQuote(this)"><span>Reply</span></button>';
-		html += '<button class="btn btn_action" data-qb="' + qbID + '"><span>Private message</span></button>';
+		html += '<button class="btn btn_action" data-qb="' + qbID + '" onclick="createPrivateChat(this)"><span>Private message</span></button>';
 	}
 	html += fbID ? '<a href="https://facebook.com/' + fbID + '" target="_blank" class="btn btn_action"><span>View profile</span></a>' : '';
 	html += '</div><div class="action-group">';
@@ -575,7 +577,7 @@ function makeQuote(btn) {
 	
 	name = $(btn).data('name').replace(/ /g, "%20");
 	quote = '@'.concat(name).concat(' ');
-	$('#message').focus().val(quote);
+	$('.chat:visible .send-message').focus().val(quote);
 }
 
 function takeQuote(str, time) {
@@ -594,4 +596,11 @@ function takeQuote(str, time) {
 	function escapeSpace(s) {
 		return s.replace("%20", ' ');
 	}
+}
+
+function createPrivateChat(btn) {
+	var qbID, name;
+	
+	qbID = $(btn).data('qb');
+	name = namesOccupants[qbID];
 }

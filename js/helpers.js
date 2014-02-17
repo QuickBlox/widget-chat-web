@@ -15,9 +15,9 @@ function connectFailure() {
 
 function connectSuccess() {
 	$('#connecting').hide();
-	$('#chat').show();
-	$('#chat .chat-content').html('');
-	$('#chat #message').val('');
+	$('#chat-group').show();
+	$('.chat-content').html('');
+	$('.send-message').val('');
 	$('.users-list').html('<li class="users-list-title">Occupants</li>');
 	switches.isLogout = false;
 	createAnimatedLoadingUsers();
@@ -44,7 +44,7 @@ function signUpSuccess() {
 function logoutSuccess() {
 	$('.bubbles').removeClass('bubbles_login');
 	$('.header').removeClass('header_login');
-	$('#chat, #login-form').hide();
+	$('#chat-group, #login-form').hide();
 	$('#main, #auth').show();
 	if (!switches.isLogout) window.location.reload();
 }
@@ -73,32 +73,33 @@ function changeHeightChatBlock() {
 
 function getSmiles() {
 	$(SMILES).each(function(i) {
-		$('.smiles-list').append('<img class="smileicons" alt="icons" data-plain="' + SMILES[i].plain + '" src="images/smiles/' + SMILES[i].image + '">');
+		$('#smiles-list').append('<img class="smileicons" alt="icons" data-plain="' + SMILES[i].plain + '" src="images/smiles/' + SMILES[i].image + '">');
 	});
 }
 
 function clickBehavior() {
 	$(document).click(function(e) {
 		if ($(e.target).is('.hide-actions, .hide-actions *')) {
-			$('.actions-wrap').hide();
+			$('#actions-wrap').hide();
 		}
 		else if ($(e.target).is('.show-actions, .show-actions *')) {
 			if ($(e.target).is('.user') || !$('.users').is('.visible') && !$('.smiles').is('.visible'))
-				$('.actions-wrap').show();
+				$('#actions-wrap').show();
 		}
 		if (!$(e.target).is('.users, .users-list-title, .loading_users, .loading_users *')) {
 			$('.users').removeClass('visible');
 			$('.users-list').hide();
 		}
-		if (!$(e.target).is('.smiles, .smiles-list, .smiles-list *')) {
+		if (!$(e.target).is('.smiles, #smiles-list, #smiles-list *')) {
 			$('.smiles').removeClass('visible');
-			$('.smiles-list').hide();
+			$('#smiles-list').hide();
 		}
 	});
 }
 
-function showList(obj) {
-	var objList = obj + '-list';
+function showList(str) {
+	var obj = '.' + str;
+	var objList = (str == 'smiles') ? '#' + str + '-list' : '.' + str + '-list';
 	
 	if ($(obj).is('.visible')) {
 		$(obj).removeClass('visible');
@@ -110,8 +111,8 @@ function showList(obj) {
 }
 
 function choseSmile(img) {
-	var tmp = $('#message').val() + ' ' + $(img).data('plain') + ' ';
-	$('#message').val(tmp);
+	var tmp = $('.chat:visible .send-message').val() + ' ' + $(img).data('plain') + ' ';
+	$('.chat:visible .send-message').val(tmp);
 }
 
 function updateTime() {
