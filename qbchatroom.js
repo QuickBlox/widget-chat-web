@@ -31,21 +31,19 @@ $(document).ready(function() {
 		updateTime();
 		sendMesage();
 		
-		$('#authFB').click(function(){ authFB() });
-		$('#authQB').click(function(){ authQB() });
-		$('#signUp').click(function(){ signUp(); return false; });
-		$('.logout').click(function(){ logout(); return false; });
-		$('#smiles-list *').click(function() { choseSmile(this); });
-		$('.smiles').click(function(){ showList('smiles'); return false; });
-		$('#dataLogin').click(function(){ prepareDataForLogin(); return false; });
-		$('#dataSignup').click(function(){ prepareDataForSignUp(); return false; });
+		$('#authFB').click(authFB);
+		$('#authQB').click(authQB);
+		$('#signUp').click(signUp);
+		$('#dataLogin').click(prepareDataForLogin);
+		$('#dataSignup').click(prepareDataForSignUp);
+		$('#smiles-list img').click(choseSmile);
 		
-		$('.users').click(function(){ 
-			showList('users');
-			if (!switches.isOccupantsDownloaded)
-				getOccupants();
-			return false;
-		});
+		$('body').on('click', '.logout', logout);
+		$('body').on('click', '.show-actions', showActionToolbar);
+		$('body').on('click', '.users', {list: '.users-list'}, showList);
+		$('body').on('click', '.smiles', {list: '#smiles-list'}, showList);
+		$('#actions-wrap').on('click', '.btn_quote', makeQuote);
+		$('#actions-wrap').on('click', '.btn_private', createPrivateChat);
 	});
 });
 
@@ -97,7 +95,8 @@ function authQB() {
 
 /* QB Module (find the user)
 -----------------------------------------------------------------------------*/
-function prepareDataForLogin() {
+function prepareDataForLogin(event) {
+	event.preventDefault();
 	var storage = {
 		login: $('#login').val(),
 		pass: $('#pass').val()
@@ -190,13 +189,15 @@ function recoverySession(data) {
 
 /* QB Module (creating the user)
 --------------------------------------------------------------------------------*/
-function signUp() {
+function signUp(event) {
+	event.preventDefault();
 	$('#main').hide();
 	$('#signup-form').show();
 	$('#signup-form input').val('').removeClass('error').prop('disabled', false);
 }
 
-function prepareDataForSignUp() {
+function prepareDataForSignUp(event) {
+	event.preventDefault();
 	if ($('#signup-form input:first').is(':disabled')) return false;
 	
 	$('#signup-form input').removeClass('error');
@@ -358,6 +359,7 @@ function sendMesage() {
 				connection.muc.groupchat(CHAT.roomJID, message);
 				$(this).val('');
 			}
+			
 			return false;
 		}
 	});
@@ -374,7 +376,8 @@ function sendMesage() {
 	}
 }
 
-function logout() {
+function logout(event) {
+	event.preventDefault();
 	switches.isLogout = true;
 	disconnectChat(chatUser.qbID);
 	
@@ -395,6 +398,7 @@ function disconnectChat(nick) {
 function getRoster(users, room) {
 	var usersCount = Object.keys(users).length;
 	$('#chat-group .users-count').text(usersCount);
+	
 	return true;
 }
 
@@ -432,7 +436,7 @@ function getPresence(stanza, room) {
 function getMessage(stanza, room) {
 	var html, author, response, createTime, messageTime, composing, paused;
 	var qbID, message, name, avatar, fbID, icon, defaultAvatar = 'images/avatar_default.png';
-	if (!switches.isOccupantsDownloaded)
+	if (!switches.isOccupantsDownloaded && $('#chat-group .message').length > 1)
 		getOccupants();
 	
 	author = $(stanza).attr('from');
@@ -458,7 +462,7 @@ function getMessage(stanza, room) {
 		fbID = response.fb || '';
 		//icon = response.fb ? 'images/fb_auth.png' : 'images/qb_auth.png';
 		
-		html = '<section class="message show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '" onclick="showActionToolbar(this)">';
+		html = '<section class="message show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '">';
 		//html += '<img class="message-icon" src="' + icon + '" alt="icon">';
 		html += '<img class="message-avatar" src="' + avatar + '" alt="avatar">';
 		html += '<div class="message-body">';
@@ -512,10 +516,8 @@ function getOneOccupant(id, time) {
 			console.log(err.detail);
 		} else {
 			createUsersList(result);
-			if ($('#chat-group .message').length > 1) { // fix showing of presences
-				$('#chat-group .chat-content').append('<span class="service-message joined" data-time="' + time + '">' + result.full_name + ' has joined the chat.</span>');
-				scrollToMessage();
-			}
+			$('#chat-group .chat-content').append('<span class="service-message joined" data-time="' + time + '">' + result.full_name + ' has joined the chat.</span>');
+			scrollToMessage();
 		}
 	});
 }
@@ -531,7 +533,7 @@ function createUsersList(user) {
 	//var iconClass = user.facebook_id ? 'user_fb_icon' : 'user_qb_icon';
 	
 	$('.loading_users').remove();
-	$('#chat-group .users-list').append('<li class="user show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '" onclick="showActionToolbar(this)">' + name + '</li>');
+	$('#chat-group .users-list').append('<li class="user show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '">' + name + '</li>');
 	namesOccupants[qbID] = name;
 }
 
@@ -552,17 +554,17 @@ function showComposing(composing, qbID) {
 	}
 }
 
-function showActionToolbar(info) {
+function showActionToolbar() {
 	var html, qbID, fbID, name;
 	
-	qbID = $(info).data('qb');
-	fbID = $(info).data('fb');
-	name = $(info).find('.message-author').text() || $(info).text();
+	qbID = $(this).data('qb');
+	fbID = $(this).data('fb');
+	name = $(this).find('.message-author').text() || $(this).text();
 	
 	html = '<div class="action-group">';
 	if (qbID != chatUser.qbID) {
-		html += '<button class="btn btn_action" data-name="' + name + '" onclick="makeQuote(this)"><span>Reply</span></button>';
-		html += '<button class="btn btn_action" data-qb="' + qbID + '" onclick="createPrivateChat(this)"><span>Private message</span></button>';
+		html += '<button class="btn btn_action btn_quote" data-name="' + name + '"><span>Reply</span></button>';
+		html += '<button class="btn btn_action btn_private" data-qb="' + qbID + '" data-fb="' + fbID + '"><span>Private message</span></button>';
 	}
 	html += fbID ? '<a href="https://facebook.com/' + fbID + '" target="_blank" class="btn btn_action"><span>View profile</span></a>' : '';
 	html += '</div><div class="action-group">';
@@ -572,10 +574,10 @@ function showActionToolbar(info) {
 	$('.actions').html(html);
 }
 
-function makeQuote(btn) {
+function makeQuote() {
 	var name, quote;
 	
-	name = $(btn).data('name').replace(/ /g, "%20");
+	name = $(this).data('name').replace(/ /g, "%20");
 	quote = '@'.concat(name).concat(' ');
 	$('.chat:visible .send-message').focus().val(quote);
 }
@@ -598,9 +600,32 @@ function takeQuote(str, time) {
 	}
 }
 
-function createPrivateChat(btn) {
-	var qbID, name;
+function createPrivateChat() {
+	var htmlChat, htmlUsersList, chatContentHeight, usersCount = 2;
+	var qbID, fbID, name;
 	
-	qbID = $(btn).data('qb');
+	qbID = $(this).data('qb');
+	fbID = $(this).data('fb');
 	name = namesOccupants[qbID];
+	chatContentHeight = $('#chat-group .chat-content').height();
+	
+	htmlUsersList = '<li class="users-list-title">Occupants</li>';
+	htmlUsersList += '<li class="user show-actions" data-qb="' + chatUser.qbID + '" data-fb="' + (chatUser.fbID || '') + '">' + chatUser.name + '</li>';
+	htmlUsersList += '<li class="user show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '">' + name + '</li>';
+	
+	htmlChat = '<div id="chat-' + qbID + '" class="chat layout">';
+	htmlChat += '<header class="chat-header">';
+	htmlChat += '<a href="#" class="users"><span class="users-count">' + usersCount + '</span></a>';
+	htmlChat += '<a href="#" class="logout"><img src="images/logout.png" alt="logout"></a>';
+	htmlChat += '<h2 class="chat-name">' + name + '</h2>';
+	htmlChat += '<ul class="users-list hidden">' + htmlUsersList + '</ul></header>';
+	htmlChat += '<section class="chat-content"></section>';
+	htmlChat += '<footer class="chat-footer">';
+	htmlChat += '<textarea class="send-message" placeholder="Enter Message" rows="1"></textarea>';
+	htmlChat += '<a href="#" class="smiles"><img src="images/smile.png" alt="smile"></a>';
+	htmlChat += '</footer></div>';
+	
+	$('#chat-group').hide();
+	$('.chat:last').after(htmlChat);
+	$('.chat:visible .chat-content').height(chatContentHeight);
 }
