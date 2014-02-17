@@ -44,7 +44,7 @@ function signUpSuccess() {
 function logoutSuccess() {
 	$('.bubbles').removeClass('bubbles_login');
 	$('.header').removeClass('header_login');
-	$('#chat-group, #login-form').hide();
+	$('.chat, #login-form').hide();
 	$('#main, #auth').show();
 	if (!switches.isLogout) window.location.reload();
 }
@@ -78,40 +78,43 @@ function getSmiles() {
 }
 
 function clickBehavior() {
-	$(document).click(function(e) {
-		if ($(e.target).is('.hide-actions, .hide-actions *')) {
+	$(document).click(function(event) {
+		var obj = $(event.target);
+		
+		if (obj.is('.hide-actions, .hide-actions *')) {
 			$('#actions-wrap').hide();
 		}
-		else if ($(e.target).is('.show-actions, .show-actions *')) {
-			if ($(e.target).is('.user') || !$('.users').is('.visible') && !$('.smiles').is('.visible'))
+		else if (obj.is('.show-actions, .show-actions *')) {
+			if (obj.is('.user') || !$('.users').is('.visible') && !$('.smiles').is('.visible'))
 				$('#actions-wrap').show();
 		}
-		if (!$(e.target).is('.users, .users-list-title, .loading_users, .loading_users *')) {
+		if (!obj.is('.users, .users-list-title, .loading_users, .loading_users *')) {
 			$('.users').removeClass('visible');
 			$('.users-list').hide();
 		}
-		if (!$(e.target).is('.smiles, #smiles-list, #smiles-list *')) {
+		if (!obj.is('.smiles, #smiles-list, #smiles-list *')) {
 			$('.smiles').removeClass('visible');
 			$('#smiles-list').hide();
 		}
 	});
 }
 
-function showList(str) {
-	var obj = '.' + str;
-	var objList = (str == 'smiles') ? '#' + str + '-list' : '.' + str + '-list';
+function showList(event) {
+	var list = $(event.data.list);
+	if (!switches.isOccupantsDownloaded)
+		getOccupants();
 	
-	if ($(obj).is('.visible')) {
-		$(obj).removeClass('visible');
-		$(objList).hide();
-	} else {
-		$(obj).addClass('visible');
-		$(objList).show();
-	}
+	if ($(this).is('.visible'))
+		list.hide();
+	else
+		list.show();
+	
+	$(this).toggleClass('visible');
+	return false;
 }
 
-function choseSmile(img) {
-	var tmp = $('.chat:visible .send-message').val() + ' ' + $(img).data('plain') + ' ';
+function choseSmile() {
+	var tmp = $('.chat:visible .send-message').val() + ' ' + $(this).data('plain') + ' ';
 	$('.chat:visible .send-message').val(tmp);
 }
 
