@@ -36,14 +36,15 @@ $(document).ready(function() {
 		$('#signUp').click(signUp);
 		$('#dataLogin').click(prepareDataForLogin);
 		$('#dataSignup').click(prepareDataForSignUp);
-		$('#smiles-list img').click(choseSmile);
+		$('.smiles-list img').click(choseSmile);
 		
-		$('body').on('click', '.logout', logout);
-		$('body').on('click', '.show-actions', showActionToolbar);
-		$('body').on('click', '.users', {list: '.users-list'}, showList);
-		$('body').on('click', '.smiles', {list: '#smiles-list'}, showList);
-		$('#actions-wrap').on('click', '.btn_quote', makeQuote);
-		$('#actions-wrap').on('click', '.btn_private', createPrivateChat);
+		$('#chats-wrap').on('click', '.logout', logout);
+		$('#chats-wrap').on('click', '.show-actions', showActionToolbar);
+		$('#chats-wrap').on('click', '.users', {list: '.users-list'}, showList);
+		$('#chats-wrap').on('click', '.chats', {list: '.chats-list'}, showList);
+		$('#chats-wrap').on('click', '.smiles', {list: '.smiles-list'}, showList);
+		$('.actions-wrap').on('click', '.btn_quote', makeQuote);
+		$('.actions-wrap').on('click', '.btn_private', createPrivateChat);
 	});
 });
 
@@ -397,7 +398,7 @@ function disconnectChat(nick) {
 -----------------------------------------------------------------------*/
 function getRoster(users, room) {
 	var usersCount = Object.keys(users).length;
-	$('#chat-group .users-count').text(usersCount);
+	$('#chat-room .users-count').text(usersCount);
 	
 	return true;
 }
@@ -416,9 +417,9 @@ function getPresence(stanza, room) {
 			name = namesOccupants[qbID];
 			removeTypingMessage(obj, name);
 			
-			$('.user[data-qb=' + qbID + ']').remove();
+			$('.list-item[data-qb=' + qbID + ']').remove();
 			$('.chat-content').append('<span class="service-message left" data-time="' + time + '">' + name + ' has left this chat.</span>');
-			scrollToMessage();
+			scrollToMessage('.chat:visible');
 		}
 		delete namesOccupants[qbID];
 	} else {
@@ -436,7 +437,7 @@ function getPresence(stanza, room) {
 function getMessage(stanza, room) {
 	var html, author, response, createTime, messageTime, composing, paused;
 	var qbID, message, name, avatar, fbID, icon, defaultAvatar = 'images/avatar_default.png';
-	if (!switches.isOccupantsDownloaded && $('#chat-group .message').length > 1)
+	if (!switches.isOccupantsDownloaded && $('#chat-room .message').length > 1)
 		getOccupants();
 	
 	author = $(stanza).attr('from');
@@ -452,6 +453,7 @@ function getMessage(stanza, room) {
 		showComposing(composing, qbID);
 	} else {
 		console.log('[XMPP] Message');
+		$('.loading_messages').remove();
 		
 		response = checkResponse(response);
 		messageTime = createTime || (new Date()).toISOString();
@@ -471,21 +473,20 @@ function getMessage(stanza, room) {
 		html += '<time class="message-time" datetime="' + messageTime + '">' + $.timeago(messageTime) + '</time></footer>';
 		html += '</div></section>';
 		
-		if ($('#chat-group span').is('.typing'))
-			$('#chat-group .typing').before(html);
-		else if ($('.service-message:last').data('time') > messageTime)
-			$('.service-message:first').before(html);		
+		if ($('#chat-room span').is('.typing'))
+			$('#chat-room .typing').before(html);
+		else if ($('#chat-room .service-message:last').data('time') > messageTime)
+			$('#chat-room .service-message:first').before(html);		
 		else
-			$('#chat-group .chat-content').append(html);
+			$('#chat-room .chat-content').append(html);
 		
-		$('.loading_messages').remove();
-		$('.message:odd').addClass('white');
 		if (createTime)
-			$('#chat-group .message:last').fadeTo(0, 1);
+			$('#chat-room .message:last').fadeTo(0, 1);
 		else
-			$('#chat-group .message:last').fadeTo(300, 1);
-			
-		scrollToMessage();
+			$('#chat-room .message:last').fadeTo(300, 1);
+		
+		$('.message:odd').addClass('white');
+		scrollToMessage('#chat-room');
 	}
 	
 	return true;
@@ -516,8 +517,8 @@ function getOneOccupant(id, time) {
 			console.log(err.detail);
 		} else {
 			createUsersList(result);
-			$('#chat-group .chat-content').append('<span class="service-message joined" data-time="' + time + '">' + result.full_name + ' has joined the chat.</span>');
-			scrollToMessage();
+			$('#chat-room .chat-content').append('<span class="service-message joined" data-time="' + time + '">' + result.full_name + ' has joined the chat.</span>');
+			scrollToMessage('#chat-room');
 		}
 	});
 }
@@ -533,7 +534,7 @@ function createUsersList(user) {
 	//var iconClass = user.facebook_id ? 'user_fb_icon' : 'user_qb_icon';
 	
 	$('.loading_users').remove();
-	$('#chat-group .users-list').append('<li class="user show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '">' + name + '</li>');
+	$('#chat-room .users-list').append('<li class="list-item show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '">' + name + '</li>');
 	namesOccupants[qbID] = name;
 }
 
@@ -549,7 +550,7 @@ function showComposing(composing, qbID) {
 			addTypingMessage(obj, name);
 		else {
 			$('.chat:visible .chat-content').append('<span class="typing">' + name + ' ...</span>');
-			scrollToMessage();
+			scrollToMessage('.chat:visible');
 		}
 	}
 }
@@ -562,7 +563,7 @@ function showActionToolbar() {
 	name = $(this).find('.message-author').text() || $(this).text();
 	
 	html = '<div class="action-group">';
-	if (qbID != chatUser.qbID) {
+	if (qbID != chatUser.qbID && $('#chat-room').is(':visible')) {
 		html += '<button class="btn btn_action btn_quote" data-name="' + name + '"><span>Reply</span></button>';
 		html += '<button class="btn btn_action btn_private" data-qb="' + qbID + '" data-fb="' + fbID + '"><span>Private message</span></button>';
 	}
@@ -601,31 +602,33 @@ function takeQuote(str, time) {
 }
 
 function createPrivateChat() {
-	var htmlChat, htmlUsersList, chatContentHeight, usersCount = 2;
-	var qbID, fbID, name;
+	var htmlChat, htmlChatsList, htmlUsersList, chatContentHeight;
+	var qbID, fbID, name, chatsCount = 2, usersCount = 2;
 	
 	qbID = $(this).data('qb');
 	fbID = $(this).data('fb');
 	name = namesOccupants[qbID];
-	chatContentHeight = $('#chat-group .chat-content').height();
 	
-	htmlUsersList = '<li class="users-list-title">Occupants</li>';
-	htmlUsersList += '<li class="user show-actions" data-qb="' + chatUser.qbID + '" data-fb="' + (chatUser.fbID || '') + '">' + chatUser.name + '</li>';
-	htmlUsersList += '<li class="user show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '">' + name + '</li>';
+	htmlUsersList = '<li class="list-title">Users</li>';
+	htmlUsersList += '<li class="list-item show-actions" data-qb="' + chatUser.qbID + '" data-fb="' + (chatUser.fbID || '') + '">' + chatUser.name + '</li>';
+	htmlUsersList += '<li class="list-item show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '">' + name + '</li>';
 	
-	htmlChat = '<div id="chat-' + qbID + '" class="chat layout">';
+	htmlChat = '<div id="chat-' + qbID + '" class="chat">';
 	htmlChat += '<header class="chat-header">';
-	htmlChat += '<a href="#" class="users"><span class="users-count">' + usersCount + '</span></a>';
+	htmlChat += '<a href="#" class="users show-list"><span class="users-count">' + usersCount + '</span></a>';
+	htmlChat += '<a href="#" class="chats show-list"><span class="chats-count">' + chatsCount + '</span></a>';
 	htmlChat += '<a href="#" class="logout"><img src="images/logout.png" alt="logout"></a>';
-	htmlChat += '<h2 class="chat-name">' + name + '</h2>';
-	htmlChat += '<ul class="users-list hidden">' + htmlUsersList + '</ul></header>';
+	htmlChat += '<h2 class="chat-name" title="' + name + '">' + name + '</h2>';
+	htmlChat += '<ul class="users-list list hidden">' + htmlUsersList + '</ul></header>';
 	htmlChat += '<section class="chat-content"></section>';
 	htmlChat += '<footer class="chat-footer">';
 	htmlChat += '<textarea class="send-message" placeholder="Enter Message" rows="1"></textarea>';
-	htmlChat += '<a href="#" class="smiles"><img src="images/smile.png" alt="smile"></a>';
+	htmlChat += '<a href="#" class="smiles show-list"><img src="images/smile.png" alt="smile"></a>';
 	htmlChat += '</footer></div>';
 	
-	$('#chat-group').hide();
+	$('#chat-room').hide();
 	$('.chat:last').after(htmlChat);
+	
+	chatContentHeight = $('#chat-room .chat-content').height();
 	$('.chat:visible .chat-content').height(chatContentHeight);
 }

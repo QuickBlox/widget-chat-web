@@ -86,26 +86,30 @@
 		</span>
 	</div>
 	
-	<div id="chat-group" class="chat layout hidden">
-		<header class="chat-header">
-			<a href="#" class="users"><span class="users-count">0</span></a>
-			<a href="#" class="logout"><img src="images/logout.png" alt="logout"></a>
-			<h2 class="chat-name">Chat Room</h2>
-			<ul class="users-list hidden"></ul>
-		</header>
+	<div id="chats-wrap" class="layout hidden">
+		<div id="chat-room" class="chat">
+			<header class="chat-header">
+				<a href="#" class="users show-list"><span class="users-count">0</span></a>
+				<a href="#" class="chats show-list"><span class="chats-count">0</span></a>
+				<a href="#" class="logout"><img src="images/logout.png" alt="logout"></a>
+				<h2 class="chat-name" title="Chat Room">Chat Room</h2>
+				<ul class="users-list list hidden"></ul>
+			</header>
+			
+			<section class="chat-content"></section>
+			
+			<footer class="chat-footer">
+				<textarea class="send-message" placeholder="Enter Message" rows="1"></textarea>
+				<a href="#" class="smiles show-list"><img src="images/smile.png" alt="smile"></a>
+			</footer>
+		</div>
 		
-		<section class="chat-content"></section>
+		<ul class="chats-list list hidden"></ul>
+		<div class="smiles-list list hidden"></div>
 		
-		<footer class="chat-footer">
-			<textarea class="send-message" placeholder="Enter Message" rows="1"></textarea>
-			<a href="#" class="smiles"><img src="images/smile.png" alt="smile"></a>
-		</footer>
-	</div>
-	
-	<div id="smiles-list" class="hidden"></div>
-	
-	<div id="actions-wrap" class="hide-actions hidden">
-		<div class="actions"></div>
+		<div class="actions-wrap hide-actions hidden">
+			<div class="actions"></div>
+		</div>
 	</div>
 	
 	<audio id="signal">
