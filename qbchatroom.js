@@ -43,6 +43,7 @@ $(document).ready(function() {
 		$('#chats-wrap').on('click', '.users', {list: '.users-list'}, showList);
 		$('#chats-wrap').on('click', '.chats', {list: '.chats-list'}, showList);
 		$('#chats-wrap').on('click', '.smiles', {list: '.smiles-list'}, showList);
+		$('.chats-list').on('click', '.switch-chat', switchСhat);
 		$('.actions-wrap').on('click', '.btn_quote', makeQuote);
 		$('.actions-wrap').on('click', '.btn_private', createPrivateChat);
 	});
@@ -406,6 +407,7 @@ function getRoster(users, room) {
 function getPresence(stanza, room) {
 	console.log('[XMPP] Presence');
 	var user, type, time, qbID, name, obj = $('.typing');
+	var selector;
 	
 	user = $(stanza).attr('from');
 	type = $(stanza).attr('type');
@@ -415,11 +417,13 @@ function getPresence(stanza, room) {
 	if (type) {
 		if (typeof(namesOccupants[qbID]) == "string") {
 			name = namesOccupants[qbID];
+			selector = choseSelector(qbID);
 			removeTypingMessage(obj, name);
 			
+			editUsersCount(selector, 1);
 			$('.list-item[data-qb=' + qbID + ']').remove();
-			$('.chat-content').append('<span class="service-message left" data-time="' + time + '">' + name + ' has left this chat.</span>');
-			scrollToMessage('.chat:visible');
+			selector.append('<span class="service-message left" data-time="' + time + '">' + name + ' has left this chat.</span>');
+			scrollToMessage(selector);
 		}
 		delete namesOccupants[qbID];
 	} else {
@@ -437,6 +441,8 @@ function getPresence(stanza, room) {
 function getMessage(stanza, room) {
 	var html, author, response, createTime, messageTime, composing, paused;
 	var qbID, message, name, avatar, fbID, icon, defaultAvatar = 'images/avatar_default.png';
+	var selector;
+	
 	if (!switches.isOccupantsDownloaded && $('#chat-room .message').length > 1)
 		getOccupants();
 	
@@ -486,7 +492,8 @@ function getMessage(stanza, room) {
 			$('#chat-room .message:last').fadeTo(300, 1);
 		
 		$('.message:odd').addClass('white');
-		scrollToMessage('#chat-room');
+		selector = $('#chat-room .chat-content');
+		scrollToMessage(selector);
 	}
 	
 	return true;
@@ -512,13 +519,17 @@ function getOccupants() {
 }
 
 function getOneOccupant(id, time) {
+	var selector;
+	
 	QB.users.get(parseInt(id), function(err, result) {
 		if (err) {
 			console.log(err.detail);
 		} else {
 			createUsersList(result);
-			$('#chat-room .chat-content').append('<span class="service-message joined" data-time="' + time + '">' + result.full_name + ' has joined the chat.</span>');
-			scrollToMessage('#chat-room');
+			selector = choseSelector(id);
+			editUsersCount(selector, 2);
+			selector.append('<span class="service-message joined" data-time="' + time + '">' + result.full_name + ' has joined the chat.</span>');
+			scrollToMessage(selector);
 		}
 	});
 }
@@ -527,6 +538,7 @@ function getOneOccupant(id, time) {
 -------------------------------------------------------------------------*/
 function createUsersList(user) {
 	var qbID, fbID, name;
+	var selector;
 	
 	qbID = String(user.id);
 	fbID = user.facebook_id || '';
@@ -534,25 +546,29 @@ function createUsersList(user) {
 	//var iconClass = user.facebook_id ? 'user_fb_icon' : 'user_qb_icon';
 	
 	$('.loading_users').remove();
-	$('#chat-room .users-list').append('<li class="list-item show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '">' + name + '</li>');
+	selector = choseSelector(qbID).parent().find('.users-list');
+	selector.append('<li class="list-item show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '">' + name + '</li>');
 	namesOccupants[qbID] = name;
 }
 
 function showComposing(composing, qbID) {
-	var name, obj = $('.typing');
+	/*var name, obj = $('.typing');
+	var selector;
+	
 	if (typeof(namesOccupants[qbID]) != "string") return false;
 	
 	name = namesOccupants[qbID];
+	selector = choseSelector(qbID);
 	removeTypingMessage(obj, name);
 	
 	if (composing && qbID != chatUser.qbID) {
 		if ($('.chat:visible span').is('.typing'))
 			addTypingMessage(obj, name);
 		else {
-			$('.chat:visible .chat-content').append('<span class="typing">' + name + ' ...</span>');
-			scrollToMessage('.chat:visible');
+			selector.append('<span class="typing">' + name + ' ...</span>');
+			scrollToMessage(selector);
 		}
-	}
+	}*/
 }
 
 function showActionToolbar() {
@@ -602,33 +618,36 @@ function takeQuote(str, time) {
 }
 
 function createPrivateChat() {
-	var htmlChat, htmlChatsList, htmlUsersList, chatContentHeight;
-	var qbID, fbID, name, chatsCount = 2, usersCount = 2;
+	var htmlUsersList, qbID, fbID, name, chatsCount, usersCount = 2;
+	var obj, chatID, selector;
 	
 	qbID = $(this).data('qb');
 	fbID = $(this).data('fb');
 	name = namesOccupants[qbID];
+	if (typeof(namesOccupants[qbID]) != "string") return false;
 	
-	htmlUsersList = '<li class="list-title">Users</li>';
-	htmlUsersList += '<li class="list-item show-actions" data-qb="' + chatUser.qbID + '" data-fb="' + (chatUser.fbID || '') + '">' + chatUser.name + '</li>';
-	htmlUsersList += '<li class="list-item show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '">' + name + '</li>';
+	chatID = '#chat-' + qbID;
+	selector = $(chatID).find('.chat-content');
 	
-	htmlChat = '<div id="chat-' + qbID + '" class="chat">';
-	htmlChat += '<header class="chat-header">';
-	htmlChat += '<a href="#" class="users show-list"><span class="users-count">' + usersCount + '</span></a>';
-	htmlChat += '<a href="#" class="chats show-list"><span class="chats-count">' + chatsCount + '</span></a>';
-	htmlChat += '<a href="#" class="logout"><img src="images/logout.png" alt="logout"></a>';
-	htmlChat += '<h2 class="chat-name" title="' + name + '">' + name + '</h2>';
-	htmlChat += '<ul class="users-list list hidden">' + htmlUsersList + '</ul></header>';
-	htmlChat += '<section class="chat-content"></section>';
-	htmlChat += '<footer class="chat-footer">';
-	htmlChat += '<textarea class="send-message" placeholder="Enter Message" rows="1"></textarea>';
-	htmlChat += '<a href="#" class="smiles show-list"><img src="images/smile.png" alt="smile"></a>';
-	htmlChat += '</footer></div>';
-	
-	$('#chat-room').hide();
-	$('.chat:last').after(htmlChat);
-	
-	chatContentHeight = $('#chat-room .chat-content').height();
-	$('.chat:visible .chat-content').height(chatContentHeight);
+	if ($('.chat').is(chatID)) {
+		$('.chat:visible').hide();
+		$(chatID).show();
+		scrollToMessage(selector);
+	} else {
+		$('.chats-list').append('<li class="list-item switch-chat" data-id="chat-' + qbID + '">' + name + '</li>')
+		chatsCount = $('.chats-list .list-item').length;
+		htmlUsersList = '<li class="list-item show-actions" data-qb="' + chatUser.qbID + '" data-fb="' + (chatUser.fbID || '') + '">' + chatUser.name + '</li>';
+		htmlUsersList += '<li class="list-item show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '">' + name + '</li>';
+		
+		$('.chats').show();
+		$('#chat-room').hide().clone().show().insertAfter('.chat:last');
+		$('.chats-count').text(chatsCount);
+		
+		obj = $('.chat:visible');
+		obj.attr('id', chatID.substring(1));
+		obj.find('.users-count').text(usersCount);
+		obj.find('.chat-name').attr('title', name).text(name);
+		obj.find('.users-list .list-title').nextAll().remove().end().after(htmlUsersList);
+		obj.find('.chat-content').empty();
+	}
 }
