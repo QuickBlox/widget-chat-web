@@ -318,6 +318,10 @@ fieldset {
 
 /* Chat Layout
 ----------------------------------------------------------*/
+.chat {
+	height: 100%;
+}
+
 /* Chat Header */
 .chat-header {
 	height: 3.5rem;
@@ -332,18 +336,29 @@ fieldset {
 	.chat-header a:hover {
 		opacity: 1;
 	}
-	.users {
+	.users,
+	.chats {
 		float: left;
 		max-width: 5.5rem;
 		padding: 0 1rem;
 		overflow: hidden;
 	}
-		.users span {
+	.chats {
+		padding-left: 0;
+	}
+		.users span,
+		.chats span {
 			display: block;
 			padding-left: 1.3rem;
 			font-size: 1.2rem;
 			color: #fff;
+		}
+		.users span {
 			background: url(images/users.png) left center no-repeat;
+		}
+		.chats span {
+			background: url(images/chats.png) left center no-repeat;
+			background-size: 1rem;
 		}
 	.logout {
 		float: right;
@@ -354,7 +369,7 @@ fieldset {
 		}
 	.chat-name {
 		overflow: hidden;
-		font-size: 1.7rem;
+		font-size: 1.45rem;
 		font-weight: normal;
 		color: #fff;
 		white-space: nowrap;
@@ -462,8 +477,9 @@ fieldset {
 	.html-80 .smiles {top: 27%;}
 	.html-90 .smiles {top: 30%;}
 
-/* Users List */
-.users-list {
+/* Users and Chats Lists */
+.users-list,
+.chats-list {
 	position: relative;
 	width: 15.5rem;
 	overflow-y: auto;
@@ -472,7 +488,12 @@ fieldset {
 	border-top: 0;
 	z-index: 1;
 }
-	.users-list li {
+.chats-list {
+	position: absolute;
+	top: 3.5rem;
+}
+	.users-list li,
+	.chats-list li {
 		display: block;
 		font-size: 1.2rem;
 		line-height: 2.5rem;
@@ -480,9 +501,14 @@ fieldset {
 		color: #333;
 		overflow: hidden;
 	}
-	.users-list-title {
+	.list-title {
 		font-family: Helvetica-Bold, Helvetica, Arial, sans-serif;
 		color: #0066cc !important;
+	}
+	.show-actions:hover,
+	.list-item:hover {
+		background: #cdeaff;
+		cursor: pointer;
 	}
 
 /* Smiles Collection */
@@ -492,7 +518,7 @@ fieldset {
 	vertical-align: text-bottom;
 	margin: .2rem 0;
 }
-#smiles-list {
+.smiles-list {
 	position: absolute;
 	bottom: 3.8rem;
 	height: 6.7rem;
@@ -501,11 +527,11 @@ fieldset {
 	border: 2px solid #d4d4d4;
 	border-bottom: 0;
 }
-	#smiles-list .smileicons {
+	.smiles-list .smileicons {
 		padding: 7px;
 		margin: 0;
 	}
-	#smiles-list .smileicons:hover {
+	.smiles-list .smileicons:hover {
 		background: #0077cb;
 		cursor: pointer;
 	}
@@ -529,11 +555,7 @@ fieldset {
 }
 
 /* Actions Toolbar */
-.show-actions:hover {
-	background: #cdeaff;
-	cursor: pointer;
-}
-#actions-wrap {
+.actions-wrap {
 	position: absolute;
 	top: 0;
 	width: 100%;
@@ -545,29 +567,29 @@ fieldset {
 		bottom: 0;
 		width: 100%;
 	}
-	.action-group {
-		background: #ececec;
-	}
-	.action-group:first-child {
-		margin-bottom: 1rem;
-	}
-		.btn_action {
-			display: block;
-			margin-bottom: 0;
-			background: #0077cb;
-			border-top: 1px solid #d4d4d4;
-		}
-			.btn_action span {
-				padding-left: 0;
-				font-size: 1.7rem;
-				line-height: 3.5rem;
-				background: none;
-			}
-		.btn_cancel {
+		.action-group {
 			background: #ececec;
-			border-top: 0;
 		}
-			.btn_cancel span {
-				line-height: 3.8rem;
-				color: #000;
+		.action-group:first-child {
+			margin-bottom: 1rem;
+		}
+			.btn_action {
+				display: block;
+				margin-bottom: 0;
+				background: #0077cb;
+				border-top: 1px solid #d4d4d4;
 			}
+				.btn_action span {
+					padding-left: 0;
+					font-size: 1.7rem;
+					line-height: 3.5rem;
+					background: none;
+				}
+			.btn_cancel {
+				background: #ececec;
+				border-top: 0;
+			}
+				.btn_cancel span {
+					line-height: 3.8rem;
+					color: #000;
+				}

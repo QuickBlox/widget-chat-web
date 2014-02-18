@@ -15,10 +15,11 @@ function connectFailure() {
 
 function connectSuccess() {
 	$('#connecting').hide();
-	$('#chat-group').show();
+	$('#chats-wrap, #chat-room').show();
 	$('.chat-content').html('');
 	$('.send-message').val('');
-	$('.users-list').html('<li class="users-list-title">Occupants</li>');
+	$('.users-list').html('<li class="list-title">Users</li>');
+	$('.chats-list').html('<li class="list-title">Chats</li><li class="list-item">Chat Room</li>');
 	switches.isLogout = false;
 	createAnimatedLoadingUsers();
 	createAnimatedLoadingMessages();
@@ -44,13 +45,14 @@ function signUpSuccess() {
 function logoutSuccess() {
 	$('.bubbles').removeClass('bubbles_login');
 	$('.header').removeClass('header_login');
-	$('.chat, #login-form').hide();
+	$('#chats-wrap, #login-form').hide();
+	$('.chat:not(#chat-room)').remove();
 	$('#main, #auth').show();
 	if (!switches.isLogout) window.location.reload();
 }
 
-function scrollToMessage() {
-	$('.chat-content').scrollTo('*:last', 0);
+function scrollToMessage(chat) {
+	$(chat).find('.chat-content').scrollTo('*:last', 0);
 }
 
 function changeInputFileBehavior() {
@@ -68,12 +70,12 @@ function changeHeightChatBlock() {
 	
 	chatContentHeight = WIDGET_HEIGHT - chatHeaderHeight - chatFooterHeight - fixHeight;
 	$('.chat-content').height(chatContentHeight);
-	$('.users-list').css('max-height', chatContentHeight - fixUsersListHeight);
+	$('.users-list, .chats-list').css('max-height', chatContentHeight - fixUsersListHeight);
 }
 
 function getSmiles() {
 	$(SMILES).each(function(i) {
-		$('#smiles-list').append('<img class="smileicons" alt="icons" data-plain="' + SMILES[i].plain + '" src="images/smiles/' + SMILES[i].image + '">');
+		$('.smiles-list').append('<img class="smileicons" alt="icons" data-plain="' + SMILES[i].plain + '" src="images/smiles/' + SMILES[i].image + '">');
 	});
 }
 
@@ -81,20 +83,15 @@ function clickBehavior() {
 	$(document).click(function(event) {
 		var obj = $(event.target);
 		
-		if (obj.is('.hide-actions, .hide-actions *')) {
-			$('#actions-wrap').hide();
-		}
-		else if (obj.is('.show-actions, .show-actions *')) {
-			if (obj.is('.user') || !$('.users').is('.visible') && !$('.smiles').is('.visible'))
-				$('#actions-wrap').show();
-		}
-		if (!obj.is('.users, .users-list-title, .loading_users, .loading_users *')) {
-			$('.users').removeClass('visible');
-			$('.users-list').hide();
-		}
-		if (!obj.is('.smiles, #smiles-list, #smiles-list *')) {
-			$('.smiles').removeClass('visible');
-			$('#smiles-list').hide();
+		if (obj.is('.hide-actions, .hide-actions *'))
+			$('.actions-wrap').hide();
+		else if (obj.is('.show-actions, .show-actions *'))
+			if (obj.is('.list-item') || !$('.list').is(':visible'))
+				$('.actions-wrap').show();
+		
+		if (!obj.is('.list-title, .smiles-list, .smiles-list *, .loading_users, .loading_users *')) {
+			$('.show-list').removeClass('visible');
+			$('.list').hide();
 		}
 	});
 }
@@ -104,18 +101,32 @@ function showList(event) {
 	if (!switches.isOccupantsDownloaded)
 		getOccupants();
 	
+	if ($(this).is('.users')) {
+		$('.show-list:not(.users)').removeClass('visible');
+		$('.list:not(.users-list)').hide();
+	}
+	if ($(this).is('.chats')) {
+		$('.show-list:not(.chats)').removeClass('visible');
+		$('.list:not(.chats-list)').hide();
+	}
+	if ($(this).is('.smiles')) {
+		$('.show-list:not(.smiles)').removeClass('visible');
+		$('.list:not(.smiles-list)').hide();
+	}
+	
 	if ($(this).is('.visible'))
 		list.hide();
 	else
 		list.show();
 	
 	$(this).toggleClass('visible');
+	
 	return false;
 }
 
 function choseSmile() {
-	var tmp = $('.chat:visible .send-message').val() + ' ' + $(this).data('plain') + ' ';
-	$('.chat:visible .send-message').val(tmp);
+	var messageField = $('.chat:visible .send-message');
+	messageField.val(messageField.val() + ' ' + $(this).data('plain') + ' ');
 }
 
 function updateTime() {
