@@ -19,7 +19,8 @@ function connectSuccess() {
 	$('.chat-content').html('');
 	$('.send-message').val('');
 	$('.users-list').html('<li class="list-title">Users</li>');
-	$('.chats-list').html('<li class="list-title">Chats</li><li class="list-item">Chat Room</li>');
+	$('.chats-list').html('<li class="list-title">Chats</li>');
+	$('.chats-list').append('<li class="list-item switch-chat" data-id="chat-room">Chat Room</li>');
 	switches.isLogout = false;
 	createAnimatedLoadingUsers();
 	createAnimatedLoadingMessages();
@@ -45,14 +46,10 @@ function signUpSuccess() {
 function logoutSuccess() {
 	$('.bubbles').removeClass('bubbles_login');
 	$('.header').removeClass('header_login');
-	$('#chats-wrap, #login-form').hide();
+	$('#chats-wrap, #login-form, .chats').hide();
 	$('.chat:not(#chat-room)').remove();
 	$('#main, #auth').show();
 	if (!switches.isLogout) window.location.reload();
-}
-
-function scrollToMessage(chat) {
-	$(chat).find('.chat-content').scrollTo('*:last', 0);
 }
 
 function changeInputFileBehavior() {
@@ -77,6 +74,11 @@ function getSmiles() {
 	$(SMILES).each(function(i) {
 		$('.smiles-list').append('<img class="smileicons" alt="icons" data-plain="' + SMILES[i].plain + '" src="images/smiles/' + SMILES[i].image + '">');
 	});
+}
+
+function choseSmile() {
+	var messageField = $('.chat:visible .send-message');
+	messageField.val(messageField.val() + ' ' + $(this).data('plain') + ' ');
 }
 
 function clickBehavior() {
@@ -122,11 +124,6 @@ function showList(event) {
 	$(this).toggleClass('visible');
 	
 	return false;
-}
-
-function choseSmile() {
-	var messageField = $('.chat:visible .send-message');
-	messageField.val(messageField.val() + ' ' + $(this).data('plain') + ' ');
 }
 
 function updateTime() {
@@ -201,4 +198,27 @@ function addTypingMessage(obj, name) {
 function removeTypingMessage(obj, name) {
 	obj.text(obj.text().replace(', ' + name, '').replace(name + ', ', '').replace(name + ' ...', ''));
 	if (obj.text().length == 0) obj.remove();
+}
+
+function choseSelector(id) {
+	return $('#chat-room').add('#chat-' + id).find('.chat-content');
+}
+
+function scrollToMessage(selector) {
+	selector.scrollTo('*:last', 0);
+}
+
+function editUsersCount(selector, val) {
+	selector.parent().not('#chat-room').find('.users-count').text(val);
+}
+
+function switchСhat(event) {
+	var id, selector;
+	
+	id = '#' + $(event.target).data('id');
+	selector = $(id).find('.chat-content');
+	
+	$('.chat:visible').hide();
+	$(id).show();
+	scrollToMessage(selector);
 }
