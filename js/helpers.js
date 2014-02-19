@@ -20,7 +20,7 @@ function connectSuccess() {
 	$('.send-message').val('');
 	$('.users-list').html('<li class="list-title">Users</li>');
 	$('.chats-list').html('<li class="list-title">Chats</li>');
-	$('.chats-list').append('<li class="list-item switch-chat" data-id="chat-room">Chat Room</li>');
+	$('.chats-list').append('<li class="list-item switch-chat" data-id="chat-room">Chat Room <span class="messages-count"></span></li>');
 	switches.isLogout = false;
 	createAnimatedLoadingUsers();
 	createAnimatedLoadingMessages();
@@ -224,15 +224,61 @@ function editUsersCount(selector, val) {
 	selector.parent().not('#chat-room').find('.users-count').text(val);
 }
 
+function editMessagesCount(id, time) {
+	var selector, messagesCount;
+	
+	selector = $('.switch-chat[data-id=' + id + ']'); 
+	if (selector[0] && !time && !$('#' + id).is(':visible')) {
+		messagesCount = parseInt(selector.find('.messages-count').text()) || 0;
+		messagesCount++;
+		selector.find('.messages-count').text(messagesCount);
+	}
+}
+
+function deleteMessageCount(id) {
+	$('.switch-chat[data-id=' + id + ']').find('.messages-count').text('');
+}
+
 function switchСhat(event) {
 	var id, selector;
 	
-	id = '#' + $(event.target).data('id');
-	selector = $(id).find('.chat-content');
+	if (!$(event.target).is('.remove')) {
+		id = '#' + $(this).data('id');
+		selector = $(id).find('.chat-content');
+		
+		$('.chat:visible').hide();
+		$(id).show();
+		scrollToMessage(selector);
+		deleteMessageCount($(this).data('id'));
+	}
+}
+
+function addRemoveButton() {
+	if ($(this).data('id') != 'chat-room')
+		$(this).append('<span class="remove">x</span>');
+}
+
+function deleteRemoveButton() {
+	$(this).find('.remove').remove();
+}
+
+function removeChat() {
+	var id, chatsCount;
 	
-	$('.chat:visible').hide();
-	$(id).show();
-	scrollToMessage(selector);
+	id = '#' + $(this).parent().data('id');
+	chatsCount = parseInt($('.chats-count:first').text());
+	
+	$(this).parent().remove();
+	$('.chats-count').text(--chatsCount);
+	if ($('.chat:visible').attr('id') == id.substring(1)) {
+		$(id).remove();
+		$('#chat-room').show();
+	} else {
+		$(id).remove();
+	}
+	
+	if ($('.switch-chat').length == 1)
+		$('.chats').hide();
 }
 
 function checkTypeChatState(jid, type) {
