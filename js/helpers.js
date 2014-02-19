@@ -139,8 +139,20 @@ function trim(str) {
 	return str;
 }
 
-function getID(jid) {
+function getJID(id) {
+	return id + "-" + QBAPP.appID + "@" + CHAT.server;
+}
+
+function getIDFromResource(jid) {
 	return Strophe.unescapeNode(Strophe.getResourceFromJid(jid));
+}
+
+function getIDFromNode(jid) {
+	return Strophe.getNodeFromJid(jid).split('-')[0];
+}
+
+function getIDFromChat() {
+	return $('.chat:visible').attr('id').split('-')[1];
 }
 
 function checkResponse(response) {
@@ -221,4 +233,11 @@ function switchСhat(event) {
 	$('.chat:visible').hide();
 	$(id).show();
 	scrollToMessage(selector);
+}
+
+function checkTypeChatState(jid, type) {
+	if (jid)
+		connection.chatstates[type](jid);
+	else
+		connection.chatstates[type](CHAT.roomJID, 'groupchat');
 }

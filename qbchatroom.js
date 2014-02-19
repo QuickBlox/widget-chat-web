@@ -5,11 +5,11 @@
  * author: Andrey Povelichenko <andrey.povelichenko@quickblox.com>
  */
 
-var params, connection, chatUser = {}, namesOccupants = {};
+var params, connection, chatUser = {}, namesOccupants = {}, messageIDs = {};
 
 var switches = {
+	isComposing: {},
 	isLogout: false,
-	isComposing: false,
 	isFBconnected: false,
 	isOccupantsDownloaded: false
 };
@@ -29,7 +29,6 @@ $(document).ready(function() {
 		getSmiles();
 		clickBehavior();
 		updateTime();
-		sendMesage();
 		
 		$('#authFB').click(authFB);
 		$('#authQB').click(authQB);
@@ -46,6 +45,8 @@ $(document).ready(function() {
 		$('.chats-list').on('click', '.switch-chat', switchСhat);
 		$('.actions-wrap').on('click', '.btn_quote', makeQuote);
 		$('.actions-wrap').on('click', '.btn_private', createPrivateChat);
+		
+		$('#chats-wrap').on('keydown', '.send-message', sendMesage);
 	});
 });
 
@@ -286,7 +287,7 @@ function assignBlobToUser(blob, user) {
 /* One to One Chat Module
 -----------------------------------------------------------------------*/
 function connectChat(chatUser) {
-	var userJID = chatUser.qbID + "-" + QBAPP.appID + "@" + CHAT.server;
+	var userJID = getJID(chatUser.qbID);
 	var userPass = chatUser.qbPass;
 	
 	connection = new Strophe.Connection(CHAT.bosh);
@@ -316,9 +317,10 @@ function connectChat(chatUser) {
 			console.log('[Connection] Connected');
 			connectSuccess();
 			
+			connection.addHandler(getMessage, null, 'message', 'chat'); // fix private composing
 			connection.muc.join(CHAT.roomJID, chatUser.qbID, getMessage, getPresence, getRoster);
-			localStorage['QBChatUser'] = JSON.stringify(chatUser);
 			
+			localStorage['QBChatUser'] = JSON.stringify(chatUser);
 			setTimeout(function() {$('.loading_messages').remove()}, 2 * 1000);
 			break;
 		case Strophe.Status.DISCONNECTING:
@@ -338,43 +340,58 @@ function connectChat(chatUser) {
 function rawInput(data) {/*console.log('RECV: ' + data);*/}
 function rawOutput(data) {/*console.log('SENT: ' + data);*/}
 
-function sendMesage() {
-	var message, post;
+function sendMesage(event) {
+	var message, post, userJID, qbID = getIDFromChat();
+	if (!$('.chat:visible').is('#chat-room'))
+		userJID = getJID(qbID);
 	
-	$('.send-message').keydown(function(event) {
-		if (!switches.isComposing)
-			sendComposing();
-		
-		if (event.keyCode == 13 && !event.shiftKey) {
-			post = $(this).val();
-			if (trim(post)) {
-				sendPaused();
-				
-				message = {
-					message: post,
-					name: chatUser.name,
-					avatar: chatUser.avatar,
-					fb: chatUser.fbID
-				};
-				
-				message = Strophe.escapeNode(JSON.stringify(message));
-				connection.muc.groupchat(CHAT.roomJID, message);
-				$(this).val('');
-			}
+	if (!switches.isComposing[qbID])
+		sendComposing();
+	
+	if (event.keyCode == 13 && !event.shiftKey) {
+		post = $(this).val();
+		if (trim(post)) {
+			sendPaused();
 			
-			return false;
+			message = {
+				message: post,
+				name: chatUser.name,
+				avatar: chatUser.avatar,
+				fb: chatUser.fbID
+			};
+			message = Strophe.escapeNode(JSON.stringify(message));
+			
+			if (userJID) {
+				connection.muc.message(CHAT.roomJID, qbID, message);
+				showMessage(qbID,
+				            post,
+				            chatUser.name,
+				            (chatUser.avatar || 'images/avatar_default.png'),
+				            (chatUser.fbID || ''),
+				            null,
+				            null,
+				            (new Date()).toISOString(),
+				            $('.chat:visible'));
+			}
+			else
+				connection.muc.groupchat(CHAT.roomJID, message);
+			
+			$(this).val('');
 		}
-	});
+		
+		return false;
+	}
 	
 	function sendComposing() {
-		switches.isComposing = true;
-		connection.chatstates.sendComposing(CHAT.roomJID, 'groupchat');
+		switches.isComposing[qbID] = true;
+		checkTypeChatState(userJID, 'sendComposing');
 		setTimeout(sendPaused, 5 * 1000);
 	}
 	
 	function sendPaused() {
-		switches.isComposing = false;
-		connection.chatstates.sendPaused(CHAT.roomJID, 'groupchat');
+		if (!switches.isComposing[qbID]) return false;
+		delete switches.isComposing[qbID];
+		checkTypeChatState(userJID, 'sendPaused');
 	}
 }
 
@@ -412,7 +429,7 @@ function getPresence(stanza, room) {
 	user = $(stanza).attr('from');
 	type = $(stanza).attr('type');
 	time = (new Date()).toISOString();
-	qbID = getID(user);
+	qbID = getIDFromResource(user);
 	
 	if (type) {
 		if (typeof(namesOccupants[qbID]) == "string") {
@@ -439,9 +456,9 @@ function getPresence(stanza, room) {
 }
 
 function getMessage(stanza, room) {
-	var html, author, response, createTime, messageTime, composing, paused;
+	var type, messageID, author, response, createTime, messageTime, composing, paused;
 	var qbID, message, name, avatar, fbID, icon, defaultAvatar = 'images/avatar_default.png';
-	var selector;
+	var chatID, selector;
 	
 	if (!switches.isOccupantsDownloaded && $('#chat-room .message').length > 1)
 		getOccupants();
@@ -453,10 +470,25 @@ function getMessage(stanza, room) {
 	composing = $(stanza).find('composing')[0];
 	paused = $(stanza).find('paused')[0];
 	
-	qbID = getID(author);
+	type = $(stanza).attr('type');
+	messageID = $(stanza).attr('id');
+	
+	// fix double private messages
+	if (type == 'chat' && messageID) {
+		if (!messageIDs[messageID])
+			messageIDs[messageID] = true;
+		else
+			return true;
+	}
+	
+	// fix private composing
+	if (type == 'chat' && !messageID)
+		qbID = getIDFromNode(author);
+	else
+		qbID = getIDFromResource(author);
 	
 	if (!response && composing || paused) {
-		showComposing(composing, qbID);
+		showComposing(composing, qbID, type);
 	} else {
 		console.log('[XMPP] Message');
 		$('.loading_messages').remove();
@@ -470,33 +502,44 @@ function getMessage(stanza, room) {
 		fbID = response.fb || '';
 		//icon = response.fb ? 'images/fb_auth.png' : 'images/qb_auth.png';
 		
-		html = '<section class="message show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '">';
-		//html += '<img class="message-icon" src="' + icon + '" alt="icon">';
-		html += '<img class="message-avatar" src="' + avatar + '" alt="avatar">';
-		html += '<div class="message-body">';
-		html += '<div class="message-description">' + parser(message, createTime) + '</div>';
-		html += '<footer><span class="message-author">' + name + '</span>';
-		html += '<time class="message-time" datetime="' + messageTime + '">' + $.timeago(messageTime) + '</time></footer>';
-		html += '</div></section>';
+		chatID = '#chat-' + qbID;
+		if (type == 'chat' && !$('.chat').is(chatID))
+			htmlChatBuilder(qbID, fbID, name, chatID, false);
 		
-		if ($('#chat-room span').is('.typing'))
-			$('#chat-room .typing').before(html);
-		else if ($('#chat-room .service-message:last').data('time') > messageTime)
-			$('#chat-room .service-message:first').before(html);		
-		else
-			$('#chat-room .chat-content').append(html);
-		
-		if (createTime)
-			$('#chat-room .message:last').fadeTo(0, 1);
-		else
-			$('#chat-room .message:last').fadeTo(300, 1);
-		
-		$('.message:odd').addClass('white');
-		selector = $('#chat-room .chat-content');
-		scrollToMessage(selector);
+		selector = (type == 'chat') ? $(chatID) : $('#chat-room');
+		showMessage(qbID, message, name, avatar, fbID, icon, createTime, messageTime, selector);
 	}
 	
 	return true;
+}
+
+function showMessage(qbID, message, name, avatar, fbID, icon, createTime, messageTime, selector) {
+	var html;
+	
+	html = '<section class="message show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '">';
+	//html += '<img class="message-icon" src="' + icon + '" alt="icon">';
+	html += '<img class="message-avatar" src="' + avatar + '" alt="avatar">';
+	html += '<div class="message-body">';
+	html += '<div class="message-description">' + parser(message, createTime) + '</div>';
+	html += '<footer><span class="message-author">' + name + '</span>';
+	html += '<time class="message-time" datetime="' + messageTime + '">' + $.timeago(messageTime) + '</time></footer>';
+	html += '</div></section>';
+	
+	if (selector.find('span').is('.typing'))
+		selector.find('.typing').before(html);
+	else if (selector.find('.service-message:last').data('time') > messageTime)
+		selector.find('.service-message:first').before(html);		
+	else
+		selector.find('.chat-content').append(html);
+	
+	if (createTime)
+		selector.find('.message:last').fadeTo(0, 1);
+	else
+		selector.find('.message:last').fadeTo(300, 1);
+	
+	selector.find('.message:odd').addClass('white');
+	selector = selector.find('.chat-content');
+	scrollToMessage(selector);
 }
 
 function getOccupants() {
@@ -551,24 +594,23 @@ function createUsersList(user) {
 	namesOccupants[qbID] = name;
 }
 
-function showComposing(composing, qbID) {
-	/*var name, obj = $('.typing');
-	var selector;
-	
+function showComposing(composing, qbID, type) {
+	var selector, name, obj;
 	if (typeof(namesOccupants[qbID]) != "string") return false;
 	
+	selector = (type == 'chat') ? $('#chat-' + qbID) : $('#chat-room');
 	name = namesOccupants[qbID];
-	selector = choseSelector(qbID);
+	obj = selector.find('.typing');
 	removeTypingMessage(obj, name);
 	
 	if (composing && qbID != chatUser.qbID) {
-		if ($('.chat:visible span').is('.typing'))
+		if (selector.find('span').is('.typing'))
 			addTypingMessage(obj, name);
 		else {
-			selector.append('<span class="typing">' + name + ' ...</span>');
-			scrollToMessage(selector);
+			selector.find('.chat-content').append('<span class="typing">' + name + ' ...</span>');
+			scrollToMessage(selector.find('.chat-content'));
 		}
-	}*/
+	}
 }
 
 function showActionToolbar() {
@@ -618,8 +660,8 @@ function takeQuote(str, time) {
 }
 
 function createPrivateChat() {
-	var htmlUsersList, qbID, fbID, name, chatsCount, usersCount = 2;
-	var obj, chatID, selector;
+	var qbID, fbID, name;
+	var chatID, selector;
 	
 	qbID = $(this).data('qb');
 	fbID = $(this).data('fb');
@@ -634,20 +676,33 @@ function createPrivateChat() {
 		$(chatID).show();
 		scrollToMessage(selector);
 	} else {
-		$('.chats-list').append('<li class="list-item switch-chat" data-id="chat-' + qbID + '">' + name + '</li>')
-		chatsCount = $('.chats-list .list-item').length;
-		htmlUsersList = '<li class="list-item show-actions" data-qb="' + chatUser.qbID + '" data-fb="' + (chatUser.fbID || '') + '">' + chatUser.name + '</li>';
-		htmlUsersList += '<li class="list-item show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '">' + name + '</li>';
-		
-		$('.chats').show();
-		$('#chat-room').hide().clone().show().insertAfter('.chat:last');
-		$('.chats-count').text(chatsCount);
-		
-		obj = $('.chat:visible');
-		obj.attr('id', chatID.substring(1));
-		obj.find('.users-count').text(usersCount);
-		obj.find('.chat-name').attr('title', name).text(name);
-		obj.find('.users-list .list-title').nextAll().remove().end().after(htmlUsersList);
-		obj.find('.chat-content').empty();
+		htmlChatBuilder(qbID, fbID, name, chatID, true);
 	}
+}
+
+function htmlChatBuilder(qbID, fbID, name, chatID, isOwner) {
+	var obj, htmlUsersList, chatsCount, usersCount = 2, signal = $('#signal')[0];
+	
+	$('.chats-list').append('<li class="list-item switch-chat" data-id="chat-' + qbID + '">' + name + '</li>')
+	chatsCount = $('.chats-list .list-item').length;
+	htmlUsersList = '<li class="list-item show-actions" data-qb="' + chatUser.qbID + '" data-fb="' + (chatUser.fbID || '') + '">' + chatUser.name + '</li>';
+	htmlUsersList += '<li class="list-item show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '">' + name + '</li>';
+	
+	$('.chats').show();
+	$('.chats-count').text(chatsCount);
+	
+	if (isOwner) {
+		$('#chat-room').hide().clone().show().insertAfter('.chat:last');
+		obj = $('.chat:visible');
+	} else {
+		$('#chat-room').clone().hide().insertAfter('.chat:last');
+		obj = $('.chat:last');
+		signal.play();
+	}
+	
+	obj.attr('id', chatID.substring(1));
+	obj.find('.users-count').text(usersCount);
+	obj.find('.chat-name').attr('title', name).text(name);
+	obj.find('.users-list .list-title').nextAll().remove().end().after(htmlUsersList);
+	obj.find('.chat-content').empty();
 }
