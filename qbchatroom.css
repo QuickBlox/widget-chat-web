@@ -500,6 +500,7 @@ fieldset {
 		padding: 0 .6rem;
 		color: #333;
 		overflow: hidden;
+		word-wrap: break-word;
 	}
 	.list-title {
 		font-family: Helvetica-Bold, Helvetica, Arial, sans-serif;
@@ -510,6 +511,20 @@ fieldset {
 		background: #cdeaff;
 		cursor: pointer;
 	}
+		.messages-count {
+			padding: 0 .4rem;
+			font-size: 1rem;
+			color: #fff;
+			border-radius: 7px;
+			background: #f80;
+		}
+		.remove {
+			float: right;
+			margin-right: -.7rem;
+			padding: 0 .7rem;
+			font-size: 1.3rem;
+			color: #c9310b;
+		}
 
 /* Smiles Collection */
 .smileicons {

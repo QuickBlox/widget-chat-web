@@ -43,6 +43,9 @@ $(document).ready(function() {
 		$('#chats-wrap').on('click', '.chats', {list: '.chats-list'}, showList);
 		$('#chats-wrap').on('click', '.smiles', {list: '.smiles-list'}, showList);
 		$('.chats-list').on('click', '.switch-chat', switchСhat);
+		$('.chats-list').on('mouseenter', '.switch-chat', addRemoveButton);
+		$('.chats-list').on('mouseleave', '.switch-chat', deleteRemoveButton);
+		$('.chats-list').on('click', '.remove', removeChat);
 		$('.actions-wrap').on('click', '.btn_quote', makeQuote);
 		$('.actions-wrap').on('click', '.btn_private', createPrivateChat);
 		
@@ -502,11 +505,12 @@ function getMessage(stanza, room) {
 		fbID = response.fb || '';
 		//icon = response.fb ? 'images/fb_auth.png' : 'images/qb_auth.png';
 		
-		chatID = '#chat-' + qbID;
+		chatID = (type == 'chat') ? '#chat-' + qbID : '#chat-room';
 		if (type == 'chat' && !$('.chat').is(chatID))
 			htmlChatBuilder(qbID, fbID, name, chatID, false);
 		
-		selector = (type == 'chat') ? $(chatID) : $('#chat-room');
+		selector = $(chatID);
+		editMessagesCount(chatID.substring(1), createTime);
 		showMessage(qbID, message, name, avatar, fbID, icon, createTime, messageTime, selector);
 	}
 	
@@ -675,6 +679,7 @@ function createPrivateChat() {
 		$('.chat:visible').hide();
 		$(chatID).show();
 		scrollToMessage(selector);
+		deleteMessageCount(chatID.substring(1));
 	} else {
 		htmlChatBuilder(qbID, fbID, name, chatID, true);
 	}
@@ -683,7 +688,7 @@ function createPrivateChat() {
 function htmlChatBuilder(qbID, fbID, name, chatID, isOwner) {
 	var obj, htmlUsersList, chatsCount, usersCount = 2, signal = $('#signal')[0];
 	
-	$('.chats-list').append('<li class="list-item switch-chat" data-id="chat-' + qbID + '">' + name + '</li>')
+	$('.chats-list').append('<li class="list-item switch-chat" data-id="chat-' + qbID + '">' + name + ' <span class="messages-count"></span></li>')
 	chatsCount = $('.chats-list .list-item').length;
 	htmlUsersList = '<li class="list-item show-actions" data-qb="' + chatUser.qbID + '" data-fb="' + (chatUser.fbID || '') + '">' + chatUser.name + '</li>';
 	htmlUsersList += '<li class="list-item show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '">' + name + '</li>';
