@@ -231,12 +231,12 @@ function editMessagesCount(id, time) {
 	if (selector[0] && !time && !$('#' + id).is(':visible')) {
 		messagesCount = parseInt(selector.find('.messages-count').text()) || 0;
 		messagesCount++;
-		selector.find('.messages-count').text(messagesCount);
+		selector.find('.messages-count').text(messagesCount).css('padding', '0 .4rem');
 	}
 }
 
 function deleteMessageCount(id) {
-	$('.switch-chat[data-id=' + id + ']').find('.messages-count').text('');
+	$('.switch-chat[data-id=' + id + ']').find('.messages-count').text('').css('padding', '0');
 }
 
 function switchСhat(event) {
