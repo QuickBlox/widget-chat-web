@@ -5,7 +5,7 @@
  * author: Andrey Povelichenko <andrey.povelichenko@quickblox.com>
  */
 
-var params, connection, chatUser = {}, namesOccupants = {}, messageIDs = {};
+var params, connection, chatUser = {}, namesOccupants = {};
 
 var switches = {
 	isComposing: {},
@@ -320,7 +320,7 @@ function connectChat(chatUser) {
 			console.log('[Connection] Connected');
 			connectSuccess();
 			
-			connection.addHandler(getMessage, null, 'message', 'chat'); // fix private composing
+			connection.addHandler(getMessage, null, 'message', 'chat');
 			connection.muc.join(CHAT.roomJID, chatUser.qbID, getMessage, getPresence, getRoster);
 			
 			localStorage['QBChatUser'] = JSON.stringify(chatUser);
@@ -365,7 +365,13 @@ function sendMesage(event) {
 			message = Strophe.escapeNode(JSON.stringify(message));
 			
 			if (userJID) {
-				connection.muc.message(CHAT.roomJID, qbID, message);
+				params = {
+					to: userJID,
+					from: connection.jid,
+					type: 'chat'
+				};
+				connection.send($msg(params).c('body').t(message));
+				
 				showMessage(qbID,
 				            post,
 				            chatUser.name,
@@ -459,7 +465,7 @@ function getPresence(stanza, room) {
 }
 
 function getMessage(stanza, room) {
-	var type, messageID, author, response, createTime, messageTime, composing, paused;
+	var type, author, response, createTime, messageTime, composing, paused;
 	var qbID, message, name, avatar, fbID, icon, defaultAvatar = 'images/avatar_default.png';
 	var chatID, selector;
 	
@@ -467,25 +473,16 @@ function getMessage(stanza, room) {
 		getOccupants();
 	
 	author = $(stanza).attr('from');
-	response = $(stanza).find('body').context.textContent;
+	response = $(stanza).find('body')[0] && $(stanza).find('body')[0].textContent;
 	createTime = $(stanza).find('delay').attr('stamp');
 	
 	composing = $(stanza).find('composing')[0];
 	paused = $(stanza).find('paused')[0];
 	
 	type = $(stanza).attr('type');
-	messageID = $(stanza).attr('id');
 	
-	// fix double private messages
-	if (type == 'chat' && messageID) {
-		if (!messageIDs[messageID])
-			messageIDs[messageID] = true;
-		else
-			return true;
-	}
-	
-	// fix private composing
-	if (type == 'chat' && !messageID)
+	// fix private chat
+	if (type == 'chat')
 		qbID = getIDFromNode(author);
 	else
 		qbID = getIDFromResource(author);
@@ -494,7 +491,8 @@ function getMessage(stanza, room) {
 		showComposing(composing, qbID, type);
 	} else {
 		console.log('[XMPP] Message');
-		$('.loading_messages').remove();
+		if (type == 'groupchat')
+			$('.loading_messages').remove();
 		
 		response = checkResponse(response);
 		messageTime = createTime || (new Date()).toISOString();
@@ -627,7 +625,7 @@ function showActionToolbar() {
 	html = '<div class="action-group">';
 	if (qbID != chatUser.qbID && $('#chat-room').is(':visible')) {
 		html += '<button class="btn btn_action btn_quote" data-name="' + name + '"><span>Reply</span></button>';
-		html += '<button class="btn btn_action btn_private" data-qb="' + qbID + '" data-fb="' + fbID + '"><span>Private message</span></button>';
+		html += '<button class="btn btn_action btn_private" data-qb="' + qbID + '" data-fb="' + fbID + '" data-name="' + name + '"><span>Private message</span></button>';
 	}
 	html += fbID ? '<a href="https://facebook.com/' + fbID + '" target="_blank" class="btn btn_action"><span>View profile</span></a>' : '';
 	html += '</div><div class="action-group">';
@@ -669,8 +667,7 @@ function createPrivateChat() {
 	
 	qbID = $(this).data('qb');
 	fbID = $(this).data('fb');
-	name = namesOccupants[qbID];
-	if (typeof(namesOccupants[qbID]) != "string") return false;
+	name = $(this).data('name');
 	
 	chatID = '#chat-' + qbID;
 	selector = $(chatID).find('.chat-content');
@@ -686,12 +683,15 @@ function createPrivateChat() {
 }
 
 function htmlChatBuilder(qbID, fbID, name, chatID, isOwner) {
-	var obj, htmlUsersList, chatsCount, usersCount = 2, signal = $('#signal')[0];
+	var obj, htmlUsersList, chatsCount, usersCount = 1, signal = $('#signal')[0];
 	
 	$('.chats-list').append('<li class="list-item switch-chat" data-id="chat-' + qbID + '">' + name + ' <span class="messages-count"></span></li>')
 	chatsCount = $('.chats-list .list-item').length;
 	htmlUsersList = '<li class="list-item show-actions" data-qb="' + chatUser.qbID + '" data-fb="' + (chatUser.fbID || '') + '">' + chatUser.name + '</li>';
-	htmlUsersList += '<li class="list-item show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '">' + name + '</li>';
+	if (typeof(namesOccupants[qbID]) == "string") {
+		htmlUsersList += '<li class="list-item show-actions" data-qb="' + qbID + '" data-fb="' + fbID + '">' + name + '</li>';
+		usersCount = 2;
+	}
 	
 	$('.chats').show();
 	$('.chats-count').text(chatsCount);
