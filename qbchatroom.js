@@ -627,6 +627,8 @@ function showActionToolbar() {
 		html += '<button class="btn btn_action btn_quote" data-name="' + name + '"><span>Reply</span></button>';
 		html += '<button class="btn btn_action btn_private" data-qb="' + qbID + '" data-fb="' + fbID + '" data-name="' + name + '"><span>Private message</span></button>';
 	}
+	if (qbID != chatUser.qbID)
+		html += '<button class="btn btn_action btn_videocall" data-qb="' + qbID + '"><span>Video call</span></button>';
 	html += fbID ? '<a href="https://facebook.com/' + fbID + '" target="_blank" class="btn btn_action"><span>View profile</span></a>' : '';
 	html += '</div><div class="action-group">';
 	html += '<button class="btn btn_action btn_cancel"><span>Cancel</span></button>';
