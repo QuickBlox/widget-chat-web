@@ -731,11 +731,11 @@ function successCall(stream) {
 	console.log(stream);
 	var videoElement = $('#videocall')[0];
 	
-	if (videoElement.mozSrcObject !== undefined) {
+	/*if (videoElement.mozSrcObject !== undefined) {
 		videoElement.mozSrcObject = stream;
-	} else {
+	} else {*/
 		videoElement.src = (window.URL && window.URL.createObjectURL(stream)) || stream;
-	};
+	//};
 }
 
 function errorCall(err) {
