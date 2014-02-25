@@ -48,6 +48,7 @@ $(document).ready(function() {
 		$('.chats-list').on('click', '.remove', removeChat);
 		$('.actions-wrap').on('click', '.btn_quote', makeQuote);
 		$('.actions-wrap').on('click', '.btn_private', createPrivateChat);
+		$('.actions-wrap').on('click', '.btn_videocall', makeVideoCall);
 		
 		$('#chats-wrap').on('keydown', '.send-message', sendMesage);
 	});
@@ -712,4 +713,23 @@ function htmlChatBuilder(qbID, fbID, name, chatID, isOwner) {
 	obj.find('.chat-name').attr('title', name).text(name);
 	obj.find('.users-list .list-title').nextAll().remove().end().after(htmlUsersList);
 	obj.find('.chat-content').empty();
+}
+
+function makeVideoCall() {
+	var getUserMedia;
+	var browserUserMedia =	navigator.webkitGetUserMedia	||
+	                        navigator.mozGetUserMedia	||
+	                        navigator.getUserMedia;
+	if (!browserUserMedia) throw 'Your browser doesn\'t support WebRTC';
+	
+	getUserMedia = browserUserMedia.bind(navigator);
+	
+	getUserMedia({audio: true, video: true},
+	             function(stream) {
+	               console.log(stream);
+	             },
+	             function(err) {
+	               console.log(err);
+	             }
+	);
 }
