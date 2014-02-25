@@ -728,7 +728,8 @@ function makeVideoCall() {
 	             function(stream) {
 	               console.log(stream);
 	               var videoElement = $('#videocall')[0];
-	               videoElement.src = window.URL.createObjectURL(stream);
+	               vat URLObj = window.URL || window.webkitURL// || window.mozURL
+	               videoElement.src = URLObj.createObjectURL(stream);
 	             },
 	             function(err) {
 	               console.log(err);
