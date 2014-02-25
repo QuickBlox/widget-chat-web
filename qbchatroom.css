@@ -1,6 +1,6 @@
 /**
  * QB Group Chat Room (XMPP)
- * version 2.2.0
+ * version 2.2.1
  * 
  * author: Andrey Povelichenko <andrey.povelichenko@quickblox.com>
  */
@@ -481,7 +481,7 @@ fieldset {
 .users-list,
 .chats-list {
 	position: relative;
-	width: 15.5rem;
+	width: 16.5rem;
 	overflow-y: auto;
 	background: #fff;
 	border: 2px solid #d4d4d4;
@@ -512,7 +512,8 @@ fieldset {
 		cursor: pointer;
 	}
 		.messages-count {
-			padding: 0 .4rem;
+			padding: 0;
+			margin-left: 5px;
 			font-size: 1rem;
 			color: #fff;
 			border-radius: 7px;
