@@ -724,15 +724,20 @@ function makeVideoCall() {
 	
 	getUserMedia = browserUserMedia.bind(navigator);
 	
-	getUserMedia({audio: true, video: true},
-	             function(stream) {
-	               console.log(stream);
-	               var videoElement = $('#videocall')[0];
-	               var URLObj = window.webkitURL || window.URL; // || window.mozURL
-	               videoElement.src = URLObj.createObjectURL(stream);
-	             },
-	             function(err) {
-	               console.log(err);
-	             }
-	);
+	getUserMedia({audio: true, video: true}, successCall, errorCall);
+}
+
+function successCall(stream) {
+	console.log(stream);
+	var videoElement = $('#videocall')[0];
+	
+	if (videoElement.mozSrcObject !== undefined) {
+		videoElement.mozSrcObject = stream;
+	} else {
+		videoElement.src = (window.URL && window.URL.createObjectURL(stream)) || stream;
+	};
+}
+
+function errorCall(err) {
+	console.log(err);
 }
