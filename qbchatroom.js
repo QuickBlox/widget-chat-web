@@ -727,7 +727,7 @@ function makeVideoCall() {
 	getUserMedia({audio: true, video: true},
 	             function(stream) {
 	               console.log(stream);
-	               var videoElement = $('#videocall');
+	               var videoElement = document.getElementById('videocall');
 	               videoElement.src = window.URL.createObjectURL(stream);
 	             },
 	             function(err) {
