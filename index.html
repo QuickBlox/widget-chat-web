@@ -117,9 +117,9 @@
 		<source src="audio/signal.mp3"></source>
 	</audio>
 	
-	<video id="videocall" autoplay></video>
+	<video id="localVideo" autoplay></video>
+	<video id="remoteVideo" autoplay></video>
 	
-	<script src="js/libs/adapter.js"></script>
 	<script src="js/libs/quickblox.js"></script>
 	<script src="js/libs/strophe.js"></script>
 	<script src="js/libs/strophe.muc.js"></script>
@@ -130,6 +130,12 @@
 	<script src="config.js"></script>
 	<script src="js/smiles.js"></script>
 	<script src="js/helpers.js"></script>
+	
+	<!-- WebRTC elements -->
+	<script src="js/libs/adapter.js"></script>
+	<script src="js/qb_videochat_signalling.js"></script>
+	<script src="js/qb_videochat.js"></script>
+	
 	<script src="qbchatroom.js"></script>
 </body>
 </html>

@@ -720,7 +720,7 @@ function makeVideoCall() {
 	
 	function successCall(stream) {
 		console.log(stream);
-		var video = $('#videocall')[0];
+		var video = $('#localVideo')[0];
 		
 		attachMediaStream(video, stream);
 	}
