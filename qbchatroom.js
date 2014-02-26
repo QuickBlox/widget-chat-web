@@ -716,28 +716,16 @@ function htmlChatBuilder(qbID, fbID, name, chatID, isOwner) {
 }
 
 function makeVideoCall() {
-	var getUserMedia;
-	var browserUserMedia =	navigator.webkitGetUserMedia	||
-	                        navigator.mozGetUserMedia	||
-	                        navigator.getUserMedia;
-	if (!browserUserMedia) throw 'Your browser doesn\'t support WebRTC';
-	
-	getUserMedia = browserUserMedia.bind(navigator);
-	
 	getUserMedia({audio: true, video: true}, successCall, errorCall);
-}
-
-function successCall(stream) {
-	console.log(stream);
-	var videoElement = $('#videocall')[0];
 	
-	/*if (videoElement.mozSrcObject !== undefined) {
-		videoElement.mozSrcObject = stream;
-	} else {*/
-		videoElement.src = (window.URL && window.URL.createObjectURL(stream)) || stream;
-	//};
-}
-
-function errorCall(err) {
-	console.log(err);
+	function successCall(stream) {
+		console.log(stream);
+		var video = $('#videocall')[0];
+		
+		attachMediaStream(video, stream);
+	}
+	
+	function errorCall(err) {
+		console.log(err);
+	}
 }
