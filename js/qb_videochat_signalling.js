@@ -6,19 +6,6 @@
  *
  */
  
-// QB Account params
-var QBPARAMS = {
-                        app_id      : '92',
-                        auth_key    : 'wJHdOcQSxXQGWx5',
-                        auth_secret : 'BTFsj7Rtt27DAmT'
-}
-
-//Chat params
-var CHAT = {
-                        server      : 'chat.quickblox.com',
-                        bosh_url    : 'http://chat.quickblox.com:5280'
-}
-
 var QB_CALL = 'qbvideochat_call';
 var QB_ACCEPT = 'qbvideochat_acceptCall';
 var QB_REJECT = 'qbvideochat_rejectCall';
