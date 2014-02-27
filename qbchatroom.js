@@ -742,6 +742,7 @@ function makeVideoChat() {
 	htmlVideoChatBuilder(name);
 	localVideo = $('#localVideo')[0];
 	remoteVideo = $('#remoteVideo')[0];
+	console.log(localVideo);
 	
 	videoChat = new QBVideoChat({audio: true, video: true}, localVideo, remoteVideo, signaling);
 	videoChat.getUserMedia();
