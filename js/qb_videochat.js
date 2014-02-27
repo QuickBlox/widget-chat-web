@@ -38,7 +38,7 @@ function QBVideoChat(localStreamElement, remoteStreamElement, constraints, signa
  	traceVC("init");
  	var self = this;
 	
-  this.sessionID = (new Date().getTime()) / 1000;
+  this.sessionID = new Date().getTime();
   traceVC("sessionID = " + this.sessionID);
   
 	this.candidatesQueue = [];
@@ -56,14 +56,12 @@ function QBVideoChat(localStreamElement, remoteStreamElement, constraints, signa
   // Signalling callbacks
 	this.onCallSignalingCallback = function(sessionID, sessionDescription) {
 		traceVC("onCall");
-		
 		self.sessionID = sessionID;
     self.remoteSessionDescription = sessionDescription;
 	};
 	
 	this.onAcceptSignalingCallback = function(sessionDescription) {
 		traceVC("onAccept");
-		
 		self.setRemoteDescription(sessionDescription, "answer"); //TODO: refactor this (hide)
 	};
 	
@@ -71,26 +69,18 @@ function QBVideoChat(localStreamElement, remoteStreamElement, constraints, signa
 	this.getUserMedia = function() {
 		traceVC("getUserMedia...");
 		
+		getUserMedia(this.constraints, successCallback, errorCallback);
+		
 		function successCallback(localMediaStream) {
 			traceVC("getUserMedia successCallback");
-	
-			// save local stream
 			self.localStream = localMediaStream;
-
-			// play own stream
 			attachMediaStream(self.localStreamElement, localMediaStream);
-			
-			//
-			// Create RTC peer connection
-			self.createRTCPeerConnection();
+			//self.createRTCPeerConnection();
 		}
 
 		function errorCallback(error) {
-		   traceVC("getUserMedia errorCallback: ", error);
+			traceVC("getUserMedia errorCallback: ", error);
 		}
-
-		// Get User media
-		getUserMedia(this.constraints, successCallback, errorCallback);
 	};
 	
 	// RTCPeerConnection creation

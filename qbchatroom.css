@@ -609,3 +609,8 @@ fieldset {
 					line-height: 3.8rem;
 					color: #000;
 				}
+				
+/* Video Chat */
+video {
+	display: none;
+}

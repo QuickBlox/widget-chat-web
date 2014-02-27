@@ -6,6 +6,7 @@
  */
 
 var params, connection, chatUser = {}, namesOccupants = {};
+var signaling, localVideo, remoteVideo;
 
 var switches = {
 	isComposing: {},
@@ -21,6 +22,9 @@ $(document).ready(function() {
 			appId: FBAPP_ID,
 			status: false
 		});
+		
+		localVideo = $('#localVideo')[0];
+		remoteVideo = $('#remoteVideo')[0];
 		
 		autoLogin();
 		subscribeFBStatusEvent();
@@ -48,7 +52,7 @@ $(document).ready(function() {
 		$('.chats-list').on('click', '.remove', removeChat);
 		$('.actions-wrap').on('click', '.btn_quote', makeQuote);
 		$('.actions-wrap').on('click', '.btn_private', createPrivateChat);
-		$('.actions-wrap').on('click', '.btn_videocall', makeVideoCall);
+		$('.actions-wrap').on('click', '.btn_videocall', onCall);
 		
 		$('#chats-wrap').on('keydown', '.send-message', sendMesage);
 	});
@@ -716,16 +720,9 @@ function htmlChatBuilder(qbID, fbID, name, chatID, isOwner) {
 	obj.find('.chat-content').empty();
 }
 
-/* WebRTC Module
+/* Video Chat Module
 -------------------------------------------------------------------------*/
 function createSignalingInstance() {
-	var signaling, videoChat, localVideo, remoteVideo;
-	
-	params = {
-		audio: true,
-		video: true
-	};
-	
 	signaling = new QBVideoChatSignaling();
 	signaling.addOnCallCallback(onCall);
 	signaling.addOnAcceptCallback(onAccept);
@@ -736,27 +733,20 @@ function createSignalingInstance() {
 	$(Object.keys(QBSignalingType)).each(function() {
 		setCallback(signaling.onMessage, 'message', QBSignalingType[this]);
 	});
-	
-	localVideo = $('#localVideo')[0];
-	remoteVideo = $('#remoteVideo')[0];
-	videoChat = new QBVideoChat(localVideo, remoteVideo, params, signaling);
-}
-
-function makeVideoCall() {
-	getUserMedia({audio: true, video: true}, successCall, errorCall);
-	
-	function successCall(stream) {
-		console.log(stream);
-		attachMediaStream(localVideo, stream);
-	}
-	
-	function errorCall(err) {
-		console.log(err);
-	}
 }
 
 function onCall() {
+	var videoChat;
 	
+	params = {
+		audio: true,
+		video: true
+	};
+	
+	videoChat = new QBVideoChat(localVideo, remoteVideo, params, signaling);
+	videoChat.getUserMedia();
+	
+	$(localVideo.id).show();
 }
 
 function onAccept() {
