@@ -736,7 +736,7 @@ function createSignalingInstance() {
 }
 
 function onCall() {
-	var videoChat;
+	var qbID, videoChat;
 	
 	params = {
 		audio: true,
@@ -745,8 +745,10 @@ function onCall() {
 	
 	videoChat = new QBVideoChat(localVideo, remoteVideo, params, signaling);
 	videoChat.getUserMedia();
-	
 	$('#' + localVideo.id).show();
+	
+	qbID = $(this).data('qb');
+	videoChat.call(qbID);
 }
 
 function onAccept() {

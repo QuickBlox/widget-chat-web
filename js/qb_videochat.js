@@ -103,7 +103,7 @@ function QBVideoChat(localStreamElement, remoteStreamElement, constraints, signa
 	
 	// onIceCandidate callback
 	this.onIceCandidateCallback = function(event) {
-		var candidate = event.candidate;	
+		var candidate = event.candidate;
 	
 		//traceVC('iceGatheringState: ' + event.target.iceGatheringState);
 	
@@ -176,25 +176,22 @@ function QBVideoChat(localStreamElement, remoteStreamElement, constraints, signa
 	this.onGetSessionDescriptionSuccessCallback = function(sessionDescription) {
 		traceVC('sessionDescriptionSuccessCallback: ' + sessionDescription);
 	    
-		self.pc.setLocalDescription(sessionDescription, 
-			function onSuccess() {
-				traceVC('setLocalDescription onSuccess');
-				
-				self.localSessionDescription = sessionDescription;
-				
-				// ICE gathering starts work here
-				//
-
-				if (sessionDescription.type === 'offer') {
-					self.sendCallRequest();
-				} else if (sessionDescription.type === 'answer') {
-					self.sendAceptRequest();
-				}
-				
-			}, function onError(error) {
-				traceVC('setLocalDescription error: ' + error);
-			}
-		);
+		self.pc.setLocalDescription(sessionDescription,
+                                
+                                function onSuccess() {
+                                  traceVC('setLocalDescription onSuccess');
+                                  self.localSessionDescription = sessionDescription;
+                                  
+                                  // ICE gathering starts work here
+                                  /*if (sessionDescription.type === 'offer')
+                                    self.sendCallRequest();
+                                  else if (sessionDescription.type === 'answer')
+                                    self.sendAceptRequest();*/
+                                },
+                                
+                                function onError(error) {
+                                  traceVC('setLocalDescription error: ' + error);
+                                });
 	};
 
 	this.onCreateOfferFailureCallback = function(event) {
@@ -255,14 +252,12 @@ function QBVideoChat(localStreamElement, remoteStreamElement, constraints, signa
 QBVideoChat.prototype.call = function(userID) {
 	traceVC("Call");
 	
-	if(this.localSessionDescription != null){
-		return;
-	}
+	if (this.localSessionDescription) return;
 	
 	this.opponentID = userID;
 	
-	traceVC('Creating offer to peer...' + this.pc);
-  	this.pc.createOffer(this.onGetSessionDescriptionSuccessCallback, this.onCreateOfferFailureCallback);
+	traceVC('Creating offer to peer... ' + this.pc);
+  this.pc.createOffer(this.onGetSessionDescriptionSuccessCallback, this.onCreateOfferFailureCallback);
 };
 
 // Accept call from user 
