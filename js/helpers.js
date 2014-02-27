@@ -293,17 +293,18 @@ function setCallback(callback, name, type) {
 }
 
 function centerPopup() {
-	var winWidth, winHeight, scrollPos, disWidth, disHeight, popupWidth = 800, fixHeight = 150;
+	var winWidth, winHeight, scrollPos, disWidth, disHeight, popupWidth, fixHeight = 0.22;
 	
 	winWidth = $(window).width();
 	winHeight = $(window).height();
-	scrollPos = $(window).scrollTop();
 	
-	disWidth = (winWidth - popupWidth) / 2;
-	disHeight = scrollPos + fixHeight;
+	popupWidth = winWidth / 2;
+	disWidth = winWidth / 4;
+	disHeight = winHeight * fixHeight;
 	
 	$('#videochat').css({'width': popupWidth + 'px', 'top': disHeight + 'px', 'left': disWidth + 'px'});
 	$('#videochat-overlay').css({'width': winWidth + 'px', 'height': winHeight + 'px'});
+	$('#videochat video').css('width': popupWidth + 'px');
 	
 	return false;
 }
