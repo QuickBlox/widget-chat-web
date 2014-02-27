@@ -754,8 +754,6 @@ function makeVideoCall() {
 	$(window).scroll(centerBox);
 	
 	$('#videochat, #videochat-overlay').show();
-	$('html, body').css('overflow', 'hidden');
-	$('html').scrollTop($(window).scrollTop());
 	
 	//$('#' + localVideo.id).show().after('<button onclick="callToUser(' + qbID + ')">Call to user</button>');
 }

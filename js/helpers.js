@@ -293,7 +293,7 @@ function setCallback(callback, name, type) {
 }
 
 function centerBox() {
-	var winWidth, winHeight, scrollPos, disWidth, disHeight, boxWidth = 400, fixHeight = 150;
+	var winWidth, winHeight, scrollPos, disWidth, disHeight, boxWidth = 800, fixHeight = 150;
 	
 	winWidth = $(window).width();
 	winHeight = $(document).height();
@@ -309,9 +309,5 @@ function centerBox() {
 }
 
 $('.videochat-close').click(function() {
-	var scrollPos = $(window).scrollTop();
-	
 	$('#videochat, #videochat-overlay').hide();
-	$('html, body').css('overflow', 'auto');
-	$('html').scrollTop(scrollPos);
 });
