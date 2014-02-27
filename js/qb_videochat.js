@@ -237,7 +237,6 @@ function QBVideoChat(localStreamElement, remoteStreamElement, constraints, signa
     
 // Call to user  
 QBVideoChat.prototype.call = function(userID) {
-	traceVC("call");
 	if (this.localSessionDescription) return;
 	
 	this.opponentID = userID;

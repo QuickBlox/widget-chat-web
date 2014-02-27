@@ -736,7 +736,7 @@ function createSignalingInstance() {
 }
 
 function makeVideoCall() {
-	var qbID = $(this).data('qb');
+	var html, qbID;
 	
 	params = {
 		audio: true,
@@ -746,7 +746,17 @@ function makeVideoCall() {
 	videoChat = new QBVideoChat(localVideo, remoteVideo, params, signaling);
 	videoChat.getUserMedia();
 	
-	$('#' + localVideo.id).show().after('<button onclick="callToUser(' + qbID + ')">Call to user</button>');
+	qbID = $(this).data('qb');
+	html = '<div class="popup-box">';
+	html += '<div class="popup-close">X</div>';
+	html += '<header class="popup-header">';
+	html += '<h3>Some Title Goes Here</h3>';
+	html += '</header><div class="popup-content">';
+	//html += 'Some more content, for when you want to add a little bit more';
+	//html += '</div></div>';
+	
+	$('video').wrapAll(html);
+	//$('#' + localVideo.id).show().after('<button onclick="callToUser(' + qbID + ')">Call to user</button>');
 }
 
 function callToUser(user_id) {
