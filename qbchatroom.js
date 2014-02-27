@@ -6,7 +6,7 @@
  */
 
 var params, connection, chatUser = {}, namesOccupants = {};
-var signaling, localVideo, remoteVideo;
+var signaling, videoChat, localVideo, remoteVideo;
 
 var switches = {
 	isComposing: {},
@@ -736,9 +736,7 @@ function createSignalingInstance() {
 }
 
 function makeVideoCall() {
-	var qbID, videoChat;
-	
-	qbID = $(this).data('qb');
+	var qbID = $(this).data('qb');
 	
 	params = {
 		audio: true,
