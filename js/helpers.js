@@ -23,7 +23,7 @@ function connectSuccess() {
 	$('.chats-list').append('<li class="list-item switch-chat" data-id="chat-room">Chat Room <span class="messages-count"></span></li>');
 	switches.isLogout = false;
 	createAnimatedLoadingUsers();
-	createAnimatedLoadingMessages();
+	createAnimatedLoadingMessages('.chat-content');
 }
 
 function signUpFailure() {
@@ -197,8 +197,8 @@ function createAnimatedLoadingUsers() {
 		$('#floatingCirclesG_users').append('<div class="f_circleG_users" id="frotateG_0'+i+'_users"></div>');
 }
 
-function createAnimatedLoadingMessages() {
-	$('.chat-content').append('<div class="loading_messages"><div id="floatingCirclesG_messages"></div></div>');
+function createAnimatedLoadingMessages(selector) {
+	$(selector).append('<div class="loading_messages"><div id="floatingCirclesG_messages"></div></div>');
 	for (var i = 1; i < 9; i++)
 		$('#floatingCirclesG_messages').append('<div class="f_circleG_messages" id="frotateG_0'+i+'_messages"></div>');
 }

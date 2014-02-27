@@ -765,6 +765,7 @@ function htmlVideoChatBuilder(name) {
 	centerPopup();
 	$(window).resize(centerPopup);
 	$(window).scroll(centerPopup);
+	createAnimatedLoadingMessages('.videochat-content');
 	$('#videochat, #videochat-overlay').show();
 }
 
