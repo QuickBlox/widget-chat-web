@@ -174,7 +174,7 @@ function QBVideoChat(localStreamElement, remoteStreamElement, constraints, signa
 	};
 	
 	this.onGetSessionDescriptionSuccessCallback = function(sessionDescription) {
-		traceVC('sessionDescriptionSuccessCallback: ' + sessionDescription);
+		console.log(sessionDescription);
 	    
 		self.pc.setLocalDescription(sessionDescription,
                                 
@@ -256,7 +256,7 @@ QBVideoChat.prototype.call = function(userID) {
 	
 	this.opponentID = userID;
 	
-	traceVC('Creating offer to peer... ' + this.pc);
+	console.log(this.pc);
 	this.pc.createOffer(this.onGetSessionDescriptionSuccessCallback, this.onCreateOfferFailureCallback);
 };
 
