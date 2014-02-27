@@ -613,7 +613,7 @@ fieldset {
 /* Video Chat */
 #videochat {
 	display: none;
-	position: absolute;
+	position: fixed;
 	font-size: 14px;
 	background: #fff;
 	border-radius: 5px;
