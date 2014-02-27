@@ -85,7 +85,7 @@ function QBVideoChat(localStreamElement, remoteStreamElement, constraints, signa
 	
 	// RTCPeerConnection creation
 	this.createRTCPeerConnection = function() {
-		traceVC("createRTCPeerConnection...");
+		traceVC("create RTCPeerConnection...");
 		try {
 			this.pc = new RTCPeerConnection(ICE_SERVERS);
 			this.pc.onicecandidate = this.onIceCandidateCallback;
@@ -95,6 +95,7 @@ function QBVideoChat(localStreamElement, remoteStreamElement, constraints, signa
 			this.pc.addStream(this.localStream);
    
 			traceVC('Created RTCPeerConnnection');
+			//console.log(this.pc);
 		} catch (e) {
 			traceVC('Failed to create RTCPeerConnection, exception: ' + e.message);
 			alert('Cannot create RTCPeerConnection object.');
@@ -174,8 +175,8 @@ function QBVideoChat(localStreamElement, remoteStreamElement, constraints, signa
 	};
 	
 	this.onGetSessionDescriptionSuccessCallback = function(sessionDescription) {
-		console.log(sessionDescription);
-	    
+		//console.log(sessionDescription);
+	  
 		self.pc.setLocalDescription(sessionDescription,
                                 
                                 function onSuccess() {
@@ -183,10 +184,10 @@ function QBVideoChat(localStreamElement, remoteStreamElement, constraints, signa
                                   self.localSessionDescription = sessionDescription;
                                   
                                   // ICE gathering starts work here
-                                  /*if (sessionDescription.type === 'offer')
+                                  if (sessionDescription.type === 'offer')
                                     self.sendCallRequest();
                                   else if (sessionDescription.type === 'answer')
-                                    self.sendAceptRequest();*/
+                                    self.sendAceptRequest();
                                 },
                                 
                                 function onError(error) {
@@ -251,12 +252,9 @@ function QBVideoChat(localStreamElement, remoteStreamElement, constraints, signa
 // Call to user  
 QBVideoChat.prototype.call = function(userID) {
 	traceVC("Call");
-	
 	if (this.localSessionDescription) return;
 	
 	this.opponentID = userID;
-	
-	console.log(this.pc);
 	this.pc.createOffer(this.onGetSessionDescriptionSuccessCallback, this.onCreateOfferFailureCallback);
 };
 

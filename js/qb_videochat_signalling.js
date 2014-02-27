@@ -118,7 +118,7 @@ function QBVideoChatSignaling() {
 // methods
 QBVideoChatSignaling.prototype.call = function(userID, sessionDescription, sessionID) {
 	traceS('call ' + userID);
-	this.sendMessage(userID, QBSignalingType.CALL, sessionDescription, sessionID);
+	//this.sendMessage(userID, QBSignalingType.CALL, sessionDescription, sessionID);
 };
 
 QBVideoChatSignaling.prototype.accept = function(userID, sessionDescription, sessionID) {
