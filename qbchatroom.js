@@ -52,7 +52,7 @@ $(document).ready(function() {
 		$('.chats-list').on('click', '.remove', removeChat);
 		$('.actions-wrap').on('click', '.btn_quote', makeQuote);
 		$('.actions-wrap').on('click', '.btn_private', createPrivateChat);
-		$('.actions-wrap').on('click', '.btn_videocall', onCall);
+		$('.actions-wrap').on('click', '.btn_videocall', makeVideoCall);
 		
 		$('#chats-wrap').on('keydown', '.send-message', sendMesage);
 	});
@@ -735,8 +735,10 @@ function createSignalingInstance() {
 	});
 }
 
-function onCall() {
+function makeVideoCall() {
 	var qbID, videoChat;
+	
+	qbID = $(this).data('qb');
 	
 	params = {
 		audio: true,
@@ -745,20 +747,26 @@ function onCall() {
 	
 	videoChat = new QBVideoChat(localVideo, remoteVideo, params, signaling);
 	videoChat.getUserMedia();
-	$('#' + localVideo.id).show();
 	
-	qbID = $(this).data('qb');
-	videoChat.call(qbID);
+	$('#' + localVideo.id).show().insertAfter('<button onclick="callToUser(' + qbID + ')">Call to user</button>');
+}
+
+function callToUser(user_id) {
+	videoChat.call(user_id);
+}
+
+function onCall() {
+	console.log('my onCall');
 }
 
 function onAccept() {
-	
+	console.log('my onAccept');
 }
 
 function onReject() {
-	
+	console.log('my onReject');
 }
 
 function onStop() {
-	
+	console.log('my onStop');
 }

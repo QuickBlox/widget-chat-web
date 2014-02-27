@@ -257,7 +257,7 @@ QBVideoChat.prototype.call = function(userID) {
 	this.opponentID = userID;
 	
 	traceVC('Creating offer to peer... ' + this.pc);
-  this.pc.createOffer(this.onGetSessionDescriptionSuccessCallback, this.onCreateOfferFailureCallback);
+	this.pc.createOffer(this.onGetSessionDescriptionSuccessCallback, this.onCreateOfferFailureCallback);
 };
 
 // Accept call from user 
