@@ -34,7 +34,7 @@ var QBVideoChatState = {
 	ACTIVE: 'active'
 };
 
-function QBVideoChat(localStreamElement, remoteStreamElement, constraints, signalingService) {
+function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signalingService) {
  	var self = this;
 	
   this.sessionID = new Date().getTime();

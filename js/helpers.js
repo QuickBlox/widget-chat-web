@@ -292,22 +292,23 @@ function setCallback(callback, name, type) {
 	connection.addHandler(callback, null, name, type, null, null);
 }
 
-function centerBox() {
-	var winWidth, winHeight, scrollPos, disWidth, disHeight, boxWidth = 800, fixHeight = 150;
+function centerPopup() {
+	var winWidth, winHeight, scrollPos, disWidth, disHeight, popupWidth = 800, fixHeight = 150;
 	
 	winWidth = $(window).width();
-	winHeight = $(document).height();
+	winHeight = $(window).height();
 	scrollPos = $(window).scrollTop();
 	
-	disWidth = (winWidth - boxWidth) / 2;
+	disWidth = (winWidth - popupWidth) / 2;
 	disHeight = scrollPos + fixHeight;
 	
-	$('#videochat').css({'width': boxWidth + 'px', 'top': disHeight + 'px', 'left': disWidth + 'px'});
+	$('#videochat').css({'width': popupWidth + 'px', 'top': disHeight + 'px', 'left': disWidth + 'px'});
 	$('#videochat-overlay').css({'width': winWidth + 'px', 'height': winHeight + 'px'});
 	
 	return false;
 }
 
-$('.videochat-close').click(function() {
-	$('#videochat, #videochat-overlay').hide();
-});
+function closeVideoChat() {
+	$('#videochat').hide();
+	$('#videochat-overlay').remove();
+}

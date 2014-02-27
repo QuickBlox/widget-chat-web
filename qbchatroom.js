@@ -23,9 +23,6 @@ $(document).ready(function() {
 			status: false
 		});
 		
-		localVideo = $('#localVideo')[0];
-		remoteVideo = $('#remoteVideo')[0];
-		
 		autoLogin();
 		subscribeFBStatusEvent();
 		changeInputFileBehavior();
@@ -42,6 +39,7 @@ $(document).ready(function() {
 		$('.smiles-list img').click(choseSmile);
 		
 		$('#chats-wrap').on('click', '.logout', logout);
+		$('#chats-wrap').on('keydown', '.send-message', sendMesage);
 		$('#chats-wrap').on('click', '.show-actions', showActionToolbar);
 		$('#chats-wrap').on('click', '.users', {list: '.users-list'}, showList);
 		$('#chats-wrap').on('click', '.chats', {list: '.chats-list'}, showList);
@@ -52,9 +50,8 @@ $(document).ready(function() {
 		$('.chats-list').on('click', '.remove', removeChat);
 		$('.actions-wrap').on('click', '.btn_quote', makeQuote);
 		$('.actions-wrap').on('click', '.btn_private', createPrivateChat);
-		$('.actions-wrap').on('click', '.btn_videocall', makeVideoCall);
-		
-		$('#chats-wrap').on('keydown', '.send-message', sendMesage);
+		$('.actions-wrap').on('click', '.btn_videocall', makeVideoChat);
+		$('#videochat').on('click', '.videochat-close', closeVideoChat);
 	});
 });
 
@@ -735,27 +732,40 @@ function createSignalingInstance() {
 	});
 }
 
-function makeVideoCall() {
-	var qbID;
-	
-	params = {
-		audio: true,
-		video: true
-	};
-	
-	videoChat = new QBVideoChat(localVideo, remoteVideo, params, signaling);
-	videoChat.getUserMedia();
+function makeVideoChat() {
+	var qbID, name;
 	
 	qbID = $(this).data('qb');
+	name = namesOccupants[qbID];
+	// TODO: Here is need to put a "if block" for checking of existing users
 	
-	$('body').append('<div id="videochat-overlay"></div>');
-	centerBox();
-	$(window).resize(centerBox);
-	$(window).scroll(centerBox);
+	htmlVideoChatBuilder(name);
+	localVideo = $('#localVideo')[0];
+	remoteVideo = $('#remoteVideo')[0];
 	
-	$('#videochat, #videochat-overlay').show();
+	videoChat = new QBVideoChat({audio: true, video: true}, localVideo, remoteVideo, signaling);
+	videoChat.getUserMedia();
 	
 	//$('#' + localVideo.id).show().after('<button onclick="callToUser(' + qbID + ')">Call to user</button>');
+}
+
+function htmlVideoChatBuilder(name) {
+	var html;
+	
+	html = '<div class="videochat-close">X</div>';
+	html += '<header class="videochat-header">';
+	html += '<h3>Call to ' + name + '</h3></header>';
+	html += '<div class="videochat-content">';
+	html += '<video id="localVideo" autoplay></video>';
+	html += '<video id="remoteVideo" class="hidden" autoplay></video>';
+	html += '</div>';
+	
+	$('#videochat').html(html).after('<div id="videochat-overlay"></div>');
+	
+	centerPopup();
+	$(window).resize(centerPopup);
+	$(window).scroll(centerPopup);
+	$('#videochat, #videochat-overlay').show();
 }
 
 function callToUser(user_id) {

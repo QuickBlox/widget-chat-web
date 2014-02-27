@@ -610,11 +610,10 @@ fieldset {
 					color: #000;
 				}
 				
-/* Video Chat */
+/* Video Chat
+----------------------------------------------------------*/
 #videochat {
-	display: none;
 	position: fixed;
-	font-size: 14px;
 	background: #fff;
 	border-radius: 5px;
 	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
@@ -624,7 +623,7 @@ fieldset {
 		position: absolute;
 		top: 0;
 		right: 0;
-		padding: 20px;
+		padding: 10px;
 		font-weight: bold;
 		font-size: 20px;
 		color: #434343;
@@ -634,22 +633,20 @@ fieldset {
 		color: #000;
 	}
 	#videochat .videochat-header {
-		padding: 20px;
+		padding: 11px;
 	}
 		#videochat .videochat-header h3 {
-			padding: 0;
-			margin: 0;
 			font-size: 18px;
 		}
 	#videochat .videochat-content {
-		padding: 20px;
+		font-size: 14px;
 		background: #eee;
 		border-top: 1px solid #e5e5e5;
 		border-bottom-left-radius: 5px;
 		border-bottom-right-radius: 5px;
 	}
 		#videochat .videochat-content video {
-			width: 760px;
+			width: 800px;
 		}
 #videochat-overlay {
 	display: none;
