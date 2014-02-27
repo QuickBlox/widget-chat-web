@@ -736,7 +736,7 @@ function createSignalingInstance() {
 }
 
 function makeVideoCall() {
-	var html, qbID;
+	var qbID;
 	
 	params = {
 		audio: true,
@@ -747,15 +747,16 @@ function makeVideoCall() {
 	videoChat.getUserMedia();
 	
 	qbID = $(this).data('qb');
-	html = '<div class="popup-box">';
-	html += '<div class="popup-close">X</div>';
-	html += '<header class="popup-header">';
-	html += '<h3>Some Title Goes Here</h3>';
-	html += '</header><div class="popup-content">';
-	//html += 'Some more content, for when you want to add a little bit more';
-	//html += '</div></div>';
 	
-	$('video').wrapAll(html);
+	$('body').append('<div id="videochat-overlay"></div>');
+	centerBox();
+	$(window).resize(centerBox);
+	$(window).scroll(centerBox);
+	
+	$('#videochat, #videochat-overlay').show();
+	$('html, body').css('overflow', 'hidden');
+	$('html').scrollTop($(window).scrollTop());
+	
 	//$('#' + localVideo.id).show().after('<button onclick="callToUser(' + qbID + ')">Call to user</button>');
 }
 

@@ -611,6 +611,49 @@ fieldset {
 				}
 				
 /* Video Chat */
-video {
+#videochat {
 	display: none;
+	position: absolute;
+	font-size: 14px;
+	background: #fff;
+	border-radius: 5px;
+	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+	z-index: 9999999;
+}
+	#videochat .videochat-close {
+		position: absolute;
+		top: 0;
+		right: 0;
+		padding: 20px;
+		font-weight: bold;
+		font-size: 20px;
+		color: #434343;
+		cursor: pointer;
+	}
+	#videochat .videochat-close:hover {
+		color: #000;
+	}
+	#videochat .videochat-header {
+		padding: 20px;
+	}
+		#videochat .videochat-header h3 {
+			padding: 0;
+			margin: 0;
+			font-size: 18px;
+		}
+	#videochat .videochat-content {
+		padding: 20px;
+		background: #eee;
+		border-top: 1px solid #e5e5e5;
+		border-bottom-left-radius: 5px;
+		border-bottom-right-radius: 5px;
+	}
+#videochat-overlay {
+	display: none;
+	overflow: hidden;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background: rgba(0, 0, 0, 0.3);
+	z-index: 999999;
 }

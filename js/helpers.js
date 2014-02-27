@@ -291,3 +291,27 @@ function checkTypeChatState(jid, type) {
 function setCallback(callback, name, type) {
 	connection.addHandler(callback, null, name, type, null, null);
 }
+
+function centerBox() {
+	var winWidth, winHeight, scrollPos, disWidth, disHeight, boxWidth = 400, fixHeight = 150;
+	
+	winWidth = $(window).width();
+	winHeight = $(document).height();
+	scrollPos = $(window).scrollTop();
+	
+	disWidth = (winWidth - boxWidth) / 2;
+	disHeight = scrollPos + fixHeight;
+	
+	$('#videochat').css({'width': boxWidth + 'px', 'top': disHeight + 'px', 'left': disWidth + 'px'});
+	$('#videochat-overlay').css({'width': winWidth + 'px', 'height': winHeight + 'px'});
+	
+	return false;
+}
+
+$('.videochat-close').click(function() {
+	var scrollPos = $(window).scrollTop();
+	
+	$('#videochat, #videochat-overlay').hide();
+	$('html, body').css('overflow', 'auto');
+	$('html').scrollTop(scrollPos);
+});

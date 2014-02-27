@@ -117,8 +117,16 @@
 		<source src="audio/signal.mp3"></source>
 	</audio>
 	
-	<video id="localVideo" autoplay></video>
-	<video id="remoteVideo" autoplay></video>
+	<div id="videochat">
+		<div class="videochat-close">X</div>
+		<header class="videochat-header">
+			<h3></h3>
+		</header>
+		<div class="videochat-content">
+			<video id="localVideo" autoplay></video>
+			<video id="remoteVideo" autoplay></video>
+		</div>
+	</div>
 	
 	<script src="js/libs/quickblox.js"></script>
 	<script src="js/libs/strophe.js"></script>
