@@ -748,7 +748,7 @@ function makeVideoCall() {
 	videoChat = new QBVideoChat(localVideo, remoteVideo, params, signaling);
 	videoChat.getUserMedia();
 	
-	$('#' + localVideo.id).show().insertAfter('<button onclick="callToUser(' + qbID + ')">Call to user</button>');
+	$('#' + localVideo.id).show().after('<button onclick="callToUser(' + qbID + ')">Call to user</button>');
 }
 
 function callToUser(user_id) {
