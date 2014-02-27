@@ -746,7 +746,7 @@ function onCall() {
 	videoChat = new QBVideoChat(localVideo, remoteVideo, params, signaling);
 	videoChat.getUserMedia();
 	
-	$(localVideo.id).show();
+	$('#' + localVideo.id).show();
 }
 
 function onAccept() {
