@@ -304,7 +304,7 @@ function centerPopup() {
 	
 	$('#videochat').css({'width': popupWidth + 'px', 'top': disHeight + 'px', 'left': disWidth + 'px'});
 	$('#videochat-overlay').css({'width': winWidth + 'px', 'height': winHeight + 'px'});
-	$('#videochat video').css('width': popupWidth + 'px');
+	$('#videochat video').css('width', popupWidth + 'px');
 	
 	return false;
 }
