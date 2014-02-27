@@ -293,7 +293,7 @@ function setCallback(callback, name, type) {
 }
 
 function centerPopup() {
-	var winWidth, winHeight, popupWidth, disWidth, disHeight, fixWidthRatio = 0.625, fixHeightRatio = 0.17;
+	var winWidth, winHeight, popupWidth, disWidth, disHeight, fixWidthRatio = 0.625, fixHeightRatio = 0.15;
 	
 	winWidth = $(window).width();
 	winHeight = $(window).height();
