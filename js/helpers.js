@@ -287,3 +287,7 @@ function checkTypeChatState(jid, type) {
 	else
 		connection.chatstates[type](CHAT.roomJID, 'groupchat');
 }
+
+function setCallback(callback, name, type) {
+	connection.addHandler(callback, null, name, type, null, null);
+}

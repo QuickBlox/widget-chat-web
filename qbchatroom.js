@@ -320,8 +320,9 @@ function connectChat(chatUser) {
 		case Strophe.Status.CONNECTED:
 			console.log('[Connection] Connected');
 			connectSuccess();
+			createSignalingInstance();
 			
-			connection.addHandler(getMessage, null, 'message', 'chat');
+			setCallback(getMessage, 'message', 'chat');
 			connection.muc.join(CHAT.roomJID, chatUser.qbID, getMessage, getPresence, getRoster);
 			
 			localStorage['QBChatUser'] = JSON.stringify(chatUser);
@@ -715,14 +716,37 @@ function htmlChatBuilder(qbID, fbID, name, chatID, isOwner) {
 	obj.find('.chat-content').empty();
 }
 
+/* WebRTC Module
+-------------------------------------------------------------------------*/
+function createSignalingInstance() {
+	var signaling, videoChat, localVideo, remoteVideo;
+	
+	params = {
+		video: true,
+		audio: true
+	};
+	
+	signaling = new QBVideoChatSignaling();
+	signaling.addOnCallCallback(onCall);
+	signaling.addOnAcceptCallback(onAccept);
+	signaling.addOnRejectCallback(onReject);
+	
+	// set WebRTC callbacks
+	$(Object.keys(QBSignalingType)).each(function() {
+		setCallback(signaling.onMessage, 'message', QBSignalingType[this]);
+	});
+	
+	localVideo = $('#localVideo')[0];
+	remoteVideo = $('#remoteVideo')[0];
+	videoChat = new QBVideoChat(localVideo, remoteVideo, params, signaling);
+}
+
 function makeVideoCall() {
 	getUserMedia({audio: true, video: true}, successCall, errorCall);
 	
 	function successCall(stream) {
 		console.log(stream);
-		var video = $('#localVideo')[0];
-		
-		attachMediaStream(video, stream);
+		attachMediaStream(localVideo, stream);
 	}
 	
 	function errorCall(err) {

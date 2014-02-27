@@ -1,9 +1,27 @@
-/*
+/**
  * QuickBlox VideoChat WebRTC library
- * version 0.02
+ * version 0.1.0
  *
  * Author: Igor Khomenko (igor@quickblox.com)
  *
+ */
+
+/*
+  Public methods:
+    - call(userID)
+    - accept(userID)
+    - reject(userID)
+    - stop(userID)
+  
+  Public callbacks:
+    - onConnectionSuccess(user_id)
+    - onConnectionFailed(error)
+    - onConnectionDisconnected()
+    - onCall(fromUserID, sessionDescription)
+    - onAccept(fromUserID, sessionDescription)
+    - onReject(fromUserID)
+    - onCandidate(fromUserID, candidate)
+    - onStop(fromUserID, reason)
  */
 
 // STUN/TURN servers
@@ -27,24 +45,6 @@ var VIDEOCHAT_STATE = {
                         ESTABLISHING  : 'ESTABLISHING',
                         ACTIVE        : 'ACTIVE'
 };
-
-/*
-  Public methods:
-  	- call(userID)
-  	- accept(userID)
-  	- reject(userID)
-    - stop(userID)
-
-  Public callbacks:
-   	- onConnectionSuccess(user_id)
-	- onConnectionFailed(error)
-	- onConnectionDisconnected()
-	- onCall(fromUserID, sessionDescription)
-	- onAccept(fromUserID, sessionDescription)
-	- onReject(fromUserID)
-	- onCandidate(fromUserID, candidate)
-	- onStop(fromUserID, reason)
- */
 
 function QBVideoChat(localStreamElement, remoteStreamElement, constraints, signalingService){
  	traceVC("QBVideoChat INIT");
