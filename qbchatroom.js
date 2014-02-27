@@ -722,14 +722,15 @@ function createSignalingInstance() {
 	var signaling, videoChat, localVideo, remoteVideo;
 	
 	params = {
-		video: true,
-		audio: true
+		audio: true,
+		video: true
 	};
 	
 	signaling = new QBVideoChatSignaling();
 	signaling.addOnCallCallback(onCall);
 	signaling.addOnAcceptCallback(onAccept);
 	signaling.addOnRejectCallback(onReject);
+	signaling.addOnStopCallback(onStop);
 	
 	// set WebRTC callbacks
 	$(Object.keys(QBSignalingType)).each(function() {
@@ -752,4 +753,20 @@ function makeVideoCall() {
 	function errorCall(err) {
 		console.log(err);
 	}
+}
+
+function onCall() {
+	
+}
+
+function onAccept() {
+	
+}
+
+function onReject() {
+	
+}
+
+function onStop() {
+	
 }
