@@ -236,6 +236,8 @@ QBVideoChat.prototype.call = function(userID) {
 	if (this.localSessionDescription) return;
 	
 	this.opponentID = userID;
+	console.log(userID);
+	console.log(this.opponentID);
 	this.pc.createOffer(this.onGetSessionDescriptionSuccessCallback, this.onCreateOfferFailureCallback);
 };
 
