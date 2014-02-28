@@ -102,7 +102,6 @@ function QBVideoChatSignaling() {
 
 // methods
 QBVideoChatSignaling.prototype.call = function(userID, sessionDescription, sessionID) {
-	console.log(userID);
 	traceS('call to ' + userID);
 	this.sendMessage(userID, QBSignalingType.CALL, sessionDescription, sessionID);
 };

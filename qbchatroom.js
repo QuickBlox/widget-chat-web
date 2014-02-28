@@ -737,9 +737,6 @@ function makeVideoChat(event, userID, sessionID, sessionDescription) {
 	var qbID, name;
 	
 	qbID = userID || $(this).data('qb');
-	console.log(userID);
-	console.log($(this).data('qb'));
-	console.log(qbID);
 	name = namesOccupants[qbID] || 'Test user';
 	// TODO: Here is need to put a "if block" for checking of existing users
 	
@@ -782,7 +779,6 @@ function callToUser() {
 	var qbID = $(this).data('qb');
 	
 	$(this).hide().next().show();
-	console.log(qbID);
 	videoChat.call(qbID);
 }
 

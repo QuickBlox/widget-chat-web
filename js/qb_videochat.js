@@ -112,7 +112,7 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 	this.onIceCandidateCallback = function(event) {
 		var candidate = event.candidate;
 	
-		traceVC('iceGatheringState: ' + event.target.iceGatheringState);
+		//traceVC('iceGatheringState: ' + event.target.iceGatheringState);
 	
 		/*if (candidate) {
 			var iceData = {sdpMLineIndex: candidate.sdpMLineIndex,
@@ -236,8 +236,6 @@ QBVideoChat.prototype.call = function(userID) {
 	if (this.localSessionDescription) return;
 	
 	this.opponentID = userID;
-	console.log(userID);
-	console.log(this.opponentID);
 	this.pc.createOffer(this.onGetSessionDescriptionSuccessCallback, this.onCreateOfferFailureCallback);
 };
 
