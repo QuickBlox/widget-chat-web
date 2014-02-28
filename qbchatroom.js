@@ -733,7 +733,7 @@ function createSignalingInstance() {
 	});
 }
 
-function makeVideoChat(userID, sessionID, sessionDescription) {
+function makeVideoChat(event, userID, sessionID, sessionDescription) {
 	var qbID, name;
 	
 	qbID = userID || $(this).data('qb');
