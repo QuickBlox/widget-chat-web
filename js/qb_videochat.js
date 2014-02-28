@@ -148,38 +148,14 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 		traceVC('Remote stream removed: ' + event);
 	};
 	
-	// set Remote description
-	this.setRemoteDescription = function(descriptionSDP, descriptionType) {
-		var sessionDescription = new RTCSessionDescription({sdp: descriptionSDP, type: descriptionType});
-		//traceVC('setRemoteDescription: ' + descriptionSDP + ', pc:' + this.pc);
-	
-		this.pc.setRemoteDescription(sessionDescription,
-			function onSuccess() {
-				traceVC("Added remote description");
-				if (sessionDescription.type === 'offer') {
-						traceVC('Creating answer to peer...');
-						self.pc.createAnswer(self.onGetSessionDescriptionSuccessCallback, self.onCreateAnswerFailureCallback, SDP_CONSTRAINTS);
-				}
-			},
-			function onError(error) {
-				traceVC('setRemoteDescription error: ' + error);
-			}
-		);
-		
-		// send candidates
-		for (var i=0; i<this.candidatesQueue.length; i++) {
-			var candidate = this.candidatesQueue.pop();
-			self.signalingService.sendCandidate(self.opponentID, candidate, self.sessionID);
-		}
-	};
-	
+	// set Local description
 	this.onGetSessionDescriptionSuccessCallback = function(sessionDescription) {
 		//console.log(sessionDescription);
 		
 		self.pc.setLocalDescription(sessionDescription,
                                 
                                 function onSuccess() {
-                                  traceVC('setLocalDescription success');
+                                  traceVC('Set LocalDescription success');
                                   self.localSessionDescription = sessionDescription;
                                   
                                   // ICE gathering starts work here
@@ -190,12 +166,40 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
                                 },
                                 
                                 function onError(error) {
-                                  traceVC('setLocalDescription error: ' + error);
-                                });
+                                  traceVC('Set LocalDescription error: ' + error);
+                                }
+		);
 	};
 
 	this.onCreateOfferFailureCallback = function(event) {
 		traceVC('createOffer() error: ', event);
+	};
+	
+	// set Remote description
+	this.setRemoteDescription = function(descriptionSDP, descriptionType) {
+		var sessionDescription, candidate;
+		
+		sessionDescription = new RTCSessionDescription({sdp: descriptionSDP, type: descriptionType});
+		
+		this.pc.setRemoteDescription(sessionDescription,
+                                 
+                                 function onSuccess() {
+                                   traceVC("Set RemoteDescription success");
+                                   
+                                   if (sessionDescription.type === 'offer')
+                                     self.pc.createAnswer(self.onGetSessionDescriptionSuccessCallback, self.onCreateAnswerFailureCallback, SDP_CONSTRAINTS);
+                                 },
+                                 
+                                 function onError(error) {
+                                   traceVC('Set RemoteDescription error: ' + error);
+                                 }
+		);
+		
+		// send candidates
+		for (var i = 0; i < this.candidatesQueue.length; i++) {
+			candidate = this.candidatesQueue.pop();
+			self.signalingService.sendCandidate(self.opponentID, candidate, self.sessionID);
+		}
 	};
 	
 	this.onCreateAnswerFailureCallback = function(event) {
