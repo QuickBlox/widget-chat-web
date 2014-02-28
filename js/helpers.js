@@ -299,11 +299,13 @@ function centerPopup(selector, isControls) {
 	winHeight = $(window).height();
 	
 	popupWidth = winWidth * fixWidthRatio;
+	remoteVideoWidth = popupWidth * 0.25; // fix for remote video
 	disWidth = (winWidth - popupWidth) / 2;
 	disHeight = winHeight * fixHeightRatio;
 	
 	$(selector).css({'width': popupWidth + 'px', 'top': disHeight + 'px', 'left': disWidth + 'px'});
-	$(selector).find('video').css('width', popupWidth + 'px');
+	$(selector).find('#localVideo').css('width', popupWidth + 'px');
+	$(selector).find('#remoteVideo').css('width', remoteVideoWidth + 'px');
 	$('#videochat-overlay').css({'width': winWidth + 'px', 'height': winHeight + 'px'});
 	
 	return false;

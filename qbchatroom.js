@@ -763,7 +763,7 @@ function htmlVideoChatBuilder(qbID, name) {
 	html += '<h3>Video chat with ' + name + '</h3></header>';
 	html += '<div class="popup-content">';
 	html += '<video id="localVideo" autoplay></video>';
-	html += '<video id="remoteVideo" class="hidden" autoplay></video>';
+	html += '<video id="remoteVideo" autoplay></video>';
 	html += '<button class="doCall hidden" data-qb="' + qbID + '">Call to user</button>';
 	html += '<button class="stopCall hidden">Hang up</button>';
 	html += '</div>';

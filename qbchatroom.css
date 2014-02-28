@@ -644,6 +644,7 @@ fieldset {
 			text-overflow: ellipsis;
 		}
 	.popup .popup-content {
+		position: relative;
 		font-size: 14px;
 		background: #ececec;
 		border-top: 1px solid #d4d4d4;
@@ -654,6 +655,11 @@ fieldset {
 		}
 		#videochat .popup-content button {
 			margin: 10px;
+		}
+		#videocha #remoteVideo {
+			position: absolute;
+			right: 0;
+			bottom: 44px;
 		}
 
 #remoteCallControls {
