@@ -624,11 +624,12 @@ fieldset {
 		padding: 10px;
 		font-weight: bold;
 		font-size: 20px;
-		color: #434343;
+		color: #fff;
 		cursor: pointer;
+		opacity: 0.4;
 	}
 	.popup .popup-close:hover {
-		color: #000;
+		opacity: 1;
 	}
 	.popup .popup-header {
 		padding: 11px;
@@ -636,6 +637,10 @@ fieldset {
 	}
 		.popup .popup-header h3 {
 			font-size: 18px;
+			font-weight: normal;
+			color: #fff;
+			white-space: nowrap;
+			text-overflow: ellipsis;
 		}
 	.popup .popup-content {
 		font-size: 14px;
