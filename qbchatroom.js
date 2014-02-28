@@ -23,7 +23,7 @@ $(document).ready(function() {
 			status: false
 		});
 		
-		rind = $('#ring')[0];
+		ring = $('#ring')[0];
 		
 		autoLogin();
 		subscribeFBStatusEvent();
