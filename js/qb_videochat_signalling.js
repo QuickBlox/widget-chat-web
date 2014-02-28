@@ -92,10 +92,9 @@ function QBVideoChatSignaling() {
 	};
 	
 	this.sendMessage = function(userID, type, data, sessionID) {
-		var opponentJID, body, reply;
+		var opponentJID, reply;
 		
 		opponentJID = getJID(userID);
-		body = data ? data : '';
 		
 		params = {
 			to: opponentJID,
@@ -103,7 +102,7 @@ function QBVideoChatSignaling() {
 			type: type
 		};
 		
-		reply = $msg(params).c('body').t(body);
+		reply = $msg(params).c('body').t(data).up().c('session').t(sessionID);
 		connection.send(reply);
 	};
 
