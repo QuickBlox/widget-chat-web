@@ -656,7 +656,7 @@ fieldset {
 		#videochat .popup-content button {
 			margin: 10px;
 		}
-		#videochat #remoteVideo {
+		#videochat .smallVideo {
 			position: absolute;
 			right: 0;
 			bottom: 44px;

@@ -293,19 +293,20 @@ function setCallback(callback, name, type) {
 }
 
 function centerPopup(selector, isControls) {
-	var winWidth, winHeight, popupWidth, disWidth, disHeight, fixWidthRatio = isControls ? 0.25 : 0.625, fixHeightRatio = isControls ? 0.4 : 0.1;
+	var winWidth, winHeight, popupWidth, disWidth, disHeight;
+	var fixWidthRatio = isControls ? 0.25 : 0.625, fixHeightRatio = isControls ? 0.4 : 0.1, fixRemoteWidth = 0.25;
 	
 	winWidth = $(window).width();
 	winHeight = $(window).height();
-	
 	popupWidth = winWidth * fixWidthRatio;
-	remoteVideoWidth = popupWidth * 0.25; // fix for remote video
+	
 	disWidth = (winWidth - popupWidth) / 2;
 	disHeight = winHeight * fixHeightRatio;
+	remoteVideoWidth = popupWidth * fixRemoteWidth;
 	
 	$(selector).css({'width': popupWidth + 'px', 'top': disHeight + 'px', 'left': disWidth + 'px'});
-	$(selector).find('#localVideo').css('width', popupWidth + 'px');
-	$(selector).find('#remoteVideo').css('width', remoteVideoWidth + 'px');
+	$(selector).find('.fullVideo').css('width', popupWidth + 'px');
+	$(selector).find('.smallVideo').css('width', remoteVideoWidth + 'px');
 	$('#videochat-overlay').css({'width': winWidth + 'px', 'height': winHeight + 'px'});
 	
 	return false;

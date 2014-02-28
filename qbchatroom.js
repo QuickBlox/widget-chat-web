@@ -762,8 +762,8 @@ function htmlVideoChatBuilder(qbID, name) {
 	html += '<header class="popup-header">';
 	html += '<h3>Video chat with ' + name + '</h3></header>';
 	html += '<div class="popup-content">';
-	html += '<video id="localVideo" autoplay></video>';
-	html += '<video id="remoteVideo" autoplay></video>';
+	html += '<video id="localVideo" class="fullVideo" autoplay></video>';
+	html += '<video id="remoteVideo" class="smallVideo" autoplay></video>';
 	html += '<button class="doCall hidden" data-qb="' + qbID + '">Call to user</button>';
 	html += '<button class="stopCall hidden">Hang up</button>';
 	html += '</div>';
@@ -778,8 +778,8 @@ function htmlVideoChatBuilder(qbID, name) {
 }
 
 function doCall() {
-	var qbID = $(this).data('qb');
-	
+	var qbID;
+	qbID = $(this).data('qb');
 	$(this).hide().next().show();
 	videoChat.call(qbID);
 }
@@ -797,7 +797,6 @@ function acceptCall() {
 
 function rejectCall() {
 	var qbID;
-	
 	qbID = $(this).parents('.remoteCall').data('qb');
 	closeCall(qbID);
 }
@@ -805,11 +804,13 @@ function rejectCall() {
 // callbacks
 function getMediaSuccess(qbID, sessionDescription) {
 	$('.loading_messages').remove();
-	$('.doCall').show();
 	
 	if (sessionDescription) {
+		$('.stopCall').show();
 		videoChat.remoteSessionDescription = sessionDescription;
 		videoChat.accept(qbID);
+	} else {
+		$('.doCall').show();
 	}
 }
 
@@ -840,8 +841,10 @@ function onCall(qbID, sessionDescription, sessionID) {
 	$('#remoteCallControls, #videochat-overlay').show();
 }
 
-function onAccept() {
-	console.log('my onAccept');
+function onAccept(qbID) {
+	console.log('onAccept from ' + qbID);
+	$('#localVideo').addClass('smallVideo').removeClass('fullVideo');
+	$('#remoteVideo').addClass('fullVideo').removeClass('smallVideo');
 }
 
 function onReject() {

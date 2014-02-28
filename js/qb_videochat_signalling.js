@@ -56,11 +56,9 @@ function QBVideoChatSignaling() {
 			break;
 		case QBSignalingType.ACCEPT:
 			for (var i = 0; i < self.onAcceptCallbacks.length; i++) {
-				console.log(self.onAcceptCallbacks.length);
-				console.log(self.onAcceptCallbacks);
 				callback = self.onAcceptCallbacks[i];
 				if (typeof(callback) === "function")
-					callback(body);
+					callback(qbID, body);
 			}
 			break;
 		case QBSignalingType.REJECT:
