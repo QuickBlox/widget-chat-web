@@ -792,16 +792,16 @@ function getMediaError() {
 	closeVideoChat();
 }
 
-function onCall(userID, sessionID, sessionDescription) {
-	console.log(userID);
+function onCall(userID, sessionDescription) {
 	console.log('onCall from ' + userID);
 	$('#ring')[0].play();
 	
-	makeVideoChat(userID, sessionID, sessionDescription);
+	videoChat.remoteSessionDescription = sessionDescription;
 }
 
 function onAccept() {
 	console.log('my onAccept');
+	makeVideoChat(userID, sessionID, sessionDescription);
 }
 
 function onReject() {

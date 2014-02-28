@@ -53,7 +53,7 @@ function QBVideoChatSignaling() {
 		
 		switch (type) {
 		case QBSignalingType.CALL:
-			self.onCallCallback(qbID, sessionID, body);
+			self.onCallCallback(qbID, body);
 			break;
 		case QBSignalingType.ACCEPT:
 			for (var i = 0; i < self.onAcceptCallbacks.length; i++) {
@@ -102,6 +102,7 @@ function QBVideoChatSignaling() {
 
 // methods
 QBVideoChatSignaling.prototype.call = function(userID, sessionDescription, sessionID) {
+	console.log(userID);
 	traceS('call to ' + userID);
 	this.sendMessage(userID, QBSignalingType.CALL, sessionDescription, sessionID);
 };
