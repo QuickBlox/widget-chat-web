@@ -760,7 +760,7 @@ function htmlVideoChatBuilder(qbID, name) {
 	
 	html = '<div class="stopCall popup-close">X</div>';
 	html += '<header class="popup-header">';
-	html += '<h3>Call to ' + name + '</h3></header>';
+	html += '<h3>Video chat with ' + name + '</h3></header>';
 	html += '<div class="popup-content">';
 	html += '<video id="localVideo" autoplay></video>';
 	html += '<video id="remoteVideo" class="hidden" autoplay></video>';
@@ -770,9 +770,9 @@ function htmlVideoChatBuilder(qbID, name) {
 	
 	$('#videochat').html(html).after('<div id="videochat-overlay"></div>');
 	
-	centerPopup('#videochat');
-	$(window).resize(centerPopup('#videochat'));
-	$(window).scroll(centerPopup('#videochat'));
+	centerPopup('#videochat', false);
+	$(window).resize(centerPopup('#videochat', false));
+	$(window).scroll(centerPopup('#videochat', false));
 	createAnimatedLoadingMessages('#videochat .popup-content');
 	$('#videochat, #videochat-overlay').show();
 }
@@ -789,7 +789,8 @@ function acceptCall() {
 }
 
 function rejectCall() {
-	
+	$('#remoteCallControls').hide();
+	$('#videochat-overlay').remove();
 }
 
 // callbacks
