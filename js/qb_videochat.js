@@ -180,6 +180,7 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 		traceVC('RemoteDescription...');
 		var sessionDescription, candidate;
 		
+		this.state = QBVideoChatState.ESTABLISHING;
 		sessionDescription = new RTCSessionDescription({sdp: descriptionSDP, type: descriptionType});
 		
 		this.pc.setRemoteDescription(sessionDescription,
@@ -240,9 +241,6 @@ QBVideoChat.prototype.call = function(userID) {
 // Accept call from user 
 QBVideoChat.prototype.accept = function(userID) {
 	this.opponentID = userID;
-	this.state = QBVideoChatState.ESTABLISHING;
-	
-	// set remote description here
 	this.setRemoteDescription(this.remoteSessionDescription, "offer");
 };
 
