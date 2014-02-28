@@ -790,6 +790,7 @@ function stopCall() {
 	qbID = $(this).data('qb');
 	closeVideoChat();
 	videoChat.stop(qbID);
+	videoChat = null;
 }
 
 function acceptCall() {
@@ -854,6 +855,7 @@ function onCall(qbID, sessionDescription, sessionID) {
 
 function onStop() {
 	closeVideoChat();
+	videoChat = null;
 }
 
 function onAccept(qbID) {
