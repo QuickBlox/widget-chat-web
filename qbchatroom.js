@@ -758,10 +758,10 @@ function makeVideoChat(event, userID, sessionID, sessionDescription) {
 function htmlVideoChatBuilder(qbID, name) {
 	var html;
 	
-	html = '<div class="stopCall videochat-close">X</div>';
-	html += '<header class="videochat-header">';
+	html = '<div class="stopCall popup-close">X</div>';
+	html += '<header class="popup-header">';
 	html += '<h3>Call to ' + name + '</h3></header>';
-	html += '<div class="videochat-content">';
+	html += '<div class="popup-content">';
 	html += '<video id="localVideo" autoplay></video>';
 	html += '<video id="remoteVideo" class="hidden" autoplay></video>';
 	html += '<button class="doCall hidden" data-qb="' + qbID + '">Call to user</button>';
@@ -773,7 +773,7 @@ function htmlVideoChatBuilder(qbID, name) {
 	centerPopup('#videochat');
 	$(window).resize(centerPopup('#videochat'));
 	$(window).scroll(centerPopup('#videochat'));
-	createAnimatedLoadingMessages('.videochat-content');
+	createAnimatedLoadingMessages('#videochat .popup-content');
 	$('#videochat, #videochat-overlay').show();
 }
 
@@ -804,15 +804,19 @@ function getMediaError() {
 
 function onCall(userID, sessionDescription) {
 	console.log('onCall from ' + userID);
-	var html, rind = $('#ring')[0];
+	var html, name, rind = $('#ring')[0];
 	
+	name = namesOccupants[qbID] || 'Test user';
 	//videoChat.remoteSessionDescription = sessionDescription;
 	ring.play();
 	
 	html = '<div class="remoteCall" data-qb="' + userID + '">';
+	html += '<header class="popup-header">';
+	html += '<h3>Call from ' + name + '</h3></header>';
+	html += '<div class="popup-content">';
 	html += '<button class="acceptCall">Accept call</button>';
 	html += '<button class="rejectCall">Reject call</button>';
-	html += '</div>';
+	html += '</div></div>';
 	
 	$('#remoteCallControls').append(html).after('<div id="videochat-overlay"></div>');
 	

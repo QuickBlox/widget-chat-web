@@ -614,12 +614,10 @@ fieldset {
 ----------------------------------------------------------*/
 .popup {
 	position: fixed;
-	background: #fff;
-	border-radius: 5px;
 	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
 	z-index: 2000;
 }
-	#videochat .videochat-close {
+	.popup .popup-close {
 		position: absolute;
 		top: 0;
 		right: 0;
@@ -629,25 +627,27 @@ fieldset {
 		color: #434343;
 		cursor: pointer;
 	}
-	#videochat .videochat-close:hover {
+	.popup .popup-close:hover {
 		color: #000;
 	}
-	#videochat .videochat-header {
+	.popup .popup-header {
 		padding: 11px;
+		background: #0077cb;
 	}
-		#videochat .videochat-header h3 {
+		.popup .popup-header h3 {
 			font-size: 18px;
 		}
-	#videochat .videochat-content {
+	.popup .popup-content {
 		font-size: 14px;
-		background: #eee;
-		border-top: 1px solid #e5e5e5;
-		border-bottom-left-radius: 5px;
-		border-bottom-right-radius: 5px;
+		background: #ececec;
+		border-top: 1px solid #d4d4d4;
 	}
-		#videochat .videochat-content button {
-			margin: 10px;
+		.popup .popup-content button {
+			margin: 20px;
 			cursor: pointer;
+		}
+		#videochat .popup-content button {
+			margin: 10px;
 		}
 
 #remoteCallControls {
@@ -656,10 +656,6 @@ fieldset {
 	.remoteCall {
 		text-align: center;
 	}
-		.remoteCall button {
-			margin: 10px;
-			cursor: pointer;
-		}
 		
 #videochat-overlay {
 	display: none;
