@@ -137,6 +137,7 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 	this.onRemoteStreamAddedCallback = function(event) {
 		traceVC('Remote stream added...');
 		
+		console.log(event);
 		self.remoteStream = event.stream;
 		attachMediaStream(self.remoteStreamElement, event.stream);
 	};
