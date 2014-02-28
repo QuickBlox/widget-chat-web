@@ -51,8 +51,8 @@ $(document).ready(function() {
 		$('.actions-wrap').on('click', '.btn_quote', makeQuote);
 		$('.actions-wrap').on('click', '.btn_private', createPrivateChat);
 		$('.actions-wrap').on('click', '.btn_videocall', makeVideoChat);
-		$('#videochat').on('click', '.videochat-close', closeVideoChat);
-		$('#videochat').on('click', '#doCall', callToUser);
+		$('#videochat').on('click', '.stopCall', closeVideoChat);
+		$('#videochat').on('click', '.doCall', callToUser);
 	});
 });
 
@@ -751,14 +751,14 @@ function makeVideoChat() {
 function htmlVideoChatBuilder(qbID, name) {
 	var html;
 	
-	html = '<div class="videochat-close">X</div>';
+	html = '<div class="stopCall videochat-close">X</div>';
 	html += '<header class="videochat-header">';
 	html += '<h3>Call to ' + name + '</h3></header>';
 	html += '<div class="videochat-content">';
 	html += '<video id="localVideo" autoplay></video>';
 	html += '<video id="remoteVideo" class="hidden" autoplay></video>';
-	html += '<button id="doCall" class="hidden" data-qb="' + qbID + '">Call to user</button>';
-	html += '<button class="videochat-close hidden">Hang up</button>';
+	html += '<button class="doCall hidden" data-qb="' + qbID + '">Call to user</button>';
+	html += '<button class="stopCall hidden">Hang up</button>';
 	html += '</div>';
 	
 	$('#videochat').html(html).after('<div id="videochat-overlay"></div>');
