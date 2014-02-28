@@ -33,15 +33,15 @@ var QBSignalingType = {
 function QBVideoChatSignaling() {
 	var self = this;
 	
-	this.onCallCallbacks = [];
+	this.onCallCallback = null;
  	this.onAcceptCallbacks = [];
  	this.onRejectCallbacks = [];
  	this.onStopCallbacks = [];
- 	this.onCandidateCallbacks = null;
+ 	this.onCandidateCallback = null;
 	
 	this.onMessage = function(msg) {
 		var author, type, body;
-		var qbID, sessionID;
+		var qbID, sessionID, callback;
 		
 		author = $(msg).attr('from');
 		type = $(msg).attr('type');
@@ -51,49 +51,35 @@ function QBVideoChatSignaling() {
 		qbID = getIDFromNode(author);
 		sessionID = parseInt(sessionID);
 		
-		console.log(qbID);
-		console.log(sessionID);
-		console.log(type);
-		console.log(body);
-		
-		/*switch (type) {
+		switch (type) {
 		case QBSignalingType.CALL:
-			for (var i=0; i < self.onCallCallbacks.length; i++) {
-				var callback = self.onCallCallbacks[i];
-				if (typeof(callback) === "function") {
-					callback(sessionID, body);
-				}
-			}
+			self.onCallCallback(qbID, sessionID, body);
 			break;
 		case QBSignalingType.ACCEPT:
-			for (var i=0; i < self.onAcceptCallbacks.length; i++) {
-				var callback = self.onAcceptCallbacks[i];
-				if (typeof(callback) === "function") {
+			for (var i = 0; i < self.onAcceptCallbacks.length; i++) {
+				callback = self.onAcceptCallbacks[i];
+				if (typeof(callback) === "function")
 					callback(body);
-				}
 			}
 			break;
 		case QBSignalingType.REJECT:
-			for (var i=0; i < self.onRejectCallbacks.length; i++) {
-				var callback = self.onRejectCallbacks[i];
-				if (typeof(callback) === "function") {
-					callback(fromUserID);
-				}
+			for (var i = 0; i < self.onRejectCallbacks.length; i++) {
+				callback = self.onRejectCallbacks[i];
+				if (typeof(callback) === "function")
+					callback(qbID);
 			}
 			break;
 		case QBSignalingType.STOPCALL:
-			for (var i=0; i < self.onStopCallbacks.length; i++) {
-				var callback = self.onStopCallbacks[i];
-				if (typeof(callback) === "function") {
-					callback(fromUserID, body, sessionID);
-				}
+			for (var i = 0; i < self.onStopCallbacks.length; i++) {
+				callback = self.onStopCallbacks[i];
+				if (typeof(callback) === "function")
+					callback(qbID, body, sessionID);
 			}
 			break;
 		case QBSignalingType.CANDIDATE:
-			var jsonCandidate = self.xmppTextToDictionary(body);
-			self.onCandidateCallbacks(jsonCandidate);
+			self.onCandidateCallback(body);
 			break;
-		}*/
+		}
 		
 		return true;
 	};
@@ -111,18 +97,6 @@ function QBVideoChatSignaling() {
 		
 		reply = $msg(params).c('body').t(data).up().c('session').t(sessionID);
 		connection.send(reply);
-	};
-
-	this.xmppTextToDictionary = function(data) {
-		try {
-			return $.parseJSON(Strophe.unescapeNode(data));
-		} catch(err) {
-			return Strophe.unescapeNode(data);
-		}
-	};
-
-	this.xmppDictionaryToText = function(data) {
-		return Strophe.escapeNode(JSON.stringify(data));
 	};
 }
 
@@ -152,10 +126,6 @@ QBVideoChatSignaling.prototype.sendCandidate = function(userID, candidate, sessi
 };
 
 // callbacks
-QBVideoChatSignaling.prototype.addOnCallCallback = function(callback) {
-	this.onCallCallbacks.push(callback);
-};
-
 QBVideoChatSignaling.prototype.addOnAcceptCallback = function(callback) {
 	this.onAcceptCallbacks.push(callback);
 };

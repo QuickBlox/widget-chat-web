@@ -722,7 +722,7 @@ function htmlChatBuilder(qbID, fbID, name, chatID, isOwner) {
 -------------------------------------------------------------------------*/
 function createSignalingInstance() {
 	signaling = new QBVideoChatSignaling();
-	signaling.addOnCallCallback(onCall);
+	signaling.onCallCallback = onCall;
 	signaling.addOnAcceptCallback(onAccept);
 	signaling.addOnRejectCallback(onReject);
 	signaling.addOnStopCallback(onStop);
@@ -733,10 +733,10 @@ function createSignalingInstance() {
 	});
 }
 
-function makeVideoChat() {
+function makeVideoChat(userID, sessionID, sessionDescription) {
 	var qbID, name;
 	
-	qbID = $(this).data('qb');
+	qbID = userID || $(this).data('qb');
 	name = namesOccupants[qbID] || 'Test user';
 	// TODO: Here is need to put a "if block" for checking of existing users
 	
@@ -744,7 +744,12 @@ function makeVideoChat() {
 	localVideo = $('#localVideo')[0];
 	remoteVideo = $('#remoteVideo')[0];
 	
-	videoChat = new QBVideoChat({audio: true, video: true}, localVideo, remoteVideo, signaling);
+	videoChat = new QBVideoChat({audio: true, video: true}, localVideo, remoteVideo, signaling, sessionID);
+	videoChat.onGetUserMediaSuccess = getMediaSuccess;
+	videoChat.onGetUserMediaError = getMediaError;
+	if (sessionDescription)
+		videoChat.remoteSessionDescription = sessionDescription;
+	
 	videoChat.getUserMedia();
 }
 
@@ -778,12 +783,27 @@ function callToUser() {
 }
 
 // callbacks
-function onCall() {
-	console.log('my onCall');
+function getMediaSuccess() {
+	$('.loading_messages').remove();
+	$('.doCall').show();
+}
+
+function getMediaError() {
+	closeVideoChat();
+}
+
+function onCall(userID, sessionID, sessionDescription) {
+	console.log('onCall from ' + userID);
+	$('#ring')[0].play();
+	
+	makeVideoChat(userID, sessionID, sessionDescription);
 }
 
 function onAccept() {
 	console.log('my onAccept');
+	
+	self.sessionID = sessionID;
+  self.remoteSessionDescription = sessionDescription;
 }
 
 function onReject() {

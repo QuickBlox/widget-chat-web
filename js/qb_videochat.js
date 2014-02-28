@@ -34,13 +34,14 @@ var QBVideoChatState = {
 	ACTIVE: 'active'
 };
 
-function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signalingService) {
+function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signalingService, sessionID) {
  	var self = this;
 	
-  this.sessionID = new Date().getTime();
+  this.sessionID = sessionID || new Date().getTime();
   traceVC("sessionID = " + this.sessionID);
   
 	this.candidatesQueue = [];
+	this.remoteSessionDescription = null;
 	this.state = QBVideoChatState.INACTIVE;
 	
   this.localStreamElement = localStreamElement;
@@ -48,19 +49,21 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
   this.constraints = constraints;
   
   this.signalingService = signalingService;
-  this.signalingService.onCandidateCallbacks = this.addCandidate;
-  this.signalingService.addOnCallCallback(this.onCallSignalingCallback);
+  this.signalingService.onCandidateCallback = this.addCandidate;
 	this.signalingService.addOnAcceptCallback(this.onAcceptSignalingCallback);
   
   // Signalling callbacks
-	this.onCallSignalingCallback = function(sessionID, sessionDescription) {
-		traceVC("onCall");
-		self.sessionID = sessionID;
-    self.remoteSessionDescription = sessionDescription;
+  this.addCandidate = function(jsonCandidate) {
+		traceVC("Added remote candidate: " + JSON.stringify(jsonCandidate));
+		var candidate = new RTCIceCandidate({
+			sdpMLineIndex: jsonCandidate.sdpMLineIndex,
+				candidate: jsonCandidate.candidate,
+				   sdpMid: jsonCandidate.sdpMid
+		});
+		self.pc.addIceCandidate(candidate);
 	};
 	
 	this.onAcceptSignalingCallback = function(sessionDescription) {
-		traceVC("onAccept");
 		self.setRemoteDescription(sessionDescription, "answer"); //TODO: refactor this (hide)
 	};
 	
@@ -72,9 +75,7 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 		
 		function successCallback(localMediaStream) {
 			traceVC("getUserMedia success");
-			$('.loading_messages').remove();
-			$('.doCall').show();
-			
+			self.onGetUserMediaSuccess();
 			self.localStream = localMediaStream;
 			attachMediaStream(self.localStreamElement, localMediaStream);
 			self.createRTCPeerConnection();
@@ -82,9 +83,12 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 
 		function errorCallback(error) {
 			traceVC("getUserMedia error: ", error);
-			closeVideoChat();
+			self.onGetUserMediaSuccess();
 		}
 	};
+	
+	this.onGetUserMediaSuccess = null;
+	this.onGetUserMediaError = null;
 	
 	// RTCPeerConnection creation
 	this.createRTCPeerConnection = function() {
@@ -204,18 +208,6 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 	this.onCreateAnswerFailureCallback = function(event) {
 		traceVC('createAnswer() error: ', event);
 	};
-	
-	// Add ICE candidates 
-	this.addCandidate = function(jsonCandidate) {
-		traceVC("Added remote candidate: " + JSON.stringify(jsonCandidate));
-		var candidate = new RTCIceCandidate({
-			sdpMLineIndex: jsonCandidate.sdpMLineIndex,
-				candidate: jsonCandidate.candidate,
-				   sdpMid: jsonCandidate.sdpMid
-		});
-		self.pc.addIceCandidate(candidate);
-	};
-	
 	
 	this.sendCallRequest = function() {
 		// Send only string representation of sdp

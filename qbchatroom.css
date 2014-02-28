@@ -658,3 +658,6 @@ fieldset {
 	background: rgba(0, 0, 0, 0.3);
 	z-index: 999999;
 }
+#audio-container {
+	opacity: 0;
+}
