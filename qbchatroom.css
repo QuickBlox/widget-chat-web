@@ -636,7 +636,8 @@ fieldset {
 		background: #0077cb;
 	}
 		.popup .popup-header h3 {
-			font-size: 18px;
+			overflow: hidden;
+			font-size: 16px;
 			font-weight: normal;
 			color: #fff;
 			white-space: nowrap;
