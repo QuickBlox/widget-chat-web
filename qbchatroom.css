@@ -656,10 +656,14 @@ fieldset {
 		#videochat .popup-content button {
 			margin: 10px;
 		}
+		#videochat .fullVideo {
+			width: 100%;
+		}
 		#videochat .smallVideo {
 			position: absolute;
 			right: 0;
 			bottom: 44px;
+			width: 25%;
 		}
 
 #remoteCallControls {

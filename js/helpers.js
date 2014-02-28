@@ -294,7 +294,7 @@ function setCallback(callback, name, type) {
 
 function centerPopup(selector, isControls) {
 	var winWidth, winHeight, popupWidth, disWidth, disHeight;
-	var fixWidthRatio = isControls ? 0.25 : 0.625, fixHeightRatio = isControls ? 0.4 : 0.1, fixRemoteWidth = 0.25;
+	var fixWidthRatio = isControls ? 0.25 : 0.625, fixHeightRatio = isControls ? 0.4 : 0.1;
 	
 	winWidth = $(window).width();
 	winHeight = $(window).height();
@@ -302,11 +302,8 @@ function centerPopup(selector, isControls) {
 	
 	disWidth = (winWidth - popupWidth) / 2;
 	disHeight = winHeight * fixHeightRatio;
-	remoteVideoWidth = popupWidth * fixRemoteWidth;
 	
 	$(selector).css({'width': popupWidth + 'px', 'top': disHeight + 'px', 'left': disWidth + 'px'});
-	$(selector).find('.fullVideo').css('width', popupWidth + 'px');
-	$(selector).find('.smallVideo').css('width', remoteVideoWidth + 'px');
 	$('#videochat-overlay').css({'width': winWidth + 'px', 'height': winHeight + 'px'});
 	
 	return false;
@@ -325,4 +322,9 @@ function closeCall(id) {
 		$('#videochat-overlay').remove();
 		ring.pause();
 	}
+}
+
+function getRemoteStream() {
+	$('#localVideo').addClass('smallVideo').removeClass('fullVideo');
+	$('#remoteVideo').addClass('fullVideo').removeClass('smallVideo');
 }
