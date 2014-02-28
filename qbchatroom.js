@@ -855,6 +855,7 @@ function onCall(qbID, sessionDescription, sessionID) {
 
 function onStop() {
 	closeVideoChat();
+	videoChat.hangup();
 	videoChat = null;
 }
 
