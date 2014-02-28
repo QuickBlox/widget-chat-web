@@ -645,6 +645,9 @@ fieldset {
 		border-bottom-left-radius: 5px;
 		border-bottom-right-radius: 5px;
 	}
+		#videochat .videochat-content button {
+			margin: 10px;
+		}
 #videochat-overlay {
 	display: none;
 	overflow: hidden;
