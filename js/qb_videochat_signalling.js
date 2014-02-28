@@ -40,16 +40,23 @@ function QBVideoChatSignaling() {
  	this.onCandidateCallbacks = null;
 	
 	this.onMessage = function(msg) {
-		console.log(msg);
-		/*var to = msg.getAttribute('to');
-		var from = msg.getAttribute('from');
-		var type = msg.getAttribute('type');
-		var elems = msg.getElementsByTagName('body');
-		var body = Strophe.getText(elems[0]);
-		var fromUserID = from.split('-')[0];
-		var sessionID = '110101010101';
-	
-		switch (type) {
+		var author, type, body;
+		var qbID, sessionID;
+		
+		author = $(msg).attr('from');
+		type = $(msg).attr('type');
+		body = $(msg).find('body')[0].textContent;
+		sessionID = $(msg).find('session')[0].textContent;
+		
+		qbID = getIDFromNode(author);
+		sessionID = parseInt(sessionID);
+		
+		console.log(qbID);
+		console.log(sessionID);
+		console.log(type);
+		console.log(body);
+		
+		/*switch (type) {
 		case QBSignalingType.CALL:
 			for (var i=0; i < self.onCallCallbacks.length; i++) {
 				var callback = self.onCallCallbacks[i];
