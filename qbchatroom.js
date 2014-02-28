@@ -771,8 +771,8 @@ function htmlVideoChatBuilder(qbID, name) {
 	$('#videochat').html(html).after('<div id="videochat-overlay"></div>');
 	
 	centerPopup('#videochat', false);
-	$(window).resize(centerPopup('#videochat', false));
-	$(window).scroll(centerPopup('#videochat', false));
+	$(window).resize(centerPopup);
+	$(window).scroll(centerPopup);
 	createAnimatedLoadingMessages('#videochat .popup-content');
 	$('#videochat, #videochat-overlay').show();
 }
