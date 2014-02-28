@@ -40,7 +40,8 @@ function QBVideoChatSignaling() {
  	this.onCandidateCallbacks = null;
 	
 	this.onMessage = function(msg) {
-		var to = msg.getAttribute('to');
+		console.log(msg);
+		/*var to = msg.getAttribute('to');
 		var from = msg.getAttribute('from');
 		var type = msg.getAttribute('type');
 		var elems = msg.getElementsByTagName('body');
@@ -85,21 +86,25 @@ function QBVideoChatSignaling() {
 			var jsonCandidate = self.xmppTextToDictionary(body);
 			self.onCandidateCallbacks(jsonCandidate);
 			break;
-		}
+		}*/
 		
 		return true;
 	};
 	
 	this.sendMessage = function(userID, type, data, sessionID) {
-		var opponentJID = userID + "-" + QBPARAMS.app_id + "@" + CHAT.server;
-		var body = data == null ? '' : data;
-	
-		var reply = $msg({to: opponentJID, 
-						 from: this.userJID, 
-						 type: type})
-				.cnode(Strophe.xmlElement('body', body));
+		var opponentJID, body, reply;
 		
-		this.connection.send(reply);
+		opponentJID = getJID(userID);
+		body = data ? data : '';
+		
+		params = {
+			to: opponentJID,
+			from: connection.jid, 
+			type: type
+		};
+		
+		reply = $msg(params).c('body').t(body);
+		connection.send(reply);
 	};
 
 	this.xmppTextToDictionary = function(data) {
@@ -117,8 +122,8 @@ function QBVideoChatSignaling() {
 
 // methods
 QBVideoChatSignaling.prototype.call = function(userID, sessionDescription, sessionID) {
-	traceS('call ' + userID);
-	//this.sendMessage(userID, QBSignalingType.CALL, sessionDescription, sessionID);
+	traceS('call to ' + userID);
+	this.sendMessage(userID, QBSignalingType.CALL, sessionDescription, sessionID);
 };
 
 QBVideoChatSignaling.prototype.accept = function(userID, sessionDescription, sessionID) {
