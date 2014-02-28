@@ -54,11 +54,11 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 	
 	// Signalling callbacks
 	this.addCandidate = function(jsonCandidate) {
-		traceVC("Added remote candidate: " + JSON.stringify(jsonCandidate));
+		traceVC("Added remote candidate");
 		var candidate = new RTCIceCandidate({
 			sdpMLineIndex: jsonCandidate.sdpMLineIndex,
-				candidate: jsonCandidate.candidate,
-				   sdpMid: jsonCandidate.sdpMid
+			candidate: jsonCandidate.candidate,
+			sdpMid: jsonCandidate.sdpMid
 		});
 		self.pc.addIceCandidate(candidate);
 	};
@@ -110,31 +110,26 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 	
 	// onIceCandidate callback
 	this.onIceCandidateCallback = function(event) {
-		var candidate = event.candidate;
-	
 		//traceVC('iceGatheringState: ' + event.target.iceGatheringState);
-	
-		/*if (candidate) {
-			var iceData = {sdpMLineIndex: candidate.sdpMLineIndex,
-      					  		  sdpMid: candidate.sdpMid,
-      				   		   candidate: candidate.candidate}
-      				   		   
-      		//traceVC('onIceCandidateCallback: ' + JSON.stringify(iceData));
+		var iceData, iceDataAsmessage, candidate = event.candidate;
+		
+		if (candidate) {
+			iceData = {
+				sdpMLineIndex: candidate.sdpMLineIndex,
+				sdpMid: candidate.sdpMid,
+				candidate: candidate.candidate
+			};
 			
-    		var iceDataAsmessage = iceData;
-  	
-  			if(self.state == QBVideoChatState.INACTIVE){
-  			    // save to queue
-  			    //traceVC('candidate queued');
-  			    self.candidatesQueue.push(iceDataAsmessage);
-  			} else{
-  			    // Send ICE candidate to opponent
+			iceDataAsmessage = self.signalingService.xmppDictionaryToText(iceData);
+			
+			if (self.state == QBVideoChatState.INACTIVE) {
+				// save to queue
+				self.candidatesQueue.push(iceDataAsmessage);
+			} else {
+				// Send ICE candidate to opponent
 				self.signalingService.sendCandidate(self.opponentID, iceDataAsmessage, self.sessionID);
 			}
-
-		} else {
-			//traceVC('No candidates');
-		}*/
+		}
 	};
 
 	// onRemoteStreamAdded callback

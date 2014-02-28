@@ -98,6 +98,14 @@ function QBVideoChatSignaling() {
 		reply = $msg(params).c('body').t(data).up().c('session').t(sessionID);
 		connection.send(reply);
 	};
+	
+	this.xmppTextToDictionary = function(data) {
+		return $.parseJSON(Strophe.unescapeNode(data));
+	};
+
+	this.xmppDictionaryToText = function(data) {
+		return Strophe.escapeNode(JSON.stringify(data));
+	};
 }
 
 // methods
