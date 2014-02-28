@@ -749,10 +749,8 @@ function makeVideoChat(event, qbID, sessionDescription, sessionID) {
 	remoteVideo = $('#remoteVideo')[0];
 	
 	videoChat = new QBVideoChat({audio: true, video: true}, localVideo, remoteVideo, signaling, sessionID);
-	videoChat.onGetUserMediaSuccess = getMediaSuccess;
+	videoChat.onGetUserMediaSuccess = getMediaSuccess(qbID, sessionDescription);
 	videoChat.onGetUserMediaError = getMediaError;
-	if (sessionDescription)
-		videoChat.remoteSessionDescription = sessionDescription;
 	
 	videoChat.getUserMedia();
 }
@@ -805,9 +803,14 @@ function rejectCall() {
 }
 
 // callbacks
-function getMediaSuccess() {
+function getMediaSuccess(qbID, sessionDescription) {
 	$('.loading_messages').remove();
 	$('.doCall').show();
+	
+	if (sessionDescription) {
+		videoChat.remoteSessionDescription = sessionDescription;
+		videoChat.accept(qbID);
+	}
 }
 
 function getMediaError() {
