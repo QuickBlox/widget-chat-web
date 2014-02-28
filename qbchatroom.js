@@ -53,8 +53,8 @@ $(document).ready(function() {
 		$('.actions-wrap').on('click', '.btn_quote', makeQuote);
 		$('.actions-wrap').on('click', '.btn_private', createPrivateChat);
 		$('.actions-wrap').on('click', '.btn_videocall', makeVideoChat);
-		$('#videochat').on('click', '.stopCall', closeVideoChat);
 		$('#videochat').on('click', '.doCall', doCall);
+		$('#videochat').on('click', '.stopCall', stopCall);
 		$('#remoteCallControls').on('click', '.acceptCall', acceptCall);
 		$('#remoteCallControls').on('click', '.rejectCall', rejectCall);
 	});
@@ -727,9 +727,9 @@ function htmlChatBuilder(qbID, fbID, name, chatID, isOwner) {
 function createSignalingInstance() {
 	signaling = new QBVideoChatSignaling();
 	signaling.onCallCallback = onCall;
+	signaling.onStopCallback = onStop;
 	signaling.addOnAcceptCallback(onAccept);
 	signaling.addOnRejectCallback(onReject);
-	signaling.addOnStopCallback(onStop);
 	
 	// set WebRTC callbacks
 	$(Object.keys(QBSignalingType)).each(function() {
@@ -758,7 +758,7 @@ function makeVideoChat(event, qbID, sessionDescription, sessionID) {
 function htmlVideoChatBuilder(qbID, name) {
 	var html;
 	
-	html = '<div class="stopCall popup-close">X</div>';
+	html = '<div class="stopCall popup-close hidden">X</div>';
 	html += '<header class="popup-header">';
 	html += '<h3>Video chat with ' + name + '</h3></header>';
 	html += '<div class="popup-content">';
@@ -784,6 +784,12 @@ function doCall() {
 	videoChat.call(qbID);
 }
 
+
+function stopCall() {
+	closeVideoChat();
+	videoChat.stop(qbID);
+}
+
 function acceptCall() {
 	var qbID, sessionDescription, sessionID;
 	
@@ -804,6 +810,7 @@ function rejectCall() {
 // callbacks
 function getMediaSuccess(qbID, sessionDescription) {
 	$('.loading_messages').remove();
+	$('.popup-close').show();
 	
 	if (sessionDescription) {
 		$('.stopCall').show();
@@ -817,7 +824,7 @@ function getMediaSuccess(qbID, sessionDescription) {
 }
 
 function getMediaError() {
-	closeVideoChat();
+	stopCall();
 }
 
 function onCall(qbID, sessionDescription, sessionID) {
@@ -843,6 +850,10 @@ function onCall(qbID, sessionDescription, sessionID) {
 	$('#remoteCallControls, #videochat-overlay').show();
 }
 
+function onStop() {
+	closeVideoChat();
+}
+
 function onAccept(qbID) {
 	console.log('onAccept from ' + qbID);
 	getRemoteStream();
@@ -850,8 +861,4 @@ function onAccept(qbID) {
 
 function onReject() {
 	console.log('my onReject');
-}
-
-function onStop() {
-	console.log('my onStop');
 }

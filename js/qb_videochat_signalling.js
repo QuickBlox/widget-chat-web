@@ -9,24 +9,24 @@
 /*
   Public methods:
     - call(userID, sessionDescription, sessionID)
+    - stop(userID, reason, sessionID)
     - accept(userID, sessionDescription, sessionID)
     - reject(userID, sessionID)
-    - stop(userID, reason, sessionID)
     - sendCandidate(userID, candidate, sessionID)
   
   Public callbacks:
     - onCall(fromUserID, sessionDescription, sessionID)
-    - onAccept(fromUserID, sessionDescription, sessionID)
-    - onReject(fromUserID)
     - onStop(fromUserID, reason)
-    - onCandidate(fromUserID, candidate)
+    - onAccept(fromUserID, sessionDescription)
+    - onReject(fromUserID)
+    - onCandidate(candidate)
  */
 
 var QBSignalingType = {
 	CALL: 'qbvideochat_call',
+	STOP: 'qbvideochat_stopCall',
 	ACCEPT: 'qbvideochat_acceptCall',
 	REJECT: 'qbvideochat_rejectCall',
-	STOPCALL: 'qbvideochat_stopCall',
 	CANDIDATE: 'qbvideochat_candidate'
 };
 
@@ -34,9 +34,9 @@ function QBVideoChatSignaling() {
 	var self = this;
 	
 	this.onCallCallback = null;
+	this.onStopCallback = null;
  	this.onAcceptCallbacks = [];
  	this.onRejectCallbacks = [];
- 	this.onStopCallbacks = [];
  	this.onCandidateCallback = null;
 	
 	this.onMessage = function(msg) {
@@ -54,6 +54,9 @@ function QBVideoChatSignaling() {
 		case QBSignalingType.CALL:
 			self.onCallCallback(qbID, body, sessionID);
 			break;
+		case QBSignalingType.STOP:
+			self.onStopCallback(qbID, body);
+			break;
 		case QBSignalingType.ACCEPT:
 			for (var i = 0; i < self.onAcceptCallbacks.length; i++) {
 				callback = self.onAcceptCallbacks[i];
@@ -66,13 +69,6 @@ function QBVideoChatSignaling() {
 				callback = self.onRejectCallbacks[i];
 				if (typeof(callback) === "function")
 					callback(qbID);
-			}
-			break;
-		case QBSignalingType.STOPCALL:
-			for (var i = 0; i < self.onStopCallbacks.length; i++) {
-				callback = self.onStopCallbacks[i];
-				if (typeof(callback) === "function")
-					callback(qbID, body, sessionID);
 			}
 			break;
 		case QBSignalingType.CANDIDATE:
@@ -113,6 +109,11 @@ QBVideoChatSignaling.prototype.call = function(userID, sessionDescription, sessi
 	this.sendMessage(userID, QBSignalingType.CALL, sessionDescription, sessionID);
 };
 
+QBVideoChatSignaling.prototype.stop = function(userID, reason, sessionID) {
+	traceS('stop ' + userID);
+	this.sendMessage(userID, QBSignalingType.STOP, reason, sessionID);
+};
+
 QBVideoChatSignaling.prototype.accept = function(userID, sessionDescription, sessionID) {
 	traceS('accept ' + userID);
 	this.sendMessage(userID, QBSignalingType.ACCEPT, sessionDescription, sessionID);
@@ -121,11 +122,6 @@ QBVideoChatSignaling.prototype.accept = function(userID, sessionDescription, ses
 QBVideoChatSignaling.prototype.reject = function(userID, sessionID) {
 	traceS('reject ' + userID);
 	this.sendMessage(userID, QBSignalingType.REJECT, null, sessionID);
-};
-
-QBVideoChatSignaling.prototype.stop = function(userID, reason, sessionID) {
-	traceS('stop ' + userID);
-	this.sendMessage(userID, QBSignalingType.STOPCALL, reason, sessionID);
 };
 
 QBVideoChatSignaling.prototype.sendCandidate = function(userID, candidate, sessionID) {
@@ -139,10 +135,6 @@ QBVideoChatSignaling.prototype.addOnAcceptCallback = function(callback) {
 
 QBVideoChatSignaling.prototype.addOnRejectCallback = function(callback) {
 	this.onRejectCallbacks.push(callback);
-};
-
-QBVideoChatSignaling.prototype.addOnStopCallback = function(callback) {
-	this.onStopCallbacks.push(callback);
 };
 
 function traceS(text) {

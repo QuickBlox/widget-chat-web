@@ -9,16 +9,9 @@
 /*
   Public methods:
     - call(userID)
+    - stop(userID)
     - accept(userID)
     - reject(userID)
-    - stop(userID)
-  
-  Public callbacks:
-    - onCall(fromUserID, sessionDescription)
-    - onAccept(fromUserID, sessionDescription)
-    - onReject(fromUserID)
-    - onStop(fromUserID, reason)
-    - onCandidate(fromUserID, candidate)
  */
 
 var SDP_CONSTRAINTS = {
@@ -214,7 +207,6 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 
 	// Cleanup 
 	this.hangup = function() {
-		traceVC("Closed RTC");
 		self.pc.close();
 		self.pc = null;
 	};
@@ -228,6 +220,13 @@ QBVideoChat.prototype.call = function(userID) {
 	this.pc.createOffer(this.onGetSessionDescriptionSuccessCallback, this.onCreateOfferFailureCallback);
 };
 
+// Stop call with user
+QBVideoChat.prototype.stop = function(userID) {
+	this.signalingService.stop(userID, "manual", this.sessionID);
+	this.state = QBVideoChatState.INACTIVE;
+	this.hangup();
+};
+
 // Accept call from user 
 QBVideoChat.prototype.accept = function(userID) {
 	this.opponentID = userID;
@@ -236,17 +235,7 @@ QBVideoChat.prototype.accept = function(userID) {
 
 // Reject call from user
 QBVideoChat.prototype.reject = function(userID) {
-	traceVC("reject");
 	this.signalingService.reject(userID, this.sessionID);
-	
-	this.state = QBVideoChatState.INACTIVE;
-};
-
-// Stap call with user
-QBVideoChat.prototype.stop = function(userID) {
-	traceVC("stop");
-	this.signalingService.stops(userID, "manual", this.sessionID);
-	
 	this.state = QBVideoChatState.INACTIVE;
 };
 
