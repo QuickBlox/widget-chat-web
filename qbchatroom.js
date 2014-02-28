@@ -794,7 +794,7 @@ function acceptCall() {
 	sessionID = parseInt($(this).data('id'));
 	
 	closeCall(qbID);
-	makeVideoChat(qbID, sessionDescription, sessionID);
+	makeVideoChat(null, qbID, sessionDescription, sessionID);
 }
 
 function rejectCall() {
