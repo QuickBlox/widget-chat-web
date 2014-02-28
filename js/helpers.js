@@ -292,8 +292,8 @@ function setCallback(callback, name, type) {
 	connection.addHandler(callback, null, name, type, null, null);
 }
 
-function centerPopup() {
-	var winWidth, winHeight, popupWidth, disWidth, disHeight, fixWidthRatio = 0.625, fixHeightRatio = 0.1;
+function centerPopup(selector, isControls) {
+	var winWidth, winHeight, popupWidth, disWidth, disHeight, fixWidthRatio = isControls ? 0.117 : 0.625, fixHeightRatio = isControls ? 0.45 : 0.1;
 	
 	winWidth = $(window).width();
 	winHeight = $(window).height();
@@ -302,9 +302,9 @@ function centerPopup() {
 	disWidth = (winWidth - popupWidth) / 2;
 	disHeight = winHeight * fixHeightRatio;
 	
-	$('#videochat').css({'width': popupWidth + 'px', 'top': disHeight + 'px', 'left': disWidth + 'px'});
+	$(selector).css({'width': popupWidth + 'px', 'top': disHeight + 'px', 'left': disWidth + 'px'});
+	$(selector).find('video').css('width', popupWidth + 'px');
 	$('#videochat-overlay').css({'width': winWidth + 'px', 'height': winHeight + 'px'});
-	$('#videochat video').css('width', popupWidth + 'px');
 	
 	return false;
 }

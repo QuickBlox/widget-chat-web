@@ -612,12 +612,12 @@ fieldset {
 				
 /* Video Chat
 ----------------------------------------------------------*/
-#videochat {
+.popup {
 	position: fixed;
 	background: #fff;
 	border-radius: 5px;
 	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
-	z-index: 9999999;
+	z-index: 2000;
 }
 	#videochat .videochat-close {
 		position: absolute;
@@ -649,6 +649,18 @@ fieldset {
 			margin: 10px;
 			cursor: pointer;
 		}
+
+#remoteCallControls {
+	z-index: 3000;
+}
+	.remoteCall {
+		text-align: center;
+	}
+		.remoteCall button {
+			margin: 10px;
+			cursor: pointer;
+		}
+		
 #videochat-overlay {
 	display: none;
 	overflow: hidden;
@@ -656,8 +668,9 @@ fieldset {
 	top: 0;
 	left: 0;
 	background: rgba(0, 0, 0, 0.3);
-	z-index: 999999;
+	z-index: 1000;
 }
+
 #audio-container {
 	opacity: 0;
 }
