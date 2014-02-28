@@ -77,6 +77,7 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 		function successCallback(localMediaStream) {
 			traceVC("getUserMedia success");
 			self.localStream = localMediaStream;
+			console.log(localMediaStream);
 			attachMediaStream(self.localStreamElement, localMediaStream);
 			self.createRTCPeerConnection();
 			self.onGetUserMediaSuccess();
