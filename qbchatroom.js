@@ -52,6 +52,7 @@ $(document).ready(function() {
 		$('.actions-wrap').on('click', '.btn_private', createPrivateChat);
 		$('.actions-wrap').on('click', '.btn_videocall', makeVideoChat);
 		$('#videochat').on('click', '.videochat-close', closeVideoChat);
+		$('#videochat').on('click', '#doCall', callToUser);
 	});
 });
 
@@ -736,20 +737,18 @@ function makeVideoChat() {
 	var qbID, name;
 	
 	qbID = $(this).data('qb');
-	name = namesOccupants[qbID];
+	name = namesOccupants[qbID] || 'Test user';
 	// TODO: Here is need to put a "if block" for checking of existing users
 	
-	htmlVideoChatBuilder(name);
+	htmlVideoChatBuilder(qbID, name);
 	localVideo = $('#localVideo')[0];
 	remoteVideo = $('#remoteVideo')[0];
 	
 	videoChat = new QBVideoChat({audio: true, video: true}, localVideo, remoteVideo, signaling);
 	videoChat.getUserMedia();
-	
-	//$('#' + localVideo.id).show().after('<button onclick="callToUser(' + qbID + ')">Call to user</button>');
 }
 
-function htmlVideoChatBuilder(name) {
+function htmlVideoChatBuilder(qbID, name) {
 	var html;
 	
 	html = '<div class="videochat-close">X</div>';
@@ -758,6 +757,8 @@ function htmlVideoChatBuilder(name) {
 	html += '<div class="videochat-content">';
 	html += '<video id="localVideo" autoplay></video>';
 	html += '<video id="remoteVideo" class="hidden" autoplay></video>';
+	html += '<button id="doCall" data-qb="' + qbID + '">Call to user</button>';
+	html += '<button class="hidden videochat-close">Hang up</button>';
 	html += '</div>';
 	
 	$('#videochat').html(html).after('<div id="videochat-overlay"></div>');
@@ -769,10 +770,14 @@ function htmlVideoChatBuilder(name) {
 	$('#videochat, #videochat-overlay').show();
 }
 
-function callToUser(user_id) {
-	videoChat.call(user_id);
+function callToUser() {
+	var qbID = $(this).data('qb');
+	
+	$(this).hide().next().show();
+	videoChat.call(qbID);
 }
 
+// callbacks
 function onCall() {
 	console.log('my onCall');
 }
