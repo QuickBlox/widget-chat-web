@@ -179,7 +179,7 @@ if (navigator.mozGetUserMedia) {
 
   // Attach a media stream to an element.
   attachMediaStream = function(element, stream) {
-  	element.volume = 0.5;
+  	element.volume = 0.25;
     if (typeof element.srcObject !== 'undefined') {
       element.srcObject = stream;
     } else if (typeof element.mozSrcObject !== 'undefined') {
