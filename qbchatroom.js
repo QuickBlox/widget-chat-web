@@ -737,10 +737,10 @@ function createSignalingInstance() {
 	});
 }
 
-function makeVideoChat(event, userID, sessionID, sessionDescription) {
-	var qbID, name;
+function makeVideoChat(event, qbID, sessionDescription, sessionID) {
+	var name;
 	
-	qbID = userID || $(this).data('qb');
+	qbID = qbID || $(this).data('qb');
 	name = namesOccupants[qbID] || 'Test user';
 	// TODO: Here is need to put a "if block" for checking of existing users
 	
@@ -794,7 +794,7 @@ function acceptCall() {
 	sessionID = parseInt($(this).data('id'));
 	
 	closeCall(qbID);
-	makeVideoChat(userID, sessionID, sessionDescription);
+	makeVideoChat(qbID, sessionDescription, sessionID);
 }
 
 function rejectCall() {
