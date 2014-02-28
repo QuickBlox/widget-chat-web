@@ -806,7 +806,7 @@ function onCall(userID, sessionDescription) {
 	console.log('onCall from ' + userID);
 	var html, name, rind = $('#ring')[0];
 	
-	name = namesOccupants[qbID] || 'Test user';
+	name = namesOccupants[userID] || 'Test user';
 	//videoChat.remoteSessionDescription = sessionDescription;
 	ring.play();
 	
