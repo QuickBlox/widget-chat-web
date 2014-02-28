@@ -320,6 +320,6 @@ function closeCall(id) {
 	if (!$('div').is('.remoteCall')) {
 		$('#remoteCallControls').hide();
 		$('#videochat-overlay').remove();
-		ring.stop();
+		ring.pause();
 	}
 }
