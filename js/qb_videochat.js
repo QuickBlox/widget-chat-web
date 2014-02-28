@@ -64,6 +64,7 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 	};
 	
 	this.onAcceptSignalingCallback = function(sessionDescription) {
+		console.log('true');
 		self.setRemoteDescription(sessionDescription, "answer"); //TODO: refactor this (hide)
 	};
 	
