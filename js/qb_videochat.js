@@ -75,10 +75,10 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 		
 		function successCallback(localMediaStream) {
 			traceVC("getUserMedia success");
-			self.onGetUserMediaSuccess();
 			self.localStream = localMediaStream;
 			attachMediaStream(self.localStreamElement, localMediaStream);
 			self.createRTCPeerConnection();
+			self.onGetUserMediaSuccess();
 		}
 
 		function errorCallback(error) {
@@ -150,8 +150,6 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 	
 	// set Remote description
 	this.setRemoteDescription = function(descriptionSDP, descriptionType) {
-		this.state = QBVideoChatState.ESTABLISHING;
-			
 		var sessionDescription = new RTCSessionDescription({sdp: descriptionSDP, type: descriptionType});
 		//traceVC('setRemoteDescription: ' + descriptionSDP + ', pc:' + this.pc);
 	
@@ -239,11 +237,10 @@ QBVideoChat.prototype.accept = function(userID) {
 	traceVC("accept");
 	
 	this.opponentID = userID;
+	this.state = QBVideoChatState.ESTABLISHING;
 	
 	// set remote description here
 	this.setRemoteDescription(this.remoteSessionDescription, "offer");
-	
-	this.state = QBVideoChatState.ESTABLISHING;
 };
 
 // Reject call from user
