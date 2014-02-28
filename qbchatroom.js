@@ -749,7 +749,7 @@ function makeVideoChat(event, qbID, sessionDescription, sessionID) {
 	remoteVideo = $('#remoteVideo')[0];
 	
 	videoChat = new QBVideoChat({audio: true, video: true}, localVideo, remoteVideo, signaling, sessionID);
-	videoChat.onGetUserMediaSuccess = getMediaSuccess(qbID, sessionDescription);
+	videoChat.onGetUserMediaSuccess = function() {getMediaSuccess(qbID, sessionDescription)};
 	videoChat.onGetUserMediaError = getMediaError;
 	
 	videoChat.getUserMedia();
