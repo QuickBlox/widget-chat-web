@@ -48,10 +48,6 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 	this.remoteStreamElement = remoteStreamElement;
 	this.constraints = constraints;
 	
-	this.signalingService = signalingService;
-	this.signalingService.onCandidateCallback = this.addCandidate;
-	this.signalingService.addOnAcceptCallback(this.onAcceptSignalingCallback);
-	
 	// Signalling callbacks
 	this.addCandidate = function(data) {
 		traceVC("Added remote candidate");
@@ -67,6 +63,12 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 		console.log('true');
 		self.setRemoteDescription(sessionDescription, "answer"); //TODO: refactor this (hide)
 	};
+	
+	this.signalingService = signalingService;
+	this.signalingService.onCandidateCallback = this.addCandidate;
+	this.signalingService.addOnAcceptCallback(this.onAcceptSignalingCallback);
+	
+	
 	
 	// MediaStream getUserMedia 
 	this.getUserMedia = function() {
