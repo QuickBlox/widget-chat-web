@@ -770,9 +770,9 @@ function htmlVideoChatBuilder(qbID, name) {
 	
 	$('#videochat').html(html).after('<div id="videochat-overlay"></div>');
 	
-	centerPopup();
-	$(window).resize(centerPopup);
-	$(window).scroll(centerPopup);
+	centerPopup('#videochat');
+	$(window).resize(function() {centerPopup('#videochat')});
+	$(window).scroll(function() {centerPopup('#videochat')});
 	createAnimatedLoadingMessages('#videochat .popup-content');
 	$('#videochat, #videochat-overlay').show();
 }
@@ -822,8 +822,8 @@ function onCall(userID, sessionDescription) {
 	$('#remoteCallControls').append(html).after('<div id="videochat-overlay"></div>');
 	
 	centerPopup('#remoteCallControls', true);
-	$(window).resize(centerPopup('#remoteCallControls', true));
-	$(window).scroll(centerPopup('#remoteCallControls', true));
+	$(window).resize(function() {centerPopup('#remoteCallControls', true)});
+	$(window).scroll(function() {centerPopup('#remoteCallControls', true)});
 	$('#remoteCallControls, #videochat-overlay').show();
 }
 
