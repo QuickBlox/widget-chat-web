@@ -134,28 +134,25 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 
 	// onRemoteStreamAdded callback
 	this.onRemoteStreamAddedCallback = function(event) {
- 		traceVC('Remote stream added: ' + event);
- 	
- 	 	// save remote stream
-		self.remoteStream = event.stream;
+		traceVC('Remote stream added...');
 		
-		// play remote stream
+		self.remoteStream = event.stream;
 		attachMediaStream(self.remoteStreamElement, event.stream);
 	};
 
 	// onRemoteStreamRemoved callback
 	this.onRemoteStreamRemovedCallback = function(event) {
-		traceVC('Remote stream removed: ' + event);
+		traceVC('Remote stream removed...');
 	};
 	
 	// set Local description
 	this.onGetSessionDescriptionSuccessCallback = function(sessionDescription) {
-		//console.log(sessionDescription);
+		traceVC('LocalDescription...');
 		
 		self.pc.setLocalDescription(sessionDescription,
                                 
                                 function onSuccess() {
-                                  traceVC('Set LocalDescription success');
+                                  traceVC('LocalDescription success');
                                   self.localSessionDescription = sessionDescription;
                                   
                                   // ICE gathering starts work here
@@ -166,7 +163,7 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
                                 },
                                 
                                 function onError(error) {
-                                  traceVC('Set LocalDescription error: ' + error);
+                                  traceVC('LocalDescription error: ' + error);
                                 }
 		);
 	};
@@ -177,6 +174,7 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 	
 	// set Remote description
 	this.setRemoteDescription = function(descriptionSDP, descriptionType) {
+		traceVC('RemoteDescription...');
 		var sessionDescription, candidate;
 		
 		sessionDescription = new RTCSessionDescription({sdp: descriptionSDP, type: descriptionType});
@@ -184,14 +182,14 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 		this.pc.setRemoteDescription(sessionDescription,
                                  
                                  function onSuccess() {
-                                   traceVC("Set RemoteDescription success");
+                                   traceVC("RemoteDescription success");
                                    
                                    if (sessionDescription.type === 'offer')
                                      self.pc.createAnswer(self.onGetSessionDescriptionSuccessCallback, self.onCreateAnswerFailureCallback, SDP_CONSTRAINTS);
                                  },
                                  
                                  function onError(error) {
-                                   traceVC('Set RemoteDescription error: ' + error);
+                                   traceVC('RemoteDescription error: ' + error);
                                  }
 		);
 		
@@ -238,8 +236,6 @@ QBVideoChat.prototype.call = function(userID) {
 
 // Accept call from user 
 QBVideoChat.prototype.accept = function(userID) {
-	traceVC("accept");
-	
 	this.opponentID = userID;
 	this.state = QBVideoChatState.ESTABLISHING;
 	
