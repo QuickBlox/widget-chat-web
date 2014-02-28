@@ -647,6 +647,7 @@ fieldset {
 	}
 		#videochat .videochat-content button {
 			margin: 10px;
+			cursor: pointer;
 		}
 #videochat-overlay {
 	display: none;

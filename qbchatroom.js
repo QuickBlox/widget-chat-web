@@ -757,8 +757,8 @@ function htmlVideoChatBuilder(qbID, name) {
 	html += '<div class="videochat-content">';
 	html += '<video id="localVideo" autoplay></video>';
 	html += '<video id="remoteVideo" class="hidden" autoplay></video>';
-	html += '<button id="doCall" data-qb="' + qbID + '">Call to user</button>';
-	html += '<button class="hidden videochat-close">Hang up</button>';
+	html += '<button id="doCall" class="hidden" data-qb="' + qbID + '">Call to user</button>';
+	html += '<button class="videochat-close hidden">Hang up</button>';
 	html += '</div>';
 	
 	$('#videochat').html(html).after('<div id="videochat-overlay"></div>');
