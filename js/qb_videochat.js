@@ -112,16 +112,16 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 	this.onIceCandidateCallback = function(event) {
 		var candidate = event.candidate;
 	
-		//traceVC('iceGatheringState: ' + event.target.iceGatheringState);
+		traceVC('iceGatheringState: ' + event.target.iceGatheringState);
 	
-		if (candidate) {
+		/*if (candidate) {
 			var iceData = {sdpMLineIndex: candidate.sdpMLineIndex,
       					  		  sdpMid: candidate.sdpMid,
       				   		   candidate: candidate.candidate}
       				   		   
       		//traceVC('onIceCandidateCallback: ' + JSON.stringify(iceData));
 			
-    		var iceDataAsmessage = self.signalingService.xmppDictionaryToText(iceData);
+    		var iceDataAsmessage = iceData;
   	
   			if(self.state == QBVideoChatState.INACTIVE){
   			    // save to queue
@@ -134,7 +134,7 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 
 		} else {
 			//traceVC('No candidates');
-		}
+		}*/
 	};
 
 	// onRemoteStreamAdded callback

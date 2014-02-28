@@ -793,6 +793,7 @@ function getMediaError() {
 }
 
 function onCall(userID, sessionID, sessionDescription) {
+	console.log(userID);
 	console.log('onCall from ' + userID);
 	$('#ring')[0].play();
 	
@@ -801,9 +802,6 @@ function onCall(userID, sessionID, sessionDescription) {
 
 function onAccept() {
 	console.log('my onAccept');
-	
-	self.sessionID = sessionID;
-  self.remoteSessionDescription = sessionDescription;
 }
 
 function onReject() {
