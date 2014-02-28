@@ -53,13 +53,13 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 	this.signalingService.addOnAcceptCallback(this.onAcceptSignalingCallback);
 	
 	// Signalling callbacks
-	this.addCandidate = function(jsonCandidate) {
+	this.addCandidate = function(data) {
 		traceVC("Added remote candidate");
-		var candidate = new RTCIceCandidate({
-			sdpMLineIndex: jsonCandidate.sdpMLineIndex,
-			candidate: jsonCandidate.candidate,
-			sdpMid: jsonCandidate.sdpMid
-		});
+		var jsonCandidate, candidate;
+		
+		jsonCandidate = self.signalingService.xmppTextToDictionary(data);
+		candidate = new RTCIceCandidate(jsonCandidate);
+		
 		self.pc.addIceCandidate(candidate);
 	};
 	
@@ -116,8 +116,8 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 		if (candidate) {
 			iceData = {
 				sdpMLineIndex: candidate.sdpMLineIndex,
-				sdpMid: candidate.sdpMid,
-				candidate: candidate.candidate
+				candidate: candidate.candidate,
+				sdpMid: candidate.sdpMid
 			};
 			
 			iceDataAsmessage = self.signalingService.xmppDictionaryToText(iceData);
