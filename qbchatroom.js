@@ -762,8 +762,8 @@ function htmlVideoChatBuilder(qbID, name) {
 	html += '<header class="popup-header">';
 	html += '<h3>Video chat with ' + name + '</h3></header>';
 	html += '<div class="popup-content">';
-	html += '<video id="localVideo" class="fullVideo" autoplay></video>';
-	html += '<video id="remoteVideo" class="smallVideo" autoplay></video>';
+	html += '<video id="localVideo" class="fullVideo" autoplay muted="true"></video>';
+	html += '<video id="remoteVideo" class="smallVideo" autoplay muted="true"></video>';
 	html += '<button class="doCall hidden" data-qb="' + qbID + '">Call to user</button>';
 	html += '<button class="stopCall hidden" data-qb="' + qbID + '">Hang up</button>';
 	html += '</div>';
@@ -867,3 +867,15 @@ function onAccept(qbID) {
 function onReject() {
 	console.log('my onReject');
 }
+
+/*
+def get_preferred_audio_receive_codec():
+  return 'opus/48000'
+
+def get_preferred_audio_send_codec(user_agent):
+  # Empty string means no preference.
+  preferred_audio_send_codec = ''
+  # Prefer to send ISAC on Chrome for Android.
+  if 'Android' in user_agent and 'Chrome' in user_agent:
+    preferred_audio_send_codec = 'ISAC/16000'
+  return preferred_audio_send_codec*/
