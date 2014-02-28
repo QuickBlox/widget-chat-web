@@ -310,7 +310,7 @@ function centerPopup(selector, isControls) {
 }
 
 function closeVideoChat() {
-	$('#videochat').find('button').hide();
+	$('#videochat').emplty();
 	$('#videochat').hide();
 	$('#videochat-overlay').remove();
 }
