@@ -806,6 +806,10 @@ function getMediaSuccess(qbID, sessionDescription) {
 	$('.loading_messages').remove();
 	
 	if (sessionDescription) {
+		$('#localVideo')[0].pause();
+		$('#localVideo').addClass('smallVideo').removeClass('fullVideo');
+		$('#remoteVideo').addClass('fullVideo').removeClass('smallVideo');
+		$('#localVideo')[0].play();
 		$('.stopCall').show();
 		videoChat.remoteSessionDescription = sessionDescription;
 		videoChat.accept(qbID);
@@ -843,8 +847,10 @@ function onCall(qbID, sessionDescription, sessionID) {
 
 function onAccept(qbID) {
 	console.log('onAccept from ' + qbID);
+	$('#localVideo')[0].pause();
 	$('#localVideo').addClass('smallVideo').removeClass('fullVideo');
 	$('#remoteVideo').addClass('fullVideo').removeClass('smallVideo');
+	$('#localVideo')[0].play();
 }
 
 function onReject() {
