@@ -37,23 +37,23 @@ var QBVideoChatState = {
 function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signalingService, sessionID) {
  	var self = this;
 	
-  this.sessionID = sessionID || new Date().getTime();
-  traceVC("sessionID = " + this.sessionID);
-  
+	this.sessionID = sessionID || new Date().getTime();
+	traceVC("sessionID = " + this.sessionID);
+	
 	this.candidatesQueue = [];
 	this.remoteSessionDescription = null;
 	this.state = QBVideoChatState.INACTIVE;
 	
-  this.localStreamElement = localStreamElement;
-  this.remoteStreamElement = remoteStreamElement;
-  this.constraints = constraints;
-  
-  this.signalingService = signalingService;
-  this.signalingService.onCandidateCallback = this.addCandidate;
+	this.localStreamElement = localStreamElement;
+	this.remoteStreamElement = remoteStreamElement;
+	this.constraints = constraints;
+	
+	this.signalingService = signalingService;
+	this.signalingService.onCandidateCallback = this.addCandidate;
 	this.signalingService.addOnAcceptCallback(this.onAcceptSignalingCallback);
-  
-  // Signalling callbacks
-  this.addCandidate = function(jsonCandidate) {
+	
+	// Signalling callbacks
+	this.addCandidate = function(jsonCandidate) {
 		traceVC("Added remote candidate: " + JSON.stringify(jsonCandidate));
 		var candidate = new RTCIceCandidate({
 			sdpMLineIndex: jsonCandidate.sdpMLineIndex,
@@ -67,7 +67,7 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 		self.setRemoteDescription(sessionDescription, "answer"); //TODO: refactor this (hide)
 	};
 	
-  // MediaStream getUserMedia 
+	// MediaStream getUserMedia 
 	this.getUserMedia = function() {
 		traceVC("getUserMedia...");
 		
@@ -100,7 +100,7 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 			this.pc.onremovestream = this.onRemoteStreamRemovedCallback;
 		
 			this.pc.addStream(this.localStream);
-   
+			
 			traceVC('RTCPeerConnnection created');
 			//console.log(this.pc);
 		} catch (e) {
@@ -142,31 +142,31 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
  		traceVC('Remote stream added: ' + event);
  	
  	 	// save remote stream
-  	self.remoteStream = event.stream;
-  		
-  	// play remote stream
- 		attachMediaStream(self.remoteStreamElement, event.stream);
+		self.remoteStream = event.stream;
+		
+		// play remote stream
+		attachMediaStream(self.remoteStreamElement, event.stream);
 	};
 
 	// onRemoteStreamRemoved callback
 	this.onRemoteStreamRemovedCallback = function(event) {
-  	traceVC('Remote stream removed: ' + event);
+		traceVC('Remote stream removed: ' + event);
 	};
 	
 	// set Remote description
 	this.setRemoteDescription = function(descriptionSDP, descriptionType) {
-	  this.state = QBVideoChatState.ESTABLISHING;
-	  	
+		this.state = QBVideoChatState.ESTABLISHING;
+			
 		var sessionDescription = new RTCSessionDescription({sdp: descriptionSDP, type: descriptionType});
 		//traceVC('setRemoteDescription: ' + descriptionSDP + ', pc:' + this.pc);
 	
 		this.pc.setRemoteDescription(sessionDescription,
 			function onSuccess() {
 				traceVC("Added remote description");
-				if(sessionDescription.type === 'offer'){
-  					traceVC('Creating answer to peer...');
-  					self.pc.createAnswer(self.onGetSessionDescriptionSuccessCallback, self.onCreateAnswerFailureCallback, SDP_CONSTRAINTS);
-  				}
+				if (sessionDescription.type === 'offer') {
+						traceVC('Creating answer to peer...');
+						self.pc.createAnswer(self.onGetSessionDescriptionSuccessCallback, self.onCreateAnswerFailureCallback, SDP_CONSTRAINTS);
+				}
 			},
 			function onError(error) {
 				traceVC('setRemoteDescription error: ' + error);
@@ -182,7 +182,7 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 	
 	this.onGetSessionDescriptionSuccessCallback = function(sessionDescription) {
 		//console.log(sessionDescription);
-	  
+		
 		self.pc.setLocalDescription(sessionDescription,
                                 
                                 function onSuccess() {
@@ -225,13 +225,13 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 
 	// Cleanup 
 	this.hangup = function() {
-  		traceVC("Closed RTC");
-  		self.pc.close();
-  		self.pc = null;
+		traceVC("Closed RTC");
+		self.pc.close();
+		self.pc = null;
 	};
 }
-    
-// Call to user  
+
+// Call to user
 QBVideoChat.prototype.call = function(userID) {
 	if (this.localSessionDescription) return;
 	
@@ -251,7 +251,7 @@ QBVideoChat.prototype.accept = function(userID) {
 	this.state = QBVideoChatState.ESTABLISHING;
 };
 
-// Reject call from user  
+// Reject call from user
 QBVideoChat.prototype.reject = function(userID) {
 	traceVC("reject");
 	this.signalingService.reject(userID, this.sessionID);
