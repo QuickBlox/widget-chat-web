@@ -60,7 +60,7 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 		self.pc.addIceCandidate(candidate);
 	};
 	
-	this.onAcceptSignalingCallback = function(sessionDescription) {
+	this.onAcceptSignalingCallback = function(userID, sessionDescription) {
 		self.setRemoteDescription(sessionDescription, "answer"); //TODO: refactor this (hide)
 	};
 	
@@ -232,7 +232,6 @@ QBVideoChat.prototype.call = function(userID) {
 QBVideoChat.prototype.accept = function(userID) {
 	this.opponentID = userID;
 	this.setRemoteDescription(this.remoteSessionDescription, "offer");
-	this.state = QBVideoChatState.ESTABLISHING;
 };
 
 // Reject call from user
