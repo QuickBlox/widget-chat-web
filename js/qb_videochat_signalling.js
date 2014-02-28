@@ -49,11 +49,10 @@ function QBVideoChatSignaling() {
 		sessionID = $(msg).find('session')[0].textContent;
 		
 		qbID = getIDFromNode(author);
-		sessionID = parseInt(sessionID);
 		
 		switch (type) {
 		case QBSignalingType.CALL:
-			self.onCallCallback(qbID, body);
+			self.onCallCallback(qbID, body, sessionID);
 			break;
 		case QBSignalingType.ACCEPT:
 			for (var i = 0; i < self.onAcceptCallbacks.length; i++) {

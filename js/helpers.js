@@ -314,3 +314,12 @@ function closeVideoChat() {
 	$('#videochat').hide();
 	$('#videochat-overlay').remove();
 }
+
+function closeCall(id) {
+	$('.remoteCall[data-qb=' + id + ']').remove();
+	if (!$('div').is('.remoteCall')) {
+		$('#remoteCallControls').hide();
+		$('#videochat-overlay').remove();
+		ring.stop();
+	}
+}

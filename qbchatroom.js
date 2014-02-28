@@ -6,7 +6,7 @@
  */
 
 var params, connection, chatUser = {}, namesOccupants = {};
-var signaling, videoChat, localVideo, remoteVideo;
+var signaling, videoChat, localVideo, remoteVideo, ring;
 
 var switches = {
 	isComposing: {},
@@ -22,6 +22,8 @@ $(document).ready(function() {
 			appId: FBAPP_ID,
 			status: false
 		});
+		
+		rind = $('#ring')[0];
 		
 		autoLogin();
 		subscribeFBStatusEvent();
@@ -785,12 +787,21 @@ function doCall() {
 }
 
 function acceptCall() {
+	var qbID, sessionDescription, sessionID;
 	
+	qbID = $(this).parents('.remoteCall').data('qb');
+	sessionDescription = $(this).data('description');
+	sessionID = parseInt($(this).data('id'));
+	
+	closeCall(qbID);
+	makeVideoChat(userID, sessionID, sessionDescription);
 }
 
 function rejectCall() {
-	$('#remoteCallControls').hide();
-	$('#videochat-overlay').remove();
+	var qbID;
+	
+	qbID = $(this).parents('.remoteCall').data('qb');
+	closeCall(qbID);
 }
 
 // callbacks
@@ -803,19 +814,18 @@ function getMediaError() {
 	closeVideoChat();
 }
 
-function onCall(userID, sessionDescription) {
-	console.log('onCall from ' + userID);
-	var html, name, rind = $('#ring')[0];
+function onCall(qbID, sessionDescription, sessionID) {
+	console.log('onCall from ' + qbID);
+	var html, name;
 	
-	name = namesOccupants[userID] || 'Test user';
-	//videoChat.remoteSessionDescription = sessionDescription;
+	name = namesOccupants[qbID];
 	ring.play();
 	
-	html = '<div class="remoteCall" data-qb="' + userID + '">';
+	html = '<div class="remoteCall" data-qb="' + qbID + '">';
 	html += '<header class="popup-header">';
 	html += '<h3>Call from ' + name + '</h3></header>';
 	html += '<div class="popup-content">';
-	html += '<button class="acceptCall">Accept call</button>';
+	html += '<button class="acceptCall" data-id="' + sessionID + '" data-description="' + sessionDescription + '">Accept call</button>';
 	html += '<button class="rejectCall">Reject call</button>';
 	html += '</div></div>';
 	
@@ -829,7 +839,6 @@ function onCall(userID, sessionDescription) {
 
 function onAccept() {
 	console.log('my onAccept');
-	//makeVideoChat(userID, sessionID, sessionDescription);
 }
 
 function onReject() {
