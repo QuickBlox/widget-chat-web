@@ -82,6 +82,7 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 
 		function errorCallback(error) {
 			traceVC("getUserMedia error: ", error);
+			closeVideoChat();
 		}
 	};
 	
