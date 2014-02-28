@@ -242,6 +242,8 @@ QBVideoChat.prototype.call = function(userID) {
 QBVideoChat.prototype.accept = function(userID) {
 	this.opponentID = userID;
 	this.setRemoteDescription(this.remoteSessionDescription, "offer");
+	
+	this.state = QBVideoChatState.ESTABLISHING;
 };
 
 // Reject call from user
