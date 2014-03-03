@@ -853,7 +853,8 @@ function onCall(qbID, sessionDescription, sessionID) {
 	$('#remoteCallControls, #videochat-overlay').show();
 }
 
-function onStop() {
+function onStop(qbID) {
+	console.log('onStop from ' + qbID);
 	closeVideoChat();
 	videoChat.hangup();
 	videoChat = null;
@@ -867,15 +868,3 @@ function onAccept(qbID) {
 function onReject() {
 	console.log('my onReject');
 }
-
-/*
-def get_preferred_audio_receive_codec():
-  return 'opus/48000'
-
-def get_preferred_audio_send_codec(user_agent):
-  # Empty string means no preference.
-  preferred_audio_send_codec = ''
-  # Prefer to send ISAC on Chrome for Android.
-  if 'Android' in user_agent and 'Chrome' in user_agent:
-    preferred_audio_send_codec = 'ISAC/16000'
-  return preferred_audio_send_codec*/

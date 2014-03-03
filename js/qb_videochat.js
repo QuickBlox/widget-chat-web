@@ -164,10 +164,10 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 		var sessionDescription, candidate;
 		
 		this.state = QBVideoChatState.ESTABLISHING;
-		console.log(descriptionSDP);
 		console.log(descriptionType);
 		sessionDescription = new RTCSessionDescription({sdp: descriptionSDP, type: descriptionType});
 		console.log(sessionDescription);
+		console.log(this.pc);
 		
 		this.pc.setRemoteDescription(sessionDescription,
                                  
