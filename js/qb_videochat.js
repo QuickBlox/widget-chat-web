@@ -211,7 +211,7 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 	// Cleanup 
 	this.hangup = function() {
 		self.pc.close();
-		self.pc = null;
+		//self.pc = null;
 	};
 }
 
@@ -227,7 +227,7 @@ QBVideoChat.prototype.call = function(userID) {
 QBVideoChat.prototype.stop = function(userID) {
 	this.signalingService.stop(userID, "manual", this.sessionID);
 	this.state = QBVideoChatState.INACTIVE;
-	//this.hangup();
+	this.hangup();
 };
 
 // Accept call from user 
