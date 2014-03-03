@@ -857,7 +857,7 @@ function onStop(qbID) {
 	console.log('onStop from ' + qbID);
 	closeVideoChat();
 	//videoChat.hangup();
-	videoChat = null;
+	//videoChat = null;
 }
 
 function onAccept(qbID) {
