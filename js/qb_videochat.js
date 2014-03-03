@@ -227,7 +227,7 @@ QBVideoChat.prototype.call = function(userID) {
 QBVideoChat.prototype.stop = function(userID) {
 	this.signalingService.stop(userID, "manual", this.sessionID);
 	this.state = QBVideoChatState.INACTIVE;
-	this.hangup();
+	//this.hangup();
 };
 
 // Accept call from user 
