@@ -169,6 +169,7 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 		sessionDescription = new RTCSessionDescription({sdp: descriptionSDP, type: descriptionType});
 		console.log(sessionDescription);
 		console.log(this.pc);
+		console.log(self.pc);
 		
 		this.pc.setRemoteDescription(sessionDescription,
                                  
