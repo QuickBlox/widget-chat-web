@@ -213,7 +213,7 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 		self.localStream.stop();
 		self.pc.removeStream(self.localStream);
 		//self.pc.close();
-		//self.pc = null;
+		self.pc = null;
 	};
 }
 
