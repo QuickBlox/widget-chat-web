@@ -135,7 +135,6 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 	// Set LocalDescription
 	this.onGetSessionDescriptionSuccessCallback = function(sessionDescription) {
 		traceVC('LocalDescription...');
-		console.log(this.pc);
 		self.pc.setLocalDescription(sessionDescription,
                                 
                                 function onSuccess() {
@@ -165,11 +164,10 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 		var sessionDescription, candidate;
 		
 		this.state = QBVideoChatState.ESTABLISHING;
-		console.log(descriptionType);
 		sessionDescription = new RTCSessionDescription({sdp: descriptionSDP, type: descriptionType});
+		console.log(descriptionType);
 		console.log(sessionDescription);
 		console.log(this.pc);
-		console.log(self.pc);
 		
 		this.pc.setRemoteDescription(sessionDescription,
                                  
@@ -212,13 +210,11 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 
 	// Cleanup 
 	this.hangup = function() {
-		console.log(this.pc);
 		console.log(self.pc);
-		this.localStream.stop();
+		self.localStream.stop();
 		//self.pc.removeStream(self.localStream);
-		this.pc.close();
-		this.pc = null;
-		console.log(this.pc);
+		self.pc.close();
+		self.pc = null;
 		console.log(self.pc);
 	};
 }

@@ -749,7 +749,6 @@ function makeVideoChat(event, qbID, sessionDescription, sessionID) {
 	remoteVideo = $('#remoteVideo')[0];
 	
 	videoChat = new QBVideoChat({audio: true, video: true}, localVideo, remoteVideo, signaling, sessionID);
-	console.log(videoChat);
 	videoChat.onGetUserMediaSuccess = function() {getMediaSuccess(qbID, sessionDescription)};
 	videoChat.onGetUserMediaError = getMediaError;
 	
@@ -791,7 +790,7 @@ function stopCall() {
 	qbID = $(this).data('qb');
 	closeVideoChat();
 	videoChat.stop(qbID);
-	//videoChat = null;
+	videoChat = null;
 }
 
 function acceptCall() {
@@ -858,7 +857,7 @@ function onStop(qbID) {
 	console.log('onStop from ' + qbID);
 	closeVideoChat();
 	videoChat.hangup();
-	//videoChat = null;
+	videoChat = null;
 }
 
 function onAccept(qbID) {
