@@ -212,8 +212,8 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 	this.hangup = function() {
 		self.localStream.stop();
 		self.pc.removeStream(self.localStream);
-		self.pc.close();
-		self.pc = null;
+		//self.pc.close();
+		//self.pc = null;
 	};
 }
 
