@@ -86,6 +86,7 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 		traceVC("RTCPeerConnection...");
 		try {
 			this.pc = new RTCPeerConnection(ICE_SERVERS);
+			console.log(this.pc);
 			this.pc.addStream(this.localStream);
 			this.pc.onicecandidate = this.onIceCandidateCallback;
 			this.pc.onaddstream = this.onRemoteStreamAddedCallback;
@@ -211,9 +212,9 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 	// Cleanup 
 	this.hangup = function() {
 		self.localStream.stop();
-		self.pc.removeStream(self.localStream);
+		//self.pc.removeStream(self.localStream);
 		self.pc.close();
-		//self.pc = null;
+		self.pc = null;
 	};
 }
 
