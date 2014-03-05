@@ -661,7 +661,7 @@ fieldset {
 		}
 		#videochat .smallVideo {
 			position: absolute;
-			right: 0;
+			right: 10px;
 			bottom: 44px;
 			width: 25%;
 		}

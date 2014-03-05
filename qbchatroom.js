@@ -853,7 +853,8 @@ function onCall(qbID, sessionDescription, sessionID) {
 	$('#remoteCallControls, #videochat-overlay').show();
 }
 
-function onStop() {
+function onStop(qbID) {
+	console.log('onStop from ' + qbID);
 	closeVideoChat();
 	videoChat.hangup();
 	videoChat = null;

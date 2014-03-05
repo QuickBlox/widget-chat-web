@@ -294,7 +294,7 @@ function setCallback(callback, name, type) {
 
 function centerPopup(selector, isControls) {
 	var winWidth, winHeight, popupWidth, disWidth, disHeight;
-	var fixWidthRatio = isControls ? 0.25 : 0.625, fixHeightRatio = isControls ? 0.4 : 0.1;
+	var fixWidthRatio = isControls ? 0.25 : 0.625, fixHeightRatio = isControls ? 0.4 : 0.05;
 	
 	winWidth = $(window).width();
 	winHeight = $(window).height();
@@ -304,13 +304,19 @@ function centerPopup(selector, isControls) {
 	disHeight = winHeight * fixHeightRatio;
 	
 	$(selector).css({'width': popupWidth + 'px', 'top': disHeight + 'px', 'left': disWidth + 'px'});
+	
+	if (!isControls) {
+		var popupHeight = winHeight - 80 - 100;
+		$(selector).find('#remoteVideo').css('max-height', popupHeight + 'px');
+	}
+	
 	$('#videochat-overlay').css({'width': winWidth + 'px', 'height': winHeight + 'px'});
 	
 	return false;
 }
 
 function closeVideoChat() {
-	$('#videochat').find('button').hide();
+	$('#videochat').empty();
 	$('#videochat').hide();
 	$('#videochat-overlay').remove();
 }
