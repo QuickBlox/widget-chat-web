@@ -760,11 +760,11 @@ function htmlVideoChatBuilder(qbID, name) {
 	
 	html = '<div class="stopCall popup-close hidden">X</div>';
 	html += '<header class="popup-header">';
-	html += '<h3>Video chat with ' + name + '</h3></header>';
-	html += '<div class="popup-content">';
+	html += '<h3>Video chat with ' + name + '</h3>';
+	html += '</header><div class="popup-content">';
 	html += '<video id="localVideo" class="fullVideo" autoplay muted></video>';
 	html += '<video id="remoteVideo" class="smallVideo" autoplay></video>';
-	html += '<button class="doCall hidden" data-qb="' + qbID + '">Call to user</button>';
+	html += '<button class="doCall hidden" data-qb="' + qbID + '">Call user</button>';
 	html += '<button class="stopCall hidden" data-qb="' + qbID + '">Hang up</button>';
 	html += '</div>';
 	
@@ -839,8 +839,8 @@ function onCall(qbID, sessionDescription, sessionID) {
 	
 	html = '<div class="remoteCall" data-qb="' + qbID + '">';
 	html += '<header class="popup-header">';
-	html += '<h3>Call from ' + name + '</h3></header>';
-	html += '<div class="popup-content">';
+	html += '<h3>Call from ' + name + '</h3>';
+	html += '</header><div class="popup-content">';
 	html += '<button class="acceptCall" data-id="' + sessionID + '" data-description="' + sessionDescription + '">Accept call</button>';
 	html += '<button class="rejectCall">Reject call</button>';
 	html += '</div></div>';
