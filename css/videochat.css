@@ -47,12 +47,21 @@ body {
 			padding: 7px 15px;
 			font-weight: 800;
 			color: #fff;
-			background: #02ad2a;
-			border: 1px solid #00821e;
 			border-radius: 4px;
 			text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 			box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
 			cursor: pointer;
+		}
+		#videochat-footer button:hover {
+			opacity: 0.6;
+		}
+		#videochat-footer .doCall {
+			background: #02ad2a;
+			border: 1px solid #00821e;
+		}
+		#videochat-footer .stopCall {
+			background: #841F22;
+			border: 1px solid #681416;
 		}
 
 #remoteCallControls {
