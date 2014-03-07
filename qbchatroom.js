@@ -756,13 +756,15 @@ function createVideoChatInstance(event, qbID, sessionDescription, sessionID) {
 function getMediaSuccess(qbID, name, sessionDescription) {
 	var popup;
 	
-	if (switches.isVideoChat)
+	if (switches.isVideoChat) {
+		switches.isVideoChat = false;
 		window.open('', 'videoChat').close();
+	}
 	
 	popup = createVideoChatWindow();
-	switches.isVideoChat = true;
 	
 	popup.onload = function() {
+		switches.isVideoChat = true;
 		loadPopup(popup);
 		
 		popup.onresize = function() {
@@ -776,7 +778,8 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		};
 		
 		popup.onunload = function() {
-			stopCall(popup);
+			if (switches.isVideoChat)
+				stopCall(popup);
 		};
 	};
 	
