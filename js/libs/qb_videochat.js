@@ -74,8 +74,8 @@ function QBVideoChat(constraints, signalingService, sessionID) {
 		}
 		
 		function errorCallback(error) {
-			traceVC("getUserMedia error: ", error);
-			self.onGetUserMediaSuccess();
+			traceVC("getUserMedia error: " + JSON.stringify(error));
+			self.onGetUserMediaError();
 		}
 	};
 	

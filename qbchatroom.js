@@ -744,6 +744,7 @@ function createVideoChatInstance(event, qbID, sessionDescription, sessionID) {
 	name = namesOccupants[qbID] || 'Test user';
 	// TODO: Here is need to put a "if block" for checking of existing users
 	
+	window.open('', 'videoChat').close();
 	videoChat = new QBVideoChat({audio: true, video: true}, signaling, sessionID);
 	videoChat.onGetUserMediaSuccess = function() {getMediaSuccess(qbID, name, sessionDescription)};
 	videoChat.onGetUserMediaError = getMediaError;
@@ -788,7 +789,7 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 }
 
 function getMediaError() {
-	stopCall();
+	//stopCall();
 }
 
 function htmlVideoChatBuilder(selector, qbID, name) {
