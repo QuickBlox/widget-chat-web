@@ -331,7 +331,7 @@ function createRemoteCallWindow(winName) {
 }
 
 function setSize(popup, innerWidth, innerHeight) {
-	var video, videoWidth, videoHeight, videoTop, videoLeft, aspectRatio;
+	var video, videoWidth, videoHeight, videoTop, videoLeft, aspectRatio, footerHeight = 52;
 	
 	video = $(popup.document).find('.fullVideo')[0];
 	aspectRatio = video.videoWidth / video.videoHeight;
@@ -340,14 +340,14 @@ function setSize(popup, innerWidth, innerHeight) {
 	             innerWidth : aspectRatio * popup.innerHeight;
 	videoHeight = innerHeight < popup.innerWidth / aspectRatio ?
 	              innerHeight : popup.innerWidth / aspectRatio;
-	videoTop = (innerHeight - videoHeight) / 2;
+	videoTop = (innerHeight - videoHeight - footerHeight) / 2;
 	videoLeft = (innerWidth - videoWidth) / 2;
 	
 	$(popup.document).find('#videochat').css({'width': videoWidth + 'px',
 	                                          'height': videoHeight + 'px',
 	                                          'top': videoTop + 'px',
 	                                          'left': videoLeft + 'px'});
-	if (videoTop == 0)
+	if (videoTop <= 0)
 		$(popup.document).find('#videochat').css('position', 'static');
 	else
 		$(popup.document).find('#videochat').css('position', 'absolute');

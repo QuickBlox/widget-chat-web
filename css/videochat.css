@@ -41,6 +41,7 @@ button:hover {
 ----------------------------------------------------------*/
 #videochat {
 	margin: 0 auto;
+	text-align: center;
 }
 	#videochat .fullVideo {
 		height: 100%;
