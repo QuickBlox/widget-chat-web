@@ -757,12 +757,10 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 	var popup;
 	
 	if (switches.isVideoChat) {
-		popup = window.open('', 'videoChat');
-		loadPopup(popup);
-	} else {
-		popup = createVideoChatWindow();
-		switches.isVideoChat = true;
-	}
+		window.open('', 'videoChat').close();
+	
+	popup = createVideoChatWindow();
+	switches.isVideoChat = true;
 	
 	popup.onload = function() {
 		loadPopup(popup);
@@ -870,7 +868,6 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 	
 	
 	function loadPopup(popup) {
-		console.log(123);
 		var selector = popup.document;
 		
 		audio.ring.play();
