@@ -311,23 +311,18 @@ function createVideoChatWindow() {
 	return popup;
 }
 
-function setSize(selector) {
-	/*var $(selector).find('#localVideo')[0].videoHeight;
-	var aspectRatio = localVideo.videoWidth/localVideo.videoHeight;
-	var innerHeight = this.innerHeight;
-	var innerWidth = this.innerWidth;
-	var videoWidth = innerWidth < aspectRatio * window.innerHeight ?
-	                 innerWidth : aspectRatio * window.innerHeight;
-	var videoHeight = innerHeight < window.innerWidth / aspectRatio ?
-	                  innerHeight : window.innerWidth / aspectRatio;
-	containerDiv = document.getElementById('container');
-	containerDiv.style.width = videoWidth + 'px';
-	containerDiv.style.height = videoHeight + 'px';
-	containerDiv.style.left = (innerWidth - videoWidth) / 2 + 'px';
-	containerDiv.style.top = (innerHeight - videoHeight) / 2 + 'px';*/
+function setSize(popup, innerWidth, innerHeight) {
+	var video, videoWidth, videoHeight, aspectRatio;
 	
-	var width = $(selector).find('.fullVideo')[0].width();
-	$(selector).find('#videoChat').width(width);
+	video = $(popup.document).find('.fullVideo')[0];
+	aspectRatio = video.videoWidth / video.videoHeight;
+	
+	videoWidth = innerWidth < aspectRatio * popup.innerHeight ?
+	             innerWidth : aspectRatio * popup.innerHeight;
+	videoHeight = innerHeight < popup.innerWidth / aspectRatio ?
+	              innerHeight : popup.innerWidth / aspectRatio;
+	
+	$(popup.document).find('#videoChat').width(videoWidth + 'px').height(videoHeight + 'px');
 }
 
 function closeVideoChat() {

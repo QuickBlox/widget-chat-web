@@ -757,6 +757,8 @@ function createVideoChatInstance(event, qbID, sessionDescription, sessionID) {
 
 function getMediaSuccess(qbID, name, sessionDescription) {
 	var popup = createVideoChatWindow();
+	var innerWidth = popup.innerWidth;
+	var innerHeight = popup.innerHeight;
 	
 	popup.onload = function() {
 		var selector = popup.document;
@@ -765,20 +767,21 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		videoChat.localStreamElement = $(selector).find('#localVideo')[0];
 		videoChat.remoteStreamElement = $(selector).find('#remoteVideo')[0];
 		attachMediaStream(videoChat.localStreamElement, videoChat.localStream);
-		setSize(selector);
+		setSize(popup, innerWidth, innerHeight);
 		
-		if (sessionDescription) {
+		/*if (sessionDescription) {
 			$('.stopCall').show();
 			getRemoteStream();
 			
 			videoChat.remoteSessionDescription = sessionDescription;
 			videoChat.accept(qbID);
-		}
+		}*/
 	};
 	
 	popup.onresize = function() {
-		var selector = popup.document;
-		setSize(selector);
+		innerWidth = this.innerWidth;
+		innerHeight = this.innerHeight;
+		setSize(popup, innerWidth, innerHeight);
 	};
 }
 
