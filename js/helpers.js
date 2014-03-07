@@ -362,6 +362,9 @@ function htmlVideoChatBuilder(selector, qbID, name) {
 }
 
 function htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, avatar, name) {
+	if (!avatar)
+		avatar = '../images/avatar_default.jpg';
+	
 	$(selector).find('title').text('Remote call');
 	$(selector).find('.remoteCall-avatar').attr('src', avatar);
 	$(selector).find('.remoteCall-author').html('<b>' + name + '</b><br>is calling you');

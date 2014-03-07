@@ -169,7 +169,7 @@ function getQBUser(user_id, token, pass) {
 					}
 				});
 			} else {
-				chatUser.avatar = chatUser.fbID ? 'https://graph.facebook.com/' + chatUser.fbID + '/picture?width=150&height=150' : 'images/avatar_default.jpg';
+				chatUser.avatar = chatUser.fbID ? 'https://graph.facebook.com/' + chatUser.fbID + '/picture?width=150&height=150' : null;
 			}
 			
 			connectChat(chatUser);
@@ -383,7 +383,7 @@ function sendMesage(event) {
 				showMessage(qbID,
 				            post,
 				            chatUser.name,
-				            chatUser.avatar,
+				            (chatUser.avatar || 'images/avatar_default.jpg'),
 				            (chatUser.fbID || ''),
 				            null,
 				            null,
