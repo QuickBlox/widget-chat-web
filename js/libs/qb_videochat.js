@@ -212,7 +212,8 @@ function QBVideoChat(constraints, signalingService, sessionID) {
 
 // Call to user
 QBVideoChat.prototype.call = function(userID, userAvatar) {
-	//if (this.localSessionDescription) return;
+	if (this.localSessionDescription)
+		this.sendCallRequest();
 	
 	this.opponentID = userID;
 	this.opponentAvatar = userAvatar;
