@@ -56,6 +56,8 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 		sessionID = $(msg).find('session')[0].textContent;
 		
 		qbID = this.getIDFromNode(author);
+		console.log(type);
+		console.log(qbID);
 		
 		switch (type) {
 		case QBSignalingType.CALL:

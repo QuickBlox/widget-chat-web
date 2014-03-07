@@ -347,8 +347,8 @@ function connectChat(chatUser) {
 	});
 }
 
-function rawInput(data) {console.log('RECV: ' + data);}
-function rawOutput(data) {console.log('SENT: ' + data);}
+function rawInput(data) {/*console.log('RECV: ' + data);*/}
+function rawOutput(data) {/*console.log('SENT: ' + data);*/}
 
 function sendMesage(event) {
 	var message, post, userJID, qbID = getIDFromChat();
