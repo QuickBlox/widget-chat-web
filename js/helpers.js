@@ -328,8 +328,8 @@ function setSize(popup, innerWidth, innerHeight) {
 	console.log(aspectRatio);
 	console.log(videoWidth);
 	console.log(videoHeight);
-	console.log($(popup.document).find('#videoChat'));
-	console.log($(popup.document).find('#videoChat')[0]);
+	console.log($(popup.document).find('#videochat'));
+	console.log($(popup.document).find('#videochat')[0]);
 	$(popup.document).find('#videochat')[0].width(videoWidth).height(videoHeight);
 }
 
