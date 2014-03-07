@@ -781,12 +781,14 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 	};
 	
 	popup.onresize = function() {
+		if ($(popup.document).find('.fullVideo')[0]) {
 			var innerWidth = this.innerWidth;
 			var innerHeight = this.innerHeight;
 			console.log(popup);
 			console.log(innerWidth);
 			console.log(innerHeight);
 			setSize(popup, innerWidth, innerHeight);
+		}
 		};
 }
 
