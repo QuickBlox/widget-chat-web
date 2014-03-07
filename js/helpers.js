@@ -321,14 +321,9 @@ function setSize(popup, innerWidth, innerHeight) {
 	             innerWidth : aspectRatio * popup.innerHeight;
 	videoHeight = innerHeight < popup.innerWidth / aspectRatio ?
 	              innerHeight : popup.innerWidth / aspectRatio;
-	
 	videoTop = (innerHeight - videoHeight) / 2;
 	videoLeft = (innerWidth - videoWidth) / 2;
 	
-	console.log(video);
-	console.log(aspectRatio);
-	console.log(videoWidth);
-	console.log(videoHeight);
 	$(popup.document).find('#videochat').css({'width': videoWidth + 'px',
 	                                          'height': videoHeight + 'px',
 	                                          'top': videoTop + 'px',

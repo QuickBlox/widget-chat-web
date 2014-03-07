@@ -56,11 +56,6 @@ $(document).ready(function() {
 		$('.actions-wrap').on('click', '.btn_quote', makeQuote);
 		$('.actions-wrap').on('click', '.btn_private', createPrivateChat);
 		$('.actions-wrap').on('click', '.btn_videocall', createVideoChatInstance);
-		
-		$('#videochat').on('click', '.doCall', doCall);
-		$('#videochat').on('click', '.stopCall', stopCall);
-		$('#remoteCallControls').on('click', '.acceptCall', acceptCall);
-		$('#remoteCallControls').on('click', '.rejectCall', rejectCall);
 	});
 });
 
@@ -762,6 +757,10 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		var selector = popup.document;
 		
 		htmlVideoChatBuilder(selector, qbID, name);
+		$(selector).find('.doCall').click(doCall);
+		$(selector).find('.stopCall').click(stopCall);
+		$(selector).find('#remoteCallControls').on('click', '.acceptCall', acceptCall);
+		$(selector).find('#remoteCallControls').on('click', '.rejectCall', rejectCall);
 		
 		videoChat.localStreamElement = $(selector).find('#localVideo')[0];
 		videoChat.remoteStreamElement = $(selector).find('#remoteVideo')[0];
@@ -793,6 +792,7 @@ function getMediaError() {
 
 function htmlVideoChatBuilder(selector, qbID, name) {
 	$(selector).find('title').text('Video chat with ' + name);
+	$(selector).find('.doCall, .stopCall').attr('data-qb', qbID);
 	$(selector).find('#videochat, #videochat-footer').show();
 }
 
