@@ -9,9 +9,9 @@
 /*
   Public methods:
     - call(userID)
-    - stop(userID)
     - accept(userID)
     - reject(userID)
+    - stop(userID)
  */
 
 var SDP_CONSTRAINTS = {
@@ -222,13 +222,6 @@ QBVideoChat.prototype.call = function(userID) {
 	this.pc.createOffer(this.onGetSessionDescriptionSuccessCallback, this.onCreateOfferFailureCallback);
 };
 
-// Stop call with user
-QBVideoChat.prototype.stop = function(userID) {
-	this.signalingService.stop(userID, "manual", this.sessionID);
-	this.state = QBVideoChatState.INACTIVE;
-	this.hangup();
-};
-
 // Accept call from user 
 QBVideoChat.prototype.accept = function(userID) {
 	this.opponentID = userID;
@@ -239,6 +232,13 @@ QBVideoChat.prototype.accept = function(userID) {
 QBVideoChat.prototype.reject = function(userID) {
 	this.signalingService.reject(userID, this.sessionID);
 	this.state = QBVideoChatState.INACTIVE;
+};
+
+// Stop call with user
+QBVideoChat.prototype.stop = function(userID) {
+	this.signalingService.stop(userID, "manual", this.sessionID);
+	this.state = QBVideoChatState.INACTIVE;
+	this.hangup();
 };
 
 function traceVC(text) {

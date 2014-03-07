@@ -6,13 +6,18 @@
  */
 
 var params, connection, chatUser = {}, namesOccupants = {};
-var signaling, videoChat, localVideo, remoteVideo, ring;
+var signaling, videoChat, localVideo, remoteVideo;
 
 var switches = {
 	isComposing: {},
 	isLogout: false,
 	isFBconnected: false,
 	isOccupantsDownloaded: false
+};
+
+var audio = {
+	signal: $('#signal')[0],
+	ring: $('#ring')[0]
 };
 
 $(document).ready(function() {
@@ -22,8 +27,6 @@ $(document).ready(function() {
 			appId: FBAPP_ID,
 			status: false
 		});
-		
-		ring = $('#ring')[0];
 		
 		autoLogin();
 		subscribeFBStatusEvent();
@@ -419,6 +422,7 @@ function logout(event) {
 	
 	chatUser = {};
 	namesOccupants = {};
+	signaling = null;
 	switches.isOccupantsDownloaded = false;
 	localStorage.removeItem('QBChatUser');
 }
@@ -654,13 +658,13 @@ function makeQuote() {
 }
 
 function takeQuote(str, time) {
-	var quote, signal = $('#signal')[0];
+	var quote;
 	
 	quote = str.split(' ')[0].charAt(0) == '@' && str.split(' ')[0];
 	
 	if (quote) {
 		if (escapeSpace(quote.split('@')[1]) == chatUser.name && !time)
-			signal.play();
+			audio.signal.play();
 		return str.replace(quote, '<b>' + escapeSpace(quote) + '</b>');
 	} else {
 		return str;
@@ -693,7 +697,7 @@ function createPrivateChat() {
 }
 
 function htmlChatBuilder(qbID, fbID, name, chatID, isOwner) {
-	var obj, htmlUsersList, chatsCount, usersCount = 1, signal = $('#signal')[0];
+	var obj, htmlUsersList, chatsCount, usersCount = 1;
 	
 	$('.chats-list').append('<li class="list-item switch-chat" data-id="chat-' + qbID + '">' + name + ' <span class="messages-count"></span></li>')
 	chatsCount = $('.chats-list .list-item').length;
@@ -712,7 +716,7 @@ function htmlChatBuilder(qbID, fbID, name, chatID, isOwner) {
 	} else {
 		$('#chat-room').clone().hide().insertAfter('.chat:last');
 		obj = $('.chat:last');
-		signal.play();
+		audio.signal.play();
 	}
 	
 	obj.attr('id', chatID.substring(1));
@@ -727,9 +731,9 @@ function htmlChatBuilder(qbID, fbID, name, chatID, isOwner) {
 function createSignalingInstance() {
 	signaling = new QBVideoChatSignaling();
 	signaling.onCallCallback = onCall;
-	signaling.onStopCallback = onStop;
 	signaling.addOnAcceptCallback(onAccept);
 	signaling.addOnRejectCallback(onReject);
+	signaling.onStopCallback = onStop;
 	
 	// set WebRTC callbacks
 	$(Object.keys(QBSignalingType)).each(function() {
@@ -777,40 +781,6 @@ function htmlVideoChatBuilder(qbID, name) {
 	$('#videochat, #videochat-overlay').show();
 }
 
-function doCall() {
-	var qbID;
-	qbID = $(this).data('qb');
-	$(this).hide().next().show();
-	videoChat.call(qbID);
-}
-
-
-function stopCall() {
-	var qbID;
-	qbID = $(this).data('qb');
-	closeVideoChat();
-	videoChat.stop(qbID);
-	videoChat = null;
-}
-
-function acceptCall() {
-	var qbID, sessionDescription, sessionID;
-	
-	qbID = $(this).parents('.remoteCall').data('qb');
-	sessionDescription = $(this).data('description');
-	sessionID = parseInt($(this).data('id'));
-	
-	closeCall(qbID);
-	makeVideoChat(null, qbID, sessionDescription, sessionID);
-}
-
-function rejectCall() {
-	var qbID;
-	qbID = $(this).parents('.remoteCall').data('qb');
-	closeCall(qbID);
-}
-
-// callbacks
 function getMediaSuccess(qbID, sessionDescription) {
 	$('.loading_messages').remove();
 	$('.popup-close').show();
@@ -830,12 +800,46 @@ function getMediaError() {
 	stopCall();
 }
 
+// methods
+function doCall() {
+	var qbID;
+	qbID = $(this).data('qb');
+	$(this).hide().next().show();
+	videoChat.call(qbID);
+}
+
+function acceptCall() {
+	var qbID, sessionDescription, sessionID;
+	
+	qbID = $(this).parents('.remoteCall').data('qb');
+	sessionDescription = $(this).data('description');
+	sessionID = parseInt($(this).data('id'));
+	
+	closeCall(qbID);
+	makeVideoChat(null, qbID, sessionDescription, sessionID);
+}
+
+function rejectCall() {
+	var qbID;
+	qbID = $(this).parents('.remoteCall').data('qb');
+	closeCall(qbID);
+}
+
+function stopCall() {
+	var qbID;
+	qbID = $(this).data('qb');
+	closeVideoChat();
+	videoChat.stop(qbID);
+	videoChat = null;
+}
+
+// callbacks
 function onCall(qbID, sessionDescription, sessionID) {
 	console.log('onCall from ' + qbID);
 	var html, name;
 	
 	name = namesOccupants[qbID];
-	ring.play();
+	audio.ring.play();
 	
 	html = '<div class="remoteCall" data-qb="' + qbID + '">';
 	html += '<header class="popup-header">';
@@ -853,13 +857,6 @@ function onCall(qbID, sessionDescription, sessionID) {
 	$('#remoteCallControls, #videochat-overlay').show();
 }
 
-function onStop(qbID) {
-	console.log('onStop from ' + qbID);
-	closeVideoChat();
-	videoChat.hangup();
-	videoChat = null;
-}
-
 function onAccept(qbID) {
 	console.log('onAccept from ' + qbID);
 	getRemoteStream();
@@ -867,4 +864,11 @@ function onAccept(qbID) {
 
 function onReject() {
 	console.log('my onReject');
+}
+
+function onStop(qbID) {
+	console.log('onStop from ' + qbID);
+	closeVideoChat();
+	videoChat.hangup();
+	videoChat = null;
 }

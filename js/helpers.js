@@ -292,29 +292,6 @@ function setCallback(callback, name, type) {
 	connection.addHandler(callback, null, name, type, null, null);
 }
 
-function centerPopup(selector, isControls) {
-	var winWidth, winHeight, popupWidth, disWidth, disHeight;
-	var fixWidthRatio = isControls ? 0.25 : 0.625, fixHeightRatio = isControls ? 0.4 : 0.05;
-	
-	winWidth = $(window).width();
-	winHeight = $(window).height();
-	popupWidth = winWidth * fixWidthRatio;
-	
-	disWidth = (winWidth - popupWidth) / 2;
-	disHeight = winHeight * fixHeightRatio;
-	
-	$(selector).css({'width': popupWidth + 'px', 'top': disHeight + 'px', 'left': disWidth + 'px'});
-	
-	if (!isControls) {
-		var popupHeight = winHeight - 80 - 100;
-		$(selector).find('#remoteVideo').css('max-height', popupHeight + 'px');
-	}
-	
-	$('#videochat-overlay').css({'width': winWidth + 'px', 'height': winHeight + 'px'});
-	
-	return false;
-}
-
 function closeVideoChat() {
 	$('#videochat').empty();
 	$('#videochat').hide();
@@ -326,7 +303,7 @@ function closeCall(id) {
 	if (!$('div').is('.remoteCall')) {
 		$('#remoteCallControls').hide();
 		$('#videochat-overlay').remove();
-		ring.pause();
+		audio.ring.pause();
 	}
 }
 

@@ -1,0 +1,54 @@
+@import url(reset.css);
+
+html {
+	height: 100%;
+}
+body {
+	width: 100%;
+	height: 100%;
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+.hidden {
+	display: none;
+}
+
+/* Video Chat
+----------------------------------------------------------*/
+.popup {
+	position: relative;
+	font-size: 14px;
+	background: #181818;
+	-webkit-font-smoothing: antialiased;
+}
+	.popup button {
+		margin: 20px;
+		padding: 7px 15px;
+		font-weight: 800;
+		color: #fff;
+		background: #02ad2a;
+		border: 1px solid #00821e;
+		border-radius: 4px;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+		cursor: pointer;
+	}
+	#videochat .fullVideo {
+		width: 100%;
+	}
+	#videochat .smallVideo {
+		position: absolute;
+		right: 10px;
+		bottom: 44px;
+		width: 25%;
+	}
+	#videochat button {
+		float: right;
+		margin: 10px;
+	}
+
+#remoteCallControls {
+	z-index: 3000;
+}
+	#remoteCallControls .remoteCall {
+		text-align: center;
+	}
