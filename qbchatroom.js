@@ -771,7 +771,7 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		console.log(popup);
 		console.log(innerWidth);
 		console.log(innerHeight);
-		setSize(popup, innerWidth, innerHeight);
+		//setSize(popup, innerWidth, innerHeight);
 		
 		
 		
