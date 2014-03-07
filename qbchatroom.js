@@ -168,7 +168,7 @@ function getQBUser(user_id, token, pass) {
 					}
 				});
 			} else {
-				chatUser.avatar = chatUser.fbID ? 'https://graph.facebook.com/' + chatUser.fbID + '/picture/' : null;
+				chatUser.avatar = chatUser.fbID ? 'https://graph.facebook.com/' + chatUser.fbID + '/picture?width=150&height=150' : null;
 			}
 			
 			connectChat(chatUser);
