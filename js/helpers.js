@@ -318,7 +318,7 @@ function createRemoteCallWindow(winName) {
 	scrWidth = window.screen.availWidth;
 	scrHeight = window.screen.availHeight;
 	popupWidth = 250;
-	popupHeight = 260;
+	popupHeight = 280;
 	disWidth = (scrWidth - popupWidth) / 2;
 	disHeight = (scrHeight - popupHeight) / 2;
 	params = 'width='+popupWidth+', height='+popupHeight+', left='+disWidth+', top='+disHeight;
@@ -364,7 +364,7 @@ function htmlVideoChatBuilder(selector, qbID, name) {
 function htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, avatar, name) {
 	$(selector).find('title').text('Remote call');
 	$(selector).find('.remoteCall-avatar').attr('src', avatar);
-	$(selector).find('.remoteCall-author').html('<b>' + name + '</b> is calling you');
+	$(selector).find('.remoteCall-author').html('<b>' + name + '</b><br>is calling you');
 	$(selector).find('.acceptCall').attr('data-id', sessionID).attr('data-description', sessionDescription);
 	$(selector).find('#remoteCall').attr('data-qb', qbID).show();
 }

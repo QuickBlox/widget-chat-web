@@ -70,7 +70,7 @@ button:hover {
 		}
 
 #remoteCall {
-	padding: 20px 10px 10px;
+	padding: 20px 10px;
 	text-align: center;
 }
 	#remoteCall .remoteCall-avatar {
@@ -81,7 +81,8 @@ button:hover {
 	#remoteCall .remoteCall-author {
 		margin-bottom: 20px;
 		font-size: 16px;
+		line-height: 20px;
 	}
-	#remoteCall button {
-		margin-right: 5px;
+	#remoteCall button:first-child {
+		margin-right: 15px;
 	}
