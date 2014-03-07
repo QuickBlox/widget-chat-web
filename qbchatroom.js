@@ -778,20 +778,20 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 			videoChat.remoteSessionDescription = sessionDescription;
 			videoChat.accept(qbID);
 		}*/
-	};
-	
-	popup.onresize = function() {
-		var video, innerWidth, innerHeight;
-		video = $(popup.document).find('.fullVideo')[0];
-		if (video && video.videoWidth > 0) {
-			innerWidth = this.innerWidth;
-			innerHeight = this.innerHeight;
-			setSize(popup, innerWidth, innerHeight);
-		}
-	};
-	
-	popup.onunload = function() {
-		stopCall(popup);
+		
+		popup.onresize = function() {
+			var video, innerWidth, innerHeight;
+			video = $(popup.document).find('.fullVideo')[0];
+			if (video && video.videoWidth > 0) {
+				innerWidth = this.innerWidth;
+				innerHeight = this.innerHeight;
+				setSize(popup, innerWidth, innerHeight);
+			}
+		};
+		
+		popup.onunload = function() {
+			stopCall(popup);
+		};
 	};
 }
 
