@@ -766,8 +766,8 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 	
 	popup.onload = function() {
 		loadPopup(popup);
-		$(selector).find('.doCall').click(doCall);
-		$(selector).find('.stopCall').click(stopCall);
+		$(selector).on('click', '.doCall', doCall);
+		$(selector).on('click', '.stopCall', stopCall);
 		
 		popup.onresize = function() {
 			var video, innerWidth, innerHeight;
@@ -864,8 +864,8 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 	
 	popup.onload = function() {
 		loadPopup(popup);
-		$(selector).find('.acceptCall').click(acceptCall);
-		$(selector).find('.rejectCall').click(function() {
+		$(selector).on('click', '.acceptCall', acceptCall);
+		$(selector).on('click', '.rejectCall', function() {
 			popup.close();
 		});
 		
