@@ -877,7 +877,7 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 		htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, avatar, name);
 		$(selector).find('.acceptCall').click(acceptCall);
 		$(selector).find('.rejectCall').click(function() {
-			rejectCall(this.document, sessionID);
+			rejectCall(popup.document, sessionID);
 		});
 	}
 }
