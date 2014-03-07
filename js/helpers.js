@@ -347,6 +347,11 @@ function setSize(popup, innerWidth, innerHeight) {
 	                                          'height': videoHeight + 'px',
 	                                          'top': videoTop + 'px',
 	                                          'left': videoLeft + 'px'});
+	if (videoTop == 0)
+		$(popup.document).find('#videochat').css('position', 'static');
+	else
+		$(popup.document).find('#videochat').css('position', 'absolute');
+	
 	$(popup.document).find('#videochat-footer .controls-wrap').css('width', videoWidth + 'px');
 }
 

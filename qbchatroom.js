@@ -860,11 +860,13 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 		htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, avatar, name);
 		$(selector).find('.acceptCall').click(acceptCall);
 		$(selector).find('.rejectCall').click(rejectCall);
+		
+		popup.onunload = function() {
+			rejectCall(this.document);
+		};
 	};
 	
-	popup.onunload = function() {
-		rejectCall(this.document);
-	};
+	
 }
 
 function onAccept(qbID) {
