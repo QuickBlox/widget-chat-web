@@ -315,7 +315,6 @@ function createRemoteCallWindow(winName) {
 	var scrWidth, scrHeight, popupWidth, popupHeight, disWidth, disHeight;
 	var url, popup;
 	
-	console.log(111111111);
 	scrWidth = window.screen.availWidth;
 	scrHeight = window.screen.availHeight;
 	popupWidth = 250;
@@ -327,7 +326,6 @@ function createRemoteCallWindow(winName) {
 	url = window.location.toString() + 'popups/videochat.html';
 	popup = window.open(url, winName, params);
 	popup.focus();
-	console.log(2222222222);
 	
 	return popup;
 }

@@ -841,16 +841,26 @@ function stopCall(popup) {
 // callbacks
 function onCall(qbID, sessionDescription, sessionID, avatar) {
 	console.log('onCall from ' + qbID);
-	var name, popup;
+	var popup, name = namesOccupants[qbID];
 	
-	/*if (namesWindowsRemoteCall[qbID])
-		window.open('', 'remoteCall-' + qbID).close();*/
-	
-	name = namesOccupants[qbID];
-	namesWindowsRemoteCall[qbID] = true;
-	popup = createRemoteCallWindow('remoteCall-' + qbID);
+	if (namesWindowsRemoteCall[qbID]) {
+		popup = window.open('', 'remoteCall-' + qbID);
+		loadPopup(popup);
+	} else {
+		popup = createRemoteCallWindow('remoteCall-' + qbID);
+		namesWindowsRemoteCall[qbID] = true;
+	}
 	
 	popup.onload = function() {
+		loadPopup(popup);
+		
+		popup.onunload = function() {
+			rejectCall(this.document, sessionID);
+		};
+	};
+	
+	
+	function loadPopup(popup) {
 		console.log(123);
 		var selector = popup.document;
 		
@@ -860,11 +870,7 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 		$(selector).find('.rejectCall').click(function() {
 			rejectCall(this.document, sessionID);
 		});
-		
-		popup.onunload = function() {
-			rejectCall(this.document, sessionID);
-		};
-	};
+	}
 }
 
 function onAccept(qbID) {
