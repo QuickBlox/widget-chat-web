@@ -757,11 +757,12 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 	var popup;
 	
 	if (switches.isVideoChat) {
-		switches.isVideoChat = false;
-		window.open('', 'videoChat').close();
+		popup = window.open('', 'videoChat');
+		loadPopup(popup);
+	} else {
+		popup = createVideoChatWindow();
+		switches.isVideoChat = true;
 	}
-	
-	popup = createVideoChatWindow();
 	
 	popup.onload = function() {
 		loadPopup(popup);
@@ -777,8 +778,7 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		};
 		
 		popup.onunload = function() {
-			if (switches.isVideoChat)
-				stopCall(popup);
+			stopCall(popup);
 		};
 	};
 	
@@ -793,7 +793,6 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		videoChat.localStreamElement = $(selector).find('#localVideo')[0];
 		videoChat.remoteStreamElement = $(selector).find('#remoteVideo')[0];
 		attachMediaStream(videoChat.localStreamElement, videoChat.localStream);
-		switches.isVideoChat = true;
 		
 		/*if (sessionDescription) {
 			$('.stopCall').show();
@@ -843,6 +842,7 @@ function rejectCall(selector, sessionID) {
 
 function stopCall(popup) {
 	console.log('stopstop');
+	switches.isVideoChat = false;
 	/*var qbID;
 	qbID = $(popup.document).find('#videochat, #remoteCall').data('qb');
 	videoChat.stop(qbID);*/
