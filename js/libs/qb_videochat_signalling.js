@@ -16,7 +16,8 @@
   
   Public callbacks:
     - onCall(fromUserID, sessionDescription, sessionID)
-    - onAccept(fromUserID, sessionDescription)
+    - onAccept(fromUserID)
+    - onInnerAccept(sessionDescription)
     - onReject(fromUserID)
     - onStop(fromUserID, reason)
     - onCandidate(candidate)
@@ -30,14 +31,19 @@ var QBSignalingType = {
 	CANDIDATE: 'qbvideochat_candidate'
 };
 
-function QBVideoChatSignaling() {
+function QBVideoChatSignaling(appID, chatServer, connection) {
 	var self = this;
 	
 	this.onCallCallback = null;
- 	this.onAcceptCallbacks = [];
- 	this.onRejectCallbacks = [];
+ 	this.onAcceptCallback = null;
+ 	this.onInnerAcceptCallback = null;
+ 	this.onRejectCallback = null;
 	this.onStopCallback = null;
  	this.onCandidateCallback = null;
+ 	
+ 	this.appID = appID;
+ 	this.chatServer = chatServer;
+ 	this.connection = connection;
 	
 	this.onMessage = function(msg) {
 		var author, type, body;
@@ -48,25 +54,18 @@ function QBVideoChatSignaling() {
 		body = $(msg).find('body')[0].textContent;
 		sessionID = $(msg).find('session')[0].textContent;
 		
-		qbID = getIDFromNode(author);
+		qbID = this.getIDFromNode(author);
 		
 		switch (type) {
 		case QBSignalingType.CALL:
 			self.onCallCallback(qbID, body, sessionID);
 			break;
 		case QBSignalingType.ACCEPT:
-			for (var i = 0; i < self.onAcceptCallbacks.length; i++) {
-				callback = self.onAcceptCallbacks[i];
-				if (typeof(callback) === "function")
-					callback(qbID, body);
-			}
+			self.onAcceptCallback(qbID);
+			self.onInnerAcceptCallback(body);
 			break;
 		case QBSignalingType.REJECT:
-			for (var i = 0; i < self.onRejectCallbacks.length; i++) {
-				callback = self.onRejectCallbacks[i];
-				if (typeof(callback) === "function")
-					callback(qbID);
-			}
+			self.onRejectCallback(qbID);
 			break;
 		case QBSignalingType.STOP:
 			self.onStopCallback(qbID, body);
@@ -80,20 +79,24 @@ function QBVideoChatSignaling() {
 	};
 	
 	this.sendMessage = function(userID, type, data, sessionID) {
-		var opponentJID, reply;
-		
-		opponentJID = getJID(userID);
+		var reply, opponentJID = this.getJID(userID);
 		
 		params = {
 			to: opponentJID,
-			from: connection.jid, 
+			from: this.connection.jid, 
 			type: type
 		};
 		
 		reply = $msg(params).c('body').t(data).up().c('session').t(sessionID);
-		connection.send(reply);
+		this.connection.send(reply);
 	};
 	
+	this.getJID = function(id) {
+		return id + "-" + this.appID + "@" + this.chatServer;
+	};
+	this.getIDFromNode = function(jid) {
+		return Strophe.getNodeFromJid(jid).split('-')[0];
+	};
 	this.xmppTextToDictionary = function(data) {
 		return $.parseJSON(Strophe.unescapeNode(data));
 	};
@@ -103,7 +106,6 @@ function QBVideoChatSignaling() {
 	};
 }
 
-// methods
 QBVideoChatSignaling.prototype.call = function(userID, sessionDescription, sessionID) {
 	traceS('call to ' + userID);
 	this.sendMessage(userID, QBSignalingType.CALL, sessionDescription, sessionID);
@@ -126,15 +128,6 @@ QBVideoChatSignaling.prototype.stop = function(userID, reason, sessionID) {
 
 QBVideoChatSignaling.prototype.sendCandidate = function(userID, candidate, sessionID) {
 	this.sendMessage(userID, QBSignalingType.CANDIDATE, candidate, sessionID);
-};
-
-// callbacks
-QBVideoChatSignaling.prototype.addOnAcceptCallback = function(callback) {
-	this.onAcceptCallbacks.push(callback);
-};
-
-QBVideoChatSignaling.prototype.addOnRejectCallback = function(callback) {
-	this.onRejectCallbacks.push(callback);
 };
 
 function traceS(text) {

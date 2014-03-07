@@ -729,10 +729,10 @@ function htmlChatBuilder(qbID, fbID, name, chatID, isOwner) {
 /* Video Chat Module
 -------------------------------------------------------------------------*/
 function createSignalingInstance() {
-	signaling = new QBVideoChatSignaling();
+	signaling = new QBVideoChatSignaling(QBAPP.appID, CHAT.server, connection);
 	signaling.onCallCallback = onCall;
-	signaling.addOnAcceptCallback(onAccept);
-	signaling.addOnRejectCallback(onReject);
+	signaling.onAcceptCallback = onAccept;
+	signaling.onRejectCallback = onReject;
 	signaling.onStopCallback = onStop;
 	
 	// set WebRTC callbacks

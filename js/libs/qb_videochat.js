@@ -53,15 +53,15 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 		self.pc.addIceCandidate(candidate);
 	};
 	
-	this.onAcceptSignalingCallback = function(userID, sessionDescription) {
-		self.setRemoteDescription(sessionDescription, "answer"); //TODO: refactor this (hide)
+	this.onAcceptSignalingCallback = function(sessionDescription) {
+		self.setRemoteDescription(sessionDescription, "answer");
 	};
 	
 	this.signalingService = signalingService;
 	this.signalingService.onCandidateCallback = this.addCandidate;
-	this.signalingService.addOnAcceptCallback(this.onAcceptSignalingCallback);
+	this.signalingService.onInnerAcceptCallback = this.onAcceptSignalingCallback;
 	
-	// MediaStream getUserMedia 
+	// MediaStream getUserMedia
 	this.getUserMedia = function() {
 		traceVC("getUserMedia...");
 		
@@ -207,7 +207,7 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 
 	// Cleanup 
 	this.hangup = function() {
-		self.signalingService.onAcceptCallbacks[1] = null;
+		self.signalingService = null;
 		self.localStream.stop();
 		self.pc.close();
 		self.pc = null;
