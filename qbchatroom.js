@@ -739,13 +739,14 @@ function createSignalingInstance() {
 }
 
 function createVideoChatInstance(event, qbID, sessionDescription, sessionID) {
-	var name;
+	var name, popup = window.open('', 'videoChat');
 	
 	qbID = qbID || $(this).data('qb');
 	name = namesOccupants[qbID] || 'Test user';
 	// TODO: Here is need to put a "if block" for checking of existing users
 	
-	window.open('', 'videoChat').close();
+	if (popup) popup.close();
+	
 	videoChat = new QBVideoChat({audio: true, video: true}, signaling, sessionID);
 	videoChat.onGetUserMediaSuccess = function() {getMediaSuccess(qbID, name, sessionDescription)};
 	videoChat.onGetUserMediaError = getMediaError;
@@ -837,11 +838,12 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 	console.log('onCall from ' + qbID);
 	var name, popup;
 	
-	window.open('', 'remoteCall-' + qbID).close();
-	namesWindowsRemoteCall[qbID] = true;
+	if (namesWindowsRemoteCall[qbID])
+		window.open('', 'remoteCall-' + qbID).close();
 	
 	audio.ring.play();
 	name = namesOccupants[qbID];
+	namesWindowsRemoteCall[qbID] = true;
 	popup = createRemoteCallWindow('remoteCall-' + qbID);
 	
 	popup.onload = function() {
@@ -862,8 +864,8 @@ function onAccept(qbID) {
 	getRemoteStream();
 }
 
-function onReject() {
-	console.log('my onReject');
+function onReject(qbID) {
+	console.log('onReject from ' + qbID);
 	var popup = window.open('', 'videoChat');
 	$(popup.document).find('.stopCall').hide().parent().find('.doCall').show();
 }
