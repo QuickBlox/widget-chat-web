@@ -818,14 +818,13 @@ function acceptCall() {
 	makeVideoChat(null, qbID, sessionDescription, sessionID);
 }
 
-function rejectCall(selector) {
-	console.log('rejectreject');
+function rejectCall(selector, sessionID) {
 	var qbID;
 	
 	qbID = $(selector).find('#remoteCall').data('qb');
 	delete namesWindowsRemoteCall[qbID];
 	
-	videoChat = videoChat || new QBVideoChat(null, signaling);
+	videoChat = videoChat || new QBVideoChat(null, signaling, sessionID);
 	videoChat.reject(qbID);
 	
 	if (Object.keys(namesWindowsRemoteCall).length == 0)
@@ -857,10 +856,12 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 		
 		htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, avatar, name);
 		$(selector).find('.acceptCall').click(acceptCall);
-		$(selector).find('.rejectCall').click(rejectCall);
+		$(selector).find('.rejectCall').click(function() {
+			rejectCall(this.document, sessionID);
+		});
 		
 		popup.onunload = function() {
-			rejectCall(this.document);
+			rejectCall(this.document, sessionID);
 		};
 	};
 }
