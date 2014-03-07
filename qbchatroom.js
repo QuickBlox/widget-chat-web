@@ -760,8 +760,8 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 	
 	popup.onload = function() {
 		var selector = popup.document;
-		var innerWidth = popup.innerWidth;
-		var innerHeight = popup.innerHeight;
+		var innerWidth = this.innerWidth;
+		var innerHeight = this.innerHeight;
 		
 		htmlVideoChatBuilder(selector, qbID, name);
 		
@@ -774,14 +774,7 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		setSize(popup, innerWidth, innerHeight);
 		
 		
-		popup.onresize = function() {
-			innerWidth = this.innerWidth;
-			innerHeight = this.innerHeight;
-			console.log(popup);
-			console.log(innerWidth);
-			console.log(innerHeight);
-			setSize(popup, innerWidth, innerHeight);
-		};
+		
 		
 		/*if (sessionDescription) {
 			$('.stopCall').show();
@@ -792,7 +785,14 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		}*/
 	};
 	
-	
+	popup.onresize = function() {
+			var innerWidth = this.innerWidth;
+			var innerHeight = this.innerHeight;
+			console.log(popup);
+			console.log(innerWidth);
+			console.log(innerHeight);
+			setSize(popup, innerWidth, innerHeight);
+		};
 }
 
 function getMediaError() {

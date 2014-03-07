@@ -315,6 +315,9 @@ function setSize(popup, innerWidth, innerHeight) {
 	var video, videoWidth, videoHeight, aspectRatio;
 	
 	video = $(popup.document).find('.fullVideo')[0];
+	console.log(video);
+	console.log(video.videoWidth);
+	console.log(11111111);
 	aspectRatio = video.videoWidth / video.videoHeight;
 	
 	videoWidth = innerWidth < aspectRatio * popup.innerHeight ?
