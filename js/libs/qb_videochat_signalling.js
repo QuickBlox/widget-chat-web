@@ -46,6 +46,7 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
  	this.connection = connection;
 	
 	this.onMessage = function(msg) {
+		console.log(msg);
 		var author, type, body;
 		var qbID, sessionID, callback;
 		
@@ -80,8 +81,6 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 	
 	this.sendMessage = function(userID, type, data, sessionID) {
 		var reply, opponentJID = this.getJID(userID);
-		console.log(opponentJID);
-		console.log(this.connection);
 		
 		params = {
 			to: opponentJID,
@@ -96,13 +95,15 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 	this.getJID = function(id) {
 		return id + "-" + this.appID + "@" + this.chatServer;
 	};
+	
 	this.getIDFromNode = function(jid) {
 		return Strophe.getNodeFromJid(jid).split('-')[0];
 	};
+	
 	this.xmppTextToDictionary = function(data) {
 		return $.parseJSON(Strophe.unescapeNode(data));
 	};
-
+	
 	this.xmppDictionaryToText = function(data) {
 		return Strophe.escapeNode(JSON.stringify(data));
 	};
