@@ -292,6 +292,25 @@ function setCallback(callback, name, type) {
 	connection.addHandler(callback, null, name, type, null, null);
 }
 
+function createVideoChatWindow() {
+	var scrWidth, scrHeight, popupWidth, popupHeight, disWidth, disHeight;
+	var url, popup;
+	
+	scrWidth = window.screen.width;
+	scrHeight = window.screen.height;
+	popupWidth = scrWidth / 2;
+	popupHeight = scrHeight / 2;
+	disWidth = scrWidth / 4;
+	disHeight = scrHeight / 4;
+	params = 'resizable=yes, width='+popupWidth+', height='+popupHeight+', left='+disWidth+', top='+disHeight;
+	
+	url = window.location.toString() + 'popups/videochat.html';
+	popup = window.open(url, 'videoChat', params);
+	popup.focus();
+	
+	return popup;
+}
+
 function closeVideoChat() {
 	$('#videochat').empty();
 	$('#videochat').hide();

@@ -27,19 +27,18 @@ var QBVideoChatState = {
 	ACTIVE: 'active'
 };
 
-function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signalingService, sessionID) {
+function QBVideoChat(constraints, signalingService, sessionID) {
  	var self = this;
 	
 	this.candidatesQueue = [];
+	this.localStreamElement = null;
+	this.remoteStreamElement = null;
 	this.remoteSessionDescription = null;
 	this.onGetUserMediaSuccess = null;
 	this.onGetUserMediaError = null;
 	this.state = QBVideoChatState.INACTIVE;
 	
 	this.constraints = constraints;
-	this.localStreamElement = localStreamElement;
-	this.remoteStreamElement = remoteStreamElement;
-	
 	this.sessionID = sessionID || new Date().getTime();
 	traceVC("sessionID " + this.sessionID);
 	
@@ -69,12 +68,11 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 		
 		function successCallback(localMediaStream) {
 			traceVC("getUserMedia success");
-			attachMediaStream(self.localStreamElement, localMediaStream);
 			self.localStream = localMediaStream;
-			self.createRTCPeerConnection();
 			self.onGetUserMediaSuccess();
+			self.createRTCPeerConnection();
 		}
-
+		
 		function errorCallback(error) {
 			traceVC("getUserMedia error: ", error);
 			self.onGetUserMediaSuccess();
@@ -89,8 +87,6 @@ function QBVideoChat(constraints, localStreamElement, remoteStreamElement, signa
 			this.pc.addStream(this.localStream);
 			this.pc.onicecandidate = this.onIceCandidateCallback;
 			this.pc.onaddstream = this.onRemoteStreamAddedCallback;
-			this.pc.onremovestream = this.onRemoteStreamRemovedCallback;
-			
 			traceVC('RTCPeerConnnection created');
 		} catch (e) {
 			traceVC('RTCPeerConnection failed: ' + e.message);

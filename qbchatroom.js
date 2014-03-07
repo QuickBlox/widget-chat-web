@@ -55,7 +55,8 @@ $(document).ready(function() {
 		$('.chats-list').on('click', '.remove', removeChat);
 		$('.actions-wrap').on('click', '.btn_quote', makeQuote);
 		$('.actions-wrap').on('click', '.btn_private', createPrivateChat);
-		$('.actions-wrap').on('click', '.btn_videocall', makeVideoChat);
+		$('.actions-wrap').on('click', '.btn_videocall', createVideoChatInstance);
+		
 		$('#videochat').on('click', '.doCall', doCall);
 		$('#videochat').on('click', '.stopCall', stopCall);
 		$('#remoteCallControls').on('click', '.acceptCall', acceptCall);
@@ -741,63 +742,57 @@ function createSignalingInstance() {
 	});
 }
 
-function makeVideoChat(event, qbID, sessionDescription, sessionID) {
+function createVideoChatInstance(event, qbID, sessionDescription, sessionID) {
 	var name;
 	
 	qbID = qbID || $(this).data('qb');
 	name = namesOccupants[qbID] || 'Test user';
 	// TODO: Here is need to put a "if block" for checking of existing users
 	
-	htmlVideoChatBuilder(qbID, name);
-	localVideo = $('#localVideo')[0];
-	remoteVideo = $('#remoteVideo')[0];
-	
-	videoChat = new QBVideoChat({audio: true, video: true}, localVideo, remoteVideo, signaling, sessionID);
-	videoChat.onGetUserMediaSuccess = function() {getMediaSuccess(qbID, sessionDescription)};
+	videoChat = new QBVideoChat({audio: true, video: true}, signaling, sessionID);
+	videoChat.onGetUserMediaSuccess = function() {getMediaSuccess(qbID, name, sessionDescription)};
 	videoChat.onGetUserMediaError = getMediaError;
-	
 	videoChat.getUserMedia();
 }
 
-function htmlVideoChatBuilder(qbID, name) {
-	var html;
+function getMediaSuccess(qbID, name, sessionDescription) {
+	var popup = createVideoChatWindow();
 	
-	html = '<div class="stopCall popup-close hidden">X</div>';
-	html += '<header class="popup-header">';
-	html += '<h3>Video chat with ' + name + '</h3>';
-	html += '</header><div class="popup-content">';
-	html += '<video id="localVideo" class="fullVideo" autoplay muted></video>';
-	html += '<video id="remoteVideo" class="smallVideo" autoplay></video>';
-	html += '<button class="doCall hidden" data-qb="' + qbID + '">Call user</button>';
-	html += '<button class="stopCall hidden" data-qb="' + qbID + '">Hang up</button>';
-	html += '</div>';
-	
-	$('#videochat').html(html).after('<div id="videochat-overlay"></div>');
-	
-	centerPopup('#videochat');
-	$(window).resize(function() {centerPopup('#videochat')});
-	$(window).scroll(function() {centerPopup('#videochat')});
-	createAnimatedLoadingMessages('#videochat .popup-content');
-	$('#videochat, #videochat-overlay').show();
-}
-
-function getMediaSuccess(qbID, sessionDescription) {
-	$('.loading_messages').remove();
-	$('.popup-close').show();
-	
-	if (sessionDescription) {
-		$('.stopCall').show();
-		getRemoteStream();
+	popup.onload = function() {
+		var selector = popup.document;
+		htmlVideoChatBuilder(selector, qbID, name);
 		
-		videoChat.remoteSessionDescription = sessionDescription;
-		videoChat.accept(qbID);
-	} else {
-		$('.doCall').show();
-	}
+		videoChat.localStreamElement = $(selector).find('#localVideo')[0];
+		videoChat.remoteStreamElement = $(selector).find('#remoteVideo')[0];
+		attachMediaStream(videoChat.localStreamElement, videoChat.localStream);
+		
+		if (sessionDescription) {
+			$('.stopCall').show();
+			getRemoteStream();
+			
+			videoChat.remoteSessionDescription = sessionDescription;
+			videoChat.accept(qbID);
+		}
+	};
 }
 
 function getMediaError() {
 	stopCall();
+}
+
+function htmlVideoChatBuilder(selector, qbID, name) {
+	var html;
+	
+	html = '<div class="video-container">';
+	html += '<video id="localVideo" class="fullVideo" autoplay muted></video>';
+	html += '<video id="remoteVideo" class="smallVideo" autoplay></video>';
+	html += '</div><div class="video-controls">';
+	html += '<button class="doCall" data-qb="' + qbID + '">Call user</button>';
+	html += '<button class="stopCall hidden" data-qb="' + qbID + '">Hang up</button>';
+	html += '</div>';
+	
+	$(selector).find('title').text('Video chat with ' + name);
+	$(selector).find('#videochat').html(html).show();
 }
 
 // methods
