@@ -801,8 +801,6 @@ function getMediaError() {
 
 // methods
 function doCall() {
-	console.log('test');
-	console.log(videoChat);
 	var qbID;
 	qbID = $(this).data('qb');
 	$(this).hide().parent().find('.stopCall').show();
@@ -865,8 +863,6 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 			rejectCall(this.document);
 		};
 	};
-	
-	
 }
 
 function onAccept(qbID) {
