@@ -821,6 +821,7 @@ function acceptCall() {
 }
 
 function rejectCall(selector) {
+	console.log('rejectreject');
 	var qbID;
 	
 	qbID = $(selector).find('#remoteCall').data('qb');
@@ -834,9 +835,10 @@ function rejectCall(selector) {
 }
 
 function stopCall(popup) {
-	var qbID;
+	console.log('stopstop');
+	/*var qbID;
 	qbID = $(popup.document).find('#videochat, #remoteCall').data('qb');
-	videoChat.stop(qbID);
+	videoChat.stop(qbID);*/
 }
 
 // callbacks
