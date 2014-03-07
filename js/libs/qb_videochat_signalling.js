@@ -55,7 +55,7 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 		body = $(msg).find('body')[0].textContent;
 		sessionID = $(msg).find('session')[0].textContent;
 		
-		qbID = this.getIDFromNode(author);
+		qbID = self.getIDFromNode(author);
 		console.log(type);
 		console.log(qbID);
 		
@@ -82,11 +82,11 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 	};
 	
 	this.sendMessage = function(userID, type, data, sessionID) {
-		var reply, opponentJID = this.getJID(userID);
+		var reply, opponentJID = self.getJID(userID);
 		
 		params = {
 			to: opponentJID,
-			from: this.connection.jid, 
+			from: self.connection.jid, 
 			type: type
 		};
 		
