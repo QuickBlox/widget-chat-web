@@ -11,6 +11,7 @@ var signaling, videoChat, localVideo, remoteVideo;
 var switches = {
 	isComposing: {},
 	isLogout: false,
+	isVideoChat: false,
 	isFBconnected: false,
 	isOccupantsDownloaded: false
 };
@@ -420,6 +421,7 @@ function logout(event) {
 	namesOccupants = {};
 	namesWindowsRemoteCall = {};
 	signaling = null;
+	switches.isVideoChat = false;
 	switches.isOccupantsDownloaded = false;
 	localStorage.removeItem('QBChatUser');
 }
@@ -739,13 +741,14 @@ function createSignalingInstance() {
 }
 
 function createVideoChatInstance(event, qbID, sessionDescription, sessionID) {
-	var name, popup = window.open('', 'videoChat');
+	var name;
 	
 	qbID = qbID || $(this).data('qb');
 	name = namesOccupants[qbID] || 'Test user';
 	// TODO: Here is need to put a "if block" for checking of existing users
 	
-	if (popup) popup.close();
+	if (switches.isVideoChat)
+		window.open('', 'videoChat').close();
 	
 	videoChat = new QBVideoChat({audio: true, video: true}, signaling, sessionID);
 	videoChat.onGetUserMediaSuccess = function() {getMediaSuccess(qbID, name, sessionDescription)};
@@ -755,6 +758,7 @@ function createVideoChatInstance(event, qbID, sessionDescription, sessionID) {
 
 function getMediaSuccess(qbID, name, sessionDescription) {
 	var popup = createVideoChatWindow();
+	switches.isVideoChat = true;
 	
 	popup.onload = function() {
 		var selector = popup.document;
