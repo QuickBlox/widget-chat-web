@@ -843,17 +843,18 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 	console.log('onCall from ' + qbID);
 	var name, popup;
 	
-	if (namesWindowsRemoteCall[qbID])
-		window.open('', 'remoteCall-' + qbID).close();
+	/*if (namesWindowsRemoteCall[qbID])
+		window.open('', 'remoteCall-' + qbID).close();*/
 	
-	audio.ring.play();
 	name = namesOccupants[qbID];
 	namesWindowsRemoteCall[qbID] = true;
 	popup = createRemoteCallWindow('remoteCall-' + qbID);
 	
 	popup.onload = function() {
+		console.log(123);
 		var selector = popup.document;
 		
+		audio.ring.play();
 		htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, avatar, name);
 		$(selector).find('.acceptCall').click(acceptCall);
 		$(selector).find('.rejectCall').click(function() {
