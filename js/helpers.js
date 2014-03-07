@@ -312,7 +312,21 @@ function createVideoChatWindow() {
 }
 
 function setSize(selector) {
-	var width = $(selector).find('.fullVideo').width();
+	/*var $(selector).find('#localVideo')[0].videoHeight;
+	var aspectRatio = localVideo.videoWidth/localVideo.videoHeight;
+	var innerHeight = this.innerHeight;
+	var innerWidth = this.innerWidth;
+	var videoWidth = innerWidth < aspectRatio * window.innerHeight ?
+	                 innerWidth : aspectRatio * window.innerHeight;
+	var videoHeight = innerHeight < window.innerWidth / aspectRatio ?
+	                  innerHeight : window.innerWidth / aspectRatio;
+	containerDiv = document.getElementById('container');
+	containerDiv.style.width = videoWidth + 'px';
+	containerDiv.style.height = videoHeight + 'px';
+	containerDiv.style.left = (innerWidth - videoWidth) / 2 + 'px';
+	containerDiv.style.top = (innerHeight - videoHeight) / 2 + 'px';*/
+	
+	var width = $(selector).find('.fullVideo')[0].width();
 	$(selector).find('#videoChat').width(width);
 }
 

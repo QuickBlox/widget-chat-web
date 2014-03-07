@@ -35,6 +35,7 @@ body {
 		bottom: 0;
 		width: 100%;
 		height: 52px;
+		background: #181818;
 	}
 		.videochat-controls button {
 			float: right;
