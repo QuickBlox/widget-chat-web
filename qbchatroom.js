@@ -169,7 +169,7 @@ function getQBUser(user_id, token, pass) {
 					}
 				});
 			} else {
-				chatUser.avatar = chatUser.fbID ? 'https://graph.facebook.com/' + chatUser.fbID + '/picture?width=150&height=150' : null;
+				chatUser.avatar = chatUser.fbID ? 'https://graph.facebook.com/' + chatUser.fbID + '/picture?width=150&height=150' : 'images/avatar_default.jpg';
 			}
 			
 			connectChat(chatUser);
@@ -383,7 +383,7 @@ function sendMesage(event) {
 				showMessage(qbID,
 				            post,
 				            chatUser.name,
-				            (chatUser.avatar || 'images/avatar_default.png'),
+				            chatUser.avatar,
 				            (chatUser.fbID || ''),
 				            null,
 				            null,
@@ -477,7 +477,7 @@ function getPresence(stanza, room) {
 
 function getMessage(stanza, room) {
 	var type, author, response, createTime, messageTime, composing, paused;
-	var qbID, message, name, avatar, fbID, icon, defaultAvatar = 'images/avatar_default.png';
+	var qbID, message, name, avatar, fbID, icon, defaultAvatar = 'images/avatar_default.jpg';
 	var chatID, selector;
 	
 	if (!switches.isOccupantsDownloaded && $('#chat-room .message').length > 1)
@@ -877,7 +877,7 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 		htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, avatar, name);
 		$(selector).find('.acceptCall').click(acceptCall);
 		$(selector).find('.rejectCall').click(function() {
-			rejectCall(popup.document, sessionID);
+			popup.close();
 		});
 	}
 }
