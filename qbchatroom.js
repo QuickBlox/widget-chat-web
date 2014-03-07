@@ -765,6 +765,7 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		videoChat.localStreamElement = $(selector).find('#localVideo')[0];
 		videoChat.remoteStreamElement = $(selector).find('#remoteVideo')[0];
 		attachMediaStream(videoChat.localStreamElement, videoChat.localStream);
+		setSize(selector);
 		
 		if (sessionDescription) {
 			$('.stopCall').show();
@@ -774,6 +775,11 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 			videoChat.accept(qbID);
 		}
 	};
+	
+	popup.onresize = function() {
+		var selector = popup.document;
+		setSize(selector);
+	};
 }
 
 function getMediaError() {
@@ -781,19 +787,8 @@ function getMediaError() {
 }
 
 function htmlVideoChatBuilder(selector, qbID, name) {
-	var html, fixHeight = 46;
-	
-	html = '<div class="video-container">';
-	html += '<video id="localVideo" class="fullVideo" autoplay muted></video>';
-	html += '<video id="remoteVideo" class="smallVideo" autoplay></video>';
-	html += '</div><div class="video-controls">';
-	html += '<button class="doCall" data-qb="' + qbID + '">Call user</button>';
-	html += '<button class="stopCall hidden" data-qb="' + qbID + '">Hang up</button>';
-	html += '</div>';
-	
 	$(selector).find('title').text('Video chat with ' + name);
-	$(selector).find('body').css('max-height', window.screen.availHeight - fixHeight + 'px');
-	$(selector).find('#videochat').html(html).show();
+	$(selector).find('#videochat').show();
 }
 
 // methods

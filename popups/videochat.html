@@ -6,7 +6,15 @@
 	<link rel="stylesheet" href="../css/videochat.css">
 </head>
 <body>
-	<div id="videochat" class="popup hidden"></div>
-	<div id="remoteCallControls" class="popup hidden"></div>
+	<div id="videochat" class="hidden">
+		<video id="localVideo" class="fullVideo" autoplay muted></video>
+		<video id="remoteVideo" class="smallVideo" autoplay></video>
+		<footer class="videochat-controls">
+			<button class="doCall" data-qb="qbID ">Call user</button>
+			<button class="stopCall hidden" data-qb="qbID">Hang up</button>
+		</footer>
+	</div>
+	
+	<div id="remoteCallControls" class="hidden"></div>
 </body>
 </html>

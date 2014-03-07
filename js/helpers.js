@@ -311,6 +311,11 @@ function createVideoChatWindow() {
 	return popup;
 }
 
+function setSize(selector) {
+	var width = $(selector).find('.fullVideo').width();
+	$(selector).find('#videoChat').width(width);
+}
+
 function closeVideoChat() {
 	$('#videochat').empty();
 	$('#videochat').hide();
