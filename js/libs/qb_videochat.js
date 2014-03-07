@@ -212,12 +212,13 @@ function QBVideoChat(constraints, signalingService, sessionID) {
 
 // Call to user
 QBVideoChat.prototype.call = function(userID, userAvatar) {
-	if (this.localSessionDescription)
+	if (this.localSessionDescription) {
 		this.sendCallRequest();
-	
-	this.opponentID = userID;
-	this.opponentAvatar = userAvatar;
-	this.pc.createOffer(this.onGetSessionDescriptionSuccessCallback, this.onCreateOfferFailureCallback);
+	} else {
+		this.opponentID = userID;
+		this.opponentAvatar = userAvatar;
+		this.pc.createOffer(this.onGetSessionDescriptionSuccessCallback, this.onCreateOfferFailureCallback);
+	}
 };
 
 // Accept call from user 
