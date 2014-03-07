@@ -311,20 +311,20 @@ function createVideoChatWindow() {
 	return popup;
 }
 
-function createRemoteCallWindow() {
+function createRemoteCallWindow(winName) {
 	var scrWidth, scrHeight, popupWidth, popupHeight, disWidth, disHeight;
 	var url, popup;
 	
 	scrWidth = window.screen.availWidth;
 	scrHeight = window.screen.availHeight;
 	popupWidth = 250;
-	popupHeight = 250;
+	popupHeight = 260;
 	disWidth = (scrWidth - popupWidth) / 2;
 	disHeight = (scrHeight - popupHeight) / 2;
 	params = 'width='+popupWidth+', height='+popupHeight+', left='+disWidth+', top='+disHeight;
 	
 	url = window.location.toString() + 'popups/videochat.html';
-	popup = window.open(url, '_blank', params);
+	popup = window.open(url, winName, params);
 	popup.focus();
 	
 	return popup;
@@ -352,31 +352,16 @@ function setSize(popup, innerWidth, innerHeight) {
 
 function htmlVideoChatBuilder(selector, qbID, name) {
 	$(selector).find('title').text('Video chat with ' + name);
-	$(selector).find('.doCall, .stopCall').attr('data-qb', qbID);
+	$(selector).find('#videochat, .doCall, .stopCall').attr('data-qb', qbID);
 	$(selector).find('#videochat, #videochat-footer').show();
 }
 
 function htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, avatar, name) {
-	$(selector).find('title').text('Call from ' + name);
+	$(selector).find('title').text('Remote call');
 	$(selector).find('.remoteCall-avatar').attr('src', avatar);
 	$(selector).find('.remoteCall-author').html('<b>' + name + '</b> is calling you');
 	$(selector).find('.acceptCall').attr('data-id', sessionID).attr('data-description', sessionDescription);
 	$(selector).find('#remoteCall').attr('data-qb', qbID).show();
-}
-
-function closeVideoChat() {
-	$('#videochat').empty();
-	$('#videochat').hide();
-	$('#videochat-overlay').remove();
-}
-
-function closeCall(id) {
-	$('.remoteCall[data-qb=' + id + ']').remove();
-	if (!$('div').is('.remoteCall')) {
-		$('#remoteCallControls').hide();
-		$('#videochat-overlay').remove();
-		audio.ring.pause();
-	}
 }
 
 function getRemoteStream() {

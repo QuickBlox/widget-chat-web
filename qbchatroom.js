@@ -5,7 +5,7 @@
  * author: Andrey Povelichenko <andrey.povelichenko@quickblox.com>
  */
 
-var params, connection, chatUser = {}, namesOccupants = {};
+var params, connection, chatUser = {}, namesOccupants = {}, namesWindowsRemoteCall = {};
 var signaling, videoChat, localVideo, remoteVideo;
 
 var switches = {
@@ -418,6 +418,7 @@ function logout(event) {
 	
 	chatUser = {};
 	namesOccupants = {};
+	namesWindowsRemoteCall = {};
 	signaling = null;
 	switches.isOccupantsDownloaded = false;
 	localStorage.removeItem('QBChatUser');
@@ -783,6 +784,10 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 			setSize(popup, innerWidth, innerHeight);
 		}
 	};
+	
+	popup.onunload = function() {
+		stopCall(popup);
+	};
 }
 
 function getMediaError() {
@@ -793,7 +798,7 @@ function getMediaError() {
 function doCall() {
 	var qbID;
 	qbID = $(this).data('qb');
-	$(this).hide().next().show();
+	$(this).hide().parent().find('.stopCall').show();
 	videoChat.call(qbID, chatUser.avatar);
 }
 
@@ -808,18 +813,23 @@ function acceptCall() {
 	makeVideoChat(null, qbID, sessionDescription, sessionID);
 }
 
-function rejectCall() {
+function rejectCall(selector) {
 	var qbID;
-	qbID = $(this).parents('.remoteCall').data('qb');
-	closeCall(qbID);
+	
+	qbID = $(selector).find('#remoteCall').data('qb');
+	delete namesWindowsRemoteCall[qbID];
+	
+	videoChat = videoChat || new QBVideoChat(null, signaling);
+	videoChat.reject(qbID);
+	
+	if (Object.keys(namesWindowsRemoteCall).length == 0)
+		audio.ring.pause();
 }
 
-function stopCall() {
+function stopCall(popup) {
 	var qbID;
-	qbID = $(this).data('qb');
-	closeVideoChat();
-	videoChat.stop(qbID);
-	videoChat = null;
+	qbID = $(popup.document).find('#videochat, #remoteCall').data('qb');
+	videoChat.reject(qbID);
 }
 
 // callbacks
@@ -827,9 +837,12 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 	console.log('onCall from ' + qbID);
 	var name, popup;
 	
+	window.open('', 'remoteCall-' + qbID).close();
+	namesWindowsRemoteCall[qbID] = true;
+	
 	audio.ring.play();
 	name = namesOccupants[qbID];
-	popup = createRemoteCallWindow();
+	popup = createRemoteCallWindow('remoteCall-' + qbID);
 	
 	popup.onload = function() {
 		var selector = popup.document;
@@ -837,6 +850,10 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 		htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, avatar, name);
 		$(selector).find('.acceptCall').click(acceptCall);
 		$(selector).find('.rejectCall').click(rejectCall);
+	};
+	
+	popup.onunload = function() {
+		rejectCall(this.document);
 	};
 }
 
@@ -847,11 +864,13 @@ function onAccept(qbID) {
 
 function onReject() {
 	console.log('my onReject');
+	var popup = window.open('', 'videoChat');
+	$(popup.document).find('.stopCall').hide().parent().find('.doCall').show();
 }
 
 function onStop(qbID) {
 	console.log('onStop from ' + qbID);
-	closeVideoChat();
+	audio.ring.pause();
 	videoChat.hangup();
 	videoChat = null;
 }

@@ -228,7 +228,6 @@ QBVideoChat.prototype.accept = function(userID) {
 // Reject call from user
 QBVideoChat.prototype.reject = function(userID) {
 	this.signalingService.reject(userID, this.sessionID);
-	this.state = QBVideoChatState.INACTIVE;
 };
 
 // Stop call with user
