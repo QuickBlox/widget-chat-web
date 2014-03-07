@@ -801,6 +801,8 @@ function getMediaError() {
 
 // methods
 function doCall() {
+	console.log('test');
+	console.log(videoChat);
 	var qbID;
 	qbID = $(this).data('qb');
 	$(this).hide().parent().find('.stopCall').show();
@@ -834,7 +836,7 @@ function rejectCall(selector) {
 function stopCall(popup) {
 	var qbID;
 	qbID = $(popup.document).find('#videochat, #remoteCall').data('qb');
-	videoChat.reject(qbID);
+	videoChat.stop(qbID);
 }
 
 // callbacks
