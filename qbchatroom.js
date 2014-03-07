@@ -789,12 +789,6 @@ function getMediaError() {
 	//stopCall();
 }
 
-function htmlVideoChatBuilder(selector, qbID, name) {
-	$(selector).find('title').text('Video chat with ' + name);
-	$(selector).find('.doCall, .stopCall').attr('data-qb', qbID);
-	$(selector).find('#videochat, #videochat-footer').show();
-}
-
 // methods
 function doCall() {
 	var qbID;
@@ -844,14 +838,6 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 		$(selector).find('.acceptCall').click(acceptCall);
 		$(selector).find('.rejectCall').click(rejectCall);
 	};
-}
-
-function htmlVideoChatBuilder(selector, qbID, sessionDescription, sessionID, avatar, name) {
-	$(selector).find('title').text('Call from ' + name);
-	$(selector).find('.remoteCall-avatar').attr('src', avatar);
-	$(selector).find('.remoteCall-author').html('<b>' + name + '</b> is calling you');
-	$(selector).find('.acceptCall').attr('data-id', sessionID).attr('data-description', sessionDescription);
-	$(selector).find('#remoteCall').attr('data-qb', qbID).show();
 }
 
 function onAccept(qbID) {

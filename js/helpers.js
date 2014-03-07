@@ -350,6 +350,20 @@ function setSize(popup, innerWidth, innerHeight) {
 	$(popup.document).find('#videochat-footer .controls-wrap').css('width', videoWidth + 'px');
 }
 
+function htmlVideoChatBuilder(selector, qbID, name) {
+	$(selector).find('title').text('Video chat with ' + name);
+	$(selector).find('.doCall, .stopCall').attr('data-qb', qbID);
+	$(selector).find('#videochat, #videochat-footer').show();
+}
+
+function htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, avatar, name) {
+	$(selector).find('title').text('Call from ' + name);
+	$(selector).find('.remoteCall-avatar').attr('src', avatar);
+	$(selector).find('.remoteCall-author').html('<b>' + name + '</b> is calling you');
+	$(selector).find('.acceptCall').attr('data-id', sessionID).attr('data-description', sessionDescription);
+	$(selector).find('#remoteCall').attr('data-qb', qbID).show();
+}
+
 function closeVideoChat() {
 	$('#videochat').empty();
 	$('#videochat').hide();
