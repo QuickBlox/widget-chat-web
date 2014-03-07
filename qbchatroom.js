@@ -764,7 +764,6 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 	popup = createVideoChatWindow();
 	
 	popup.onload = function() {
-		switches.isVideoChat = true;
 		loadPopup(popup);
 		
 		popup.onresize = function() {
@@ -794,6 +793,7 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		videoChat.localStreamElement = $(selector).find('#localVideo')[0];
 		videoChat.remoteStreamElement = $(selector).find('#remoteVideo')[0];
 		attachMediaStream(videoChat.localStreamElement, videoChat.localStream);
+		switches.isVideoChat = true;
 		
 		/*if (sessionDescription) {
 			$('.stopCall').show();
