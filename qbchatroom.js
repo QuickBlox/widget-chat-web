@@ -781,7 +781,7 @@ function getMediaError() {
 }
 
 function htmlVideoChatBuilder(selector, qbID, name) {
-	var html;
+	var html, fixHeight = 46;
 	
 	html = '<div class="video-container">';
 	html += '<video id="localVideo" class="fullVideo" autoplay muted></video>';
@@ -792,6 +792,7 @@ function htmlVideoChatBuilder(selector, qbID, name) {
 	html += '</div>';
 	
 	$(selector).find('title').text('Video chat with ' + name);
+	$(selector).find('body').css('max-height', window.screen.availHeight - fixHeight + 'px');
 	$(selector).find('#videochat').html(html).show();
 }
 

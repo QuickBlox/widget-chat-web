@@ -32,15 +32,18 @@ body {
 		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
 		cursor: pointer;
 	}
-	#videochat .fullVideo {
-		width: 100%;
+	#videochat .video-container {
+		height: 100%;
 	}
-	#videochat .smallVideo {
-		position: absolute;
-		right: 10px;
-		bottom: 44px;
-		width: 25%;
-	}
+		#videochat .fullVideo {
+			width: 100%;
+		}
+		#videochat .smallVideo {
+			position: absolute;
+			right: 10px;
+			bottom: 44px;
+			width: 25%;
+		}
 	#videochat button {
 		float: right;
 		margin: 10px;
