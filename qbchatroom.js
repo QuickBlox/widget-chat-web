@@ -793,7 +793,7 @@ function getMediaError() {
 
 function htmlVideoChatBuilder(selector, qbID, name) {
 	$(selector).find('title').text('Video chat with ' + name);
-	$(selector).find('#videochat').show();
+	$(selector).find('#videochat, #videochat-footer').show();
 }
 
 // methods

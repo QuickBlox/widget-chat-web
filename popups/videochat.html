@@ -9,11 +9,14 @@
 	<div id="videochat" class="hidden">
 		<video id="localVideo" class="fullVideo" autoplay muted></video>
 		<video id="remoteVideo" class="smallVideo" autoplay></video>
-		<footer class="videochat-controls">
+	</div>
+	
+	<footer id="videochat-footer" class="hidden">
+		<div class="controls-wrap">
 			<button class="doCall" data-qb="qbID ">Call user</button>
 			<button class="stopCall hidden" data-qb="qbID">Hang up</button>
-		</footer>
-	</div>
+		</div>
+	</footer>
 	
 	<div id="remoteCallControls" class="hidden"></div>
 </body>

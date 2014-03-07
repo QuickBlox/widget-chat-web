@@ -8,7 +8,7 @@ body {
 	height: 100%;
 	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 	font-size: 14px;
-	background: #181818;
+	background: #000;
 	-webkit-font-smoothing: antialiased;
 }
 .hidden {
@@ -18,7 +18,7 @@ body {
 /* Video Chat
 ----------------------------------------------------------*/
 #videochat {
-	position: relative;
+	position: absolute;
 	margin: 0 auto;
 }
 	#videochat .fullVideo {
@@ -30,14 +30,18 @@ body {
 		bottom: 44px;
 		width: 25%;
 	}
-	.videochat-controls {
-		position: absolute;
-		bottom: 0;
-		width: 100%;
-		height: 52px;
-		background: #181818;
+	
+#videochat-footer {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	height: 52px;
+	background: #181818;
+}
+	#videochat-footer .controls-wrap {
+		margin: 0 auto;
 	}
-		.videochat-controls button {
+		#videochat-footer button {
 			float: right;
 			margin: 10px;
 			padding: 7px 15px;
