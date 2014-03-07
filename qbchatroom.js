@@ -760,17 +760,12 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 	
 	popup.onload = function() {
 		var selector = popup.document;
-		var innerWidth = this.innerWidth;
-		var innerHeight = this.innerHeight;
 		
 		htmlVideoChatBuilder(selector, qbID, name);
 		
 		videoChat.localStreamElement = $(selector).find('#localVideo')[0];
 		videoChat.remoteStreamElement = $(selector).find('#remoteVideo')[0];
 		attachMediaStream(videoChat.localStreamElement, videoChat.localStream);
-		console.log(popup);
-		console.log(innerWidth);
-		console.log(innerHeight);
 		//setSize(popup, innerWidth, innerHeight);
 		
 		

@@ -317,7 +317,7 @@ function setSize(popup, innerWidth, innerHeight) {
 	video = $(popup.document).find('.fullVideo')[0];
 	console.log(video);
 	console.log(video.videoWidth);
-	console.log(11111111);
+	console.log(video.videoHeight);
 	aspectRatio = video.videoWidth / video.videoHeight;
 	
 	videoWidth = innerWidth < aspectRatio * popup.innerHeight ?
@@ -325,10 +325,10 @@ function setSize(popup, innerWidth, innerHeight) {
 	videoHeight = innerHeight < popup.innerWidth / aspectRatio ?
 	              innerHeight : popup.innerWidth / aspectRatio;
 	
-	console.log(video);
 	console.log(aspectRatio);
 	console.log(videoWidth);
 	console.log(videoHeight);
+	console.log($(popup.document).find('#videoChat')[0]);
 	$(popup.document).find('#videoChat')[0].width(videoWidth).height(videoHeight);
 }
 
