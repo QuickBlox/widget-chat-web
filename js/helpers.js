@@ -317,8 +317,8 @@ function createRemoteCallWindow() {
 	
 	scrWidth = window.screen.availWidth;
 	scrHeight = window.screen.availHeight;
-	popupWidth = 300;
-	popupHeight = 200;
+	popupWidth = 250;
+	popupHeight = 250;
 	disWidth = (scrWidth - popupWidth) / 2;
 	disHeight = (scrHeight - popupHeight) / 2;
 	params = 'width='+popupWidth+', height='+popupHeight+', left='+disWidth+', top='+disHeight;

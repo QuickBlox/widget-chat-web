@@ -831,24 +831,27 @@ function stopCall() {
 // callbacks
 function onCall(qbID, sessionDescription, sessionID, avatar) {
 	console.log('onCall from ' + qbID);
-	var html, name;
+	var name, popup;
 	
-	name = namesOccupants[qbID];
 	audio.ring.play();
-	
-	var popup = createRemoteCallWindow();
+	name = namesOccupants[qbID];
+	popup = createRemoteCallWindow();
 	
 	popup.onload = function() {
 		var selector = popup.document;
 		
-		htmlVideoChatBuilder(selector, qbID, name);
+		htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, avatar, name);
 		$(selector).find('.acceptCall').click(acceptCall);
 		$(selector).find('.rejectCall').click(rejectCall);
-		
-		$(selector).find('title').text('Call from ' + name);
 	};
-	
-	$('#remoteCall').show();
+}
+
+function htmlVideoChatBuilder(selector, qbID, sessionDescription, sessionID, avatar, name) {
+	$(selector).find('title').text('Call from ' + name);
+	$(selector).find('.remoteCall-avatar').attr('src', avatar);
+	$(selector).find('.remoteCall-author').html('<b>' + name + '</b> is calling you');
+	$(selector).find('.acceptCall').attr('data-id', sessionID).attr('data-description', sessionDescription);
+	$(selector).find('#remoteCall').attr('data-qb', qbID).show();
 }
 
 function onAccept(qbID) {

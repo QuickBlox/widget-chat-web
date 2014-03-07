@@ -13,14 +13,16 @@
 	
 	<footer id="videochat-footer" class="hidden">
 		<div class="controls-wrap">
-			<button class="doCall">Call user</button>
-			<button class="stopCall hidden">Hang up</button>
+			<button class="stopCall btn_red hidden">Hang up</button>
+			<button class="doCall btn_green">Call user</button>
 		</div>
 	</footer>
 	
-	<div id="remoteCall" class="hidden" data-qb="' + qbID + '">
-		<button class="acceptCall" data-id="' + sessionID + '" data-description="' + sessionDescription + '">Accept call</button>
-		<button class="rejectCall">Reject call</button>
+	<div id="remoteCall" class="hidden">
+		<img class="remoteCall-avatar" src="" alt="avatar" />
+		<div class="remoteCall-author"></div>
+		<button class="rejectCall btn_red">Decline</button>
+		<button class="acceptCall btn_green">Accept</button>
 	</div>
 </body>
 </html>
