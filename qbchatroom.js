@@ -747,9 +747,6 @@ function createVideoChatInstance(event, qbID, sessionDescription, sessionID) {
 	name = namesOccupants[qbID] || 'Test user';
 	// TODO: Here is need to put a "if block" for checking of existing users
 	
-	if (switches.isVideoChat)
-		window.open('', 'videoChat').close();
-	
 	videoChat = new QBVideoChat({audio: true, video: true}, signaling, sessionID);
 	videoChat.onGetUserMediaSuccess = function() {getMediaSuccess(qbID, name, sessionDescription)};
 	videoChat.onGetUserMediaError = getMediaError;
@@ -757,10 +754,36 @@ function createVideoChatInstance(event, qbID, sessionDescription, sessionID) {
 }
 
 function getMediaSuccess(qbID, name, sessionDescription) {
-	var popup = createVideoChatWindow();
-	switches.isVideoChat = true;
+	var popup;
+	
+	if (switches.isVideoChat) {
+		popup = window.open('', 'videoChat');
+		loadPopup(popup);
+	} else {
+		popup = createVideoChatWindow();
+		switches.isVideoChat = true;
+	}
 	
 	popup.onload = function() {
+		loadPopup(popup);
+		
+		popup.onresize = function() {
+			var video, innerWidth, innerHeight;
+			video = $(popup.document).find('.fullVideo')[0];
+			if (video && video.videoWidth > 0) {
+				innerWidth = this.innerWidth;
+				innerHeight = this.innerHeight;
+				setSize(popup, innerWidth, innerHeight);
+			}
+		};
+		
+		popup.onunload = function() {
+			stopCall(popup);
+		};
+	};
+	
+	
+	function loadPopup(popup) {
 		var selector = popup.document;
 		
 		htmlVideoChatBuilder(selector, qbID, name);
@@ -778,21 +801,7 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 			videoChat.remoteSessionDescription = sessionDescription;
 			videoChat.accept(qbID);
 		}*/
-		
-		popup.onresize = function() {
-			var video, innerWidth, innerHeight;
-			video = $(popup.document).find('.fullVideo')[0];
-			if (video && video.videoWidth > 0) {
-				innerWidth = this.innerWidth;
-				innerHeight = this.innerHeight;
-				setSize(popup, innerWidth, innerHeight);
-			}
-		};
-		
-		popup.onunload = function() {
-			stopCall(popup);
-		};
-	};
+	}
 }
 
 function getMediaError() {
