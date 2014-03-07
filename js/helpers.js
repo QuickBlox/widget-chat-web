@@ -312,12 +312,9 @@ function createVideoChatWindow() {
 }
 
 function setSize(popup, innerWidth, innerHeight) {
-	var video, videoWidth, videoHeight, aspectRatio;
+	var video, videoWidth, videoHeight, videoTop, videoLeft, aspectRatio;
 	
 	video = $(popup.document).find('.fullVideo')[0];
-	console.log(video);
-	console.log(video.videoWidth);
-	console.log(video.videoHeight);
 	aspectRatio = video.videoWidth / video.videoHeight;
 	
 	videoWidth = innerWidth < aspectRatio * popup.innerHeight ?
@@ -325,11 +322,17 @@ function setSize(popup, innerWidth, innerHeight) {
 	videoHeight = innerHeight < popup.innerWidth / aspectRatio ?
 	              innerHeight : popup.innerWidth / aspectRatio;
 	
+	videoTop = (innerHeight - videoHeight) / 2;
+	videoLeft = (innerWidth - videoWidth) / 2;
+	
+	console.log(video);
 	console.log(aspectRatio);
 	console.log(videoWidth);
 	console.log(videoHeight);
-	console.log($(popup.document).find('#videochat')[0]);
-	$(popup.document).find('#videochat').width(videoWidth).height(videoHeight);
+	$(popup.document).find('#videochat').css({'width': videoWidth + 'px',
+	                                          'height': videoHeight + 'px',
+	                                          'top': videoTop + 'px',
+	                                          'left': videoLeft + 'px'});
 }
 
 function closeVideoChat() {

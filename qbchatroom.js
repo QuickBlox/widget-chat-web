@@ -766,10 +766,6 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		videoChat.localStreamElement = $(selector).find('#localVideo')[0];
 		videoChat.remoteStreamElement = $(selector).find('#remoteVideo')[0];
 		attachMediaStream(videoChat.localStreamElement, videoChat.localStream);
-		//setSize(popup, innerWidth, innerHeight);
-		
-		
-		
 		
 		/*if (sessionDescription) {
 			$('.stopCall').show();
@@ -781,15 +777,14 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 	};
 	
 	popup.onresize = function() {
-		if ($(popup.document).find('.fullVideo')[0] && $(popup.document).find('.fullVideo')[0].videoWidth > 0) {
-			var innerWidth = this.innerWidth;
-			var innerHeight = this.innerHeight;
-			console.log(popup);
-			console.log(innerWidth);
-			console.log(innerHeight);
+		var video, innerWidth, innerHeight;
+		video = $(popup.document).find('.fullVideo')[0];
+		if (video && video.videoWidth > 0) {
+			innerWidth = this.innerWidth;
+			innerHeight = this.innerHeight;
 			setSize(popup, innerWidth, innerHeight);
 		}
-		};
+	};
 }
 
 function getMediaError() {
