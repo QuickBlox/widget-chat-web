@@ -46,22 +46,20 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
  	this.connection = connection;
 	
 	this.onMessage = function(msg) {
-		console.log(msg);
 		var author, type, body;
-		var qbID, sessionID, callback;
+		var qbID, sessionID, avatar;
 		
 		author = $(msg).attr('from');
 		type = $(msg).attr('type');
 		body = $(msg).find('body')[0].textContent;
 		sessionID = $(msg).find('session')[0].textContent;
+		avatar = $(msg).find('avatar')[0] && $(msg).find('avatar')[0].textContent;
 		
 		qbID = self.getIDFromNode(author);
-		console.log(type);
-		console.log(qbID);
 		
 		switch (type) {
 		case QBSignalingType.CALL:
-			self.onCallCallback(qbID, body, sessionID);
+			self.onCallCallback(qbID, body, sessionID, avatar);
 			break;
 		case QBSignalingType.ACCEPT:
 			self.onAcceptCallback(qbID);
@@ -81,7 +79,7 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 		return true;
 	};
 	
-	this.sendMessage = function(userID, type, data, sessionID) {
+	this.sendMessage = function(userID, type, data, sessionID, userAvatar) {
 		var reply, opponentJID = self.getJID(userID);
 		
 		params = {
@@ -91,6 +89,8 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 		};
 		
 		reply = $msg(params).c('body').t(data).up().c('session').t(sessionID);
+		if (userAvatar)
+			reply.up().c('avatar').t(userAvatar);
 		this.connection.send(reply);
 	};
 	
@@ -111,9 +111,9 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 	};
 }
 
-QBVideoChatSignaling.prototype.call = function(userID, sessionDescription, sessionID) {
+QBVideoChatSignaling.prototype.call = function(userID, sessionDescription, sessionID, userAvatar) {
 	traceS('call to ' + userID);
-	this.sendMessage(userID, QBSignalingType.CALL, sessionDescription, sessionID);
+	this.sendMessage(userID, QBSignalingType.CALL, sessionDescription, sessionID, userAvatar);
 };
 
 QBVideoChatSignaling.prototype.accept = function(userID, sessionDescription, sessionID) {

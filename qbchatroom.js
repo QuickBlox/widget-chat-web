@@ -760,8 +760,6 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		htmlVideoChatBuilder(selector, qbID, name);
 		$(selector).find('.doCall').click(doCall);
 		$(selector).find('.stopCall').click(stopCall);
-		$(selector).find('#remoteCallControls').on('click', '.acceptCall', acceptCall);
-		$(selector).find('#remoteCallControls').on('click', '.rejectCall', rejectCall);
 		
 		videoChat.localStreamElement = $(selector).find('#localVideo')[0];
 		videoChat.remoteStreamElement = $(selector).find('#remoteVideo')[0];
@@ -802,7 +800,7 @@ function doCall() {
 	var qbID;
 	qbID = $(this).data('qb');
 	$(this).hide().next().show();
-	videoChat.call(qbID);
+	videoChat.call(qbID, chatUser.avatar);
 }
 
 function acceptCall() {
@@ -831,27 +829,26 @@ function stopCall() {
 }
 
 // callbacks
-function onCall(qbID, sessionDescription, sessionID) {
+function onCall(qbID, sessionDescription, sessionID, avatar) {
 	console.log('onCall from ' + qbID);
 	var html, name;
 	
 	name = namesOccupants[qbID];
 	audio.ring.play();
 	
-	html = '<div class="remoteCall" data-qb="' + qbID + '">';
-	html += '<header class="popup-header">';
-	html += '<h3>Call from ' + name + '</h3>';
-	html += '</header><div class="popup-content">';
-	html += '<button class="acceptCall" data-id="' + sessionID + '" data-description="' + sessionDescription + '">Accept call</button>';
-	html += '<button class="rejectCall">Reject call</button>';
-	html += '</div></div>';
+	var popup = createRemoteCallWindow();
 	
-	$('#remoteCallControls').append(html).after('<div id="videochat-overlay"></div>');
+	popup.onload = function() {
+		var selector = popup.document;
+		
+		htmlVideoChatBuilder(selector, qbID, name);
+		$(selector).find('.acceptCall').click(acceptCall);
+		$(selector).find('.rejectCall').click(rejectCall);
+		
+		$(selector).find('title').text('Call from ' + name);
+	};
 	
-	centerPopup('#remoteCallControls', true);
-	$(window).resize(function() {centerPopup('#remoteCallControls', true)});
-	$(window).scroll(function() {centerPopup('#remoteCallControls', true)});
-	$('#remoteCallControls, #videochat-overlay').show();
+	$('#remoteCall').show();
 }
 
 function onAccept(qbID) {

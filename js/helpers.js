@@ -311,6 +311,25 @@ function createVideoChatWindow() {
 	return popup;
 }
 
+function createRemoteCallWindow() {
+	var scrWidth, scrHeight, popupWidth, popupHeight, disWidth, disHeight;
+	var url, popup;
+	
+	scrWidth = window.screen.availWidth;
+	scrHeight = window.screen.availHeight;
+	popupWidth = 300;
+	popupHeight = 200;
+	disWidth = (scrWidth - popupWidth) / 2;
+	disHeight = (scrHeight - popupHeight) / 2;
+	params = 'width='+popupWidth+', height='+popupHeight+', left='+disWidth+', top='+disHeight;
+	
+	url = window.location.toString() + 'popups/videochat.html';
+	popup = window.open(url, '_blank', params);
+	popup.focus();
+	
+	return popup;
+}
+
 function setSize(popup, innerWidth, innerHeight) {
 	var video, videoWidth, videoHeight, videoTop, videoLeft, aspectRatio;
 	

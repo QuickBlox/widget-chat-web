@@ -8,7 +8,7 @@
 
 /*
   Public methods:
-    - call(userID)
+    - call(userID, userAvatar)
     - accept(userID)
     - reject(userID)
     - stop(userID)
@@ -191,7 +191,7 @@ function QBVideoChat(constraints, signalingService, sessionID) {
 		// Send only string representation of sdp
 		// http://www.w3.org/TR/webrtc/#rtcsessiondescription-class
 	
-		self.signalingService.call(self.opponentID, self.localSessionDescription.sdp, self.sessionID);
+		self.signalingService.call(self.opponentID, self.localSessionDescription.sdp, self.sessionID, self.opponentAvatar);
 	};
 	
 	this.sendAceptRequest = function() {
@@ -211,10 +211,11 @@ function QBVideoChat(constraints, signalingService, sessionID) {
 }
 
 // Call to user
-QBVideoChat.prototype.call = function(userID) {
+QBVideoChat.prototype.call = function(userID, userAvatar) {
 	if (this.localSessionDescription) return;
 	
 	this.opponentID = userID;
+	this.opponentAvatar = userAvatar;
 	this.pc.createOffer(this.onGetSessionDescriptionSuccessCallback, this.onCreateOfferFailureCallback);
 };
 

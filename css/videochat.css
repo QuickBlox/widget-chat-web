@@ -66,9 +66,6 @@ body {
 			border: 1px solid #681416;
 		}
 
-#remoteCallControls {
-	z-index: 3000;
+#remoteCall {
+	text-align: center;
 }
-	#remoteCallControls .remoteCall {
-		text-align: center;
-	}
