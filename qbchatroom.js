@@ -756,7 +756,7 @@ function createVideoChatInstance(event, qbID, sessionDescription, sessionID) {
 function getMediaSuccess(qbID, name, sessionDescription) {
 	var popup;
 	
-	if (switches.isVideoChat) {
+	if (switches.isVideoChat)
 		window.open('', 'videoChat').close();
 	
 	popup = createVideoChatWindow();
