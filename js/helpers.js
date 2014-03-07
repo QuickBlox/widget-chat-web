@@ -296,8 +296,8 @@ function createVideoChatWindow() {
 	var scrWidth, scrHeight, popupWidth, popupHeight, disWidth, disHeight;
 	var url, popup;
 	
-	scrWidth = window.screen.width;
-	scrHeight = window.screen.height;
+	scrWidth = window.screen.availWidth;
+	scrHeight = window.screen.availHeight;
 	popupWidth = scrWidth / 2;
 	popupHeight = scrHeight / 2;
 	disWidth = scrWidth / 4;
