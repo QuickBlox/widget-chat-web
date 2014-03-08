@@ -788,6 +788,7 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		};
 		
 		popup.onunload = function() {
+			console.log(switches.isNoClosed);
 			if (!switches.isNoClosed) {
 				stopCall(this);
 				switches.isNoClosed = false;
