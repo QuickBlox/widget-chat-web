@@ -748,13 +748,7 @@ function createVideoChatInstance(event, qbID, sessionDescription, sessionID) {
 	name = namesOccupants[qbID] || 'Test user';
 	// TODO: Here is need to put a "if block" for checking of existing users
 	
-	videoChat = new QBVideoChat({audio: true, video: true}, signaling, sessionID);
-	videoChat.onGetUserMediaSuccess = function() {getMediaSuccess(qbID, name, sessionDescription)};
-	videoChat.onGetUserMediaError = getMediaError;
-	videoChat.getUserMedia();
-}
-
-function getMediaSuccess(qbID, name, sessionDescription) {
+	
 	var popup;
 	
 	switches.isNoClosed = false;
@@ -773,6 +767,13 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		switches.isVideoChat = true;
 	}
 	
+	videoChat = new QBVideoChat({audio: true, video: true}, signaling, sessionID);
+	videoChat.onGetUserMediaSuccess = function() {getMediaSuccess(qbID, name, sessionDescription, popup)};
+	videoChat.onGetUserMediaError = function() {getMediaError(popup, sessionID)};
+	videoChat.getUserMedia();
+}
+
+function getMediaSuccess(qbID, name, sessionDescription, popup) {
 	popup.onload = function() {
 		loadPopup(popup);
 		
@@ -818,8 +819,8 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 	}
 }
 
-function getMediaError() {
-	//stopCall();
+function getMediaError(popup, sessionID) {
+	rejectCall(popup.document, sessionID);
 }
 
 // methods
@@ -929,4 +930,7 @@ function onStop(qbID) {
 	window.open('', 'remoteCall-' + qbID).close();
 	videoChat.hangup();
 	videoChat = null;
+	
+	if (Object.keys(namesWindowsRemoteCall).length == 0)
+		audio.ring.pause();
 }
