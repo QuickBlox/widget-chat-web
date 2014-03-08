@@ -757,6 +757,7 @@ function createVideoChatInstance(event, qbID, sessionDescription, sessionID) {
 function getMediaSuccess(qbID, name, sessionDescription) {
 	var popup;
 	
+	console.log(sessionDescription);
 	if (switches.isVideoChat) {
 		popup = window.open('', 'videoChat-' + qbID);
 		loadPopup(popup);
@@ -788,6 +789,7 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 	
 	function loadPopup(popup) {
 		var selector = popup.document;
+		console.log(sessionDescription);
 		
 		htmlVideoChatBuilder(selector, qbID, name);
 		
