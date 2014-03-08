@@ -926,6 +926,7 @@ function onStop(qbID) {
 	switches.isVideoChat = false;
 	window.open('', 'videoChat-offer').close();
 	window.open('', 'videoChat-answer').close();
+	window.open('', 'remoteCall-' + qbID).close();
 	videoChat.hangup();
 	videoChat = null;
 }
