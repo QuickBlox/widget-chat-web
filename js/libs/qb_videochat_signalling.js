@@ -46,6 +46,7 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
  	this.connection = connection;
 	
 	this.onMessage = function(msg) {
+		console.log(msg);
 		var author, type, body;
 		var qbID, sessionID, avatar;
 		
