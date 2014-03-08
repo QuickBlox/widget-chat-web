@@ -757,7 +757,6 @@ function createVideoChatInstance(event, qbID, sessionDescription, sessionID) {
 function getMediaSuccess(qbID, name, sessionDescription) {
 	var popup;
 	
-	console.log(sessionDescription);
 	if (switches.isVideoChat) {
 		popup = window.open('', 'videoChat-' + qbID);
 		loadPopup(popup);
@@ -789,7 +788,6 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 	
 	function loadPopup(popup) {
 		var selector = popup.document;
-		console.log(sessionDescription);
 		
 		htmlVideoChatBuilder(selector, qbID, name);
 		
@@ -826,9 +824,8 @@ function acceptCall(popup) {
 	
 	audio.ring.pause();
 	qbID = $(popup.document).find('#remoteCall').data('qb');
-	sessionDescription = $(this).data('description');
-	console.log(sessionDescription);
-	sessionID = parseInt($(this).data('id'));
+	sessionDescription = $(popup.document).find('.acceptCall').data('description');
+	sessionID = parseInt($(popup.document).find('.acceptCall').data('id'));
 	
 	popup.close();
 	createVideoChatInstance(null, qbID, sessionDescription, sessionID);
