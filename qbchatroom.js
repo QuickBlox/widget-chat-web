@@ -787,12 +787,12 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		
 		htmlVideoChatBuilder(selector, qbID, name);
 		$(selector).find('.doCall').click(function(event) {
-			event.stopImmediatePropagation();
 			doCall;
+			event.stopImmediatePropagation();
 		});
 		$(selector).find('.stopCall').click(function(event) {
-			event.stopImmediatePropagation();
 			stopCall;
+			event.stopImmediatePropagation();
 		});
 		
 		videoChat.localStreamElement = $(selector).find('#localVideo')[0];
@@ -881,12 +881,12 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 		audio.ring.play();
 		htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, avatar, name);
 		$(selector).find('.acceptCall').click(function(event) {
-			event.stopImmediatePropagation();
 			acceptCall;
+			event.stopImmediatePropagation();
 		});
 		$(selector).find('.rejectCall').click(function(event) {
-			event.stopImmediatePropagation();
 			popup.close();
+			event.stopImmediatePropagation();
 		});
 	}
 }
