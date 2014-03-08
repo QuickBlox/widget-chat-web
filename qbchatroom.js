@@ -758,10 +758,13 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 	var popup;
 	
 	if (switches.isVideoChat) {
-		popup = window.open('', 'videoChat-' + qbID);
+		popup = window.open('', 'videoChat-offer');
 		loadPopup(popup);
 	} else {
-		popup = createVideoChatWindow('videoChat-' + qbID);
+		if (sessionDescription)
+			popup = createVideoChatWindow('videoChat-offer');
+		else
+			popup = createVideoChatWindow('videoChat-answer');
 		switches.isVideoChat = true;
 	}
 	
@@ -795,7 +798,7 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		videoChat.remoteStreamElement = $(selector).find('#remoteVideo')[0];
 		attachMediaStream(videoChat.localStreamElement, videoChat.localStream);
 		$(selector).find('.stopCall').hide().parent().find('.doCall').show();
-		
+		console.log(sessionDescription);
 		if (sessionDescription) {
 			console.log(1111111111);
 			$(selector).find('.doCall').hide().parent().find('.stopCall').show();
@@ -846,7 +849,7 @@ function rejectCall(selector, sessionID) {
 
 function stopCall(popup) {
 	console.log('stopstop');
-	switches.isVideoChat = false;
+	//switches.isVideoChat = false;
 	/*var qbID;
 	qbID = $(popup.document).find('#videochat, #remoteCall').data('qb');
 	videoChat.stop(qbID);*/
@@ -894,13 +897,13 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 
 function onAccept(qbID) {
 	console.log('onAccept from ' + qbID);
-	var popup = window.open('', 'videoChat-' + qbID)
+	var popup = window.open('', 'videoChat-offer');
 	getRemoteStream(popup.document);
 }
 
 function onReject(qbID) {
 	console.log('onReject from ' + qbID);
-	var popup = window.open('', 'videoChat-' + qbID);
+	var popup = window.open('', 'videoChat-offer');
 	$(popup.document).find('.stopCall').hide().parent().find('.doCall').show();
 }
 
