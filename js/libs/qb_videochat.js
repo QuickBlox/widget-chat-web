@@ -203,6 +203,7 @@ function QBVideoChat(constraints, signalingService, sessionID) {
 
 	// Cleanup 
 	this.hangup = function() {
+		self.state = QBVideoChatState.INACTIVE;
 		self.signalingService = null;
 		self.localStream.stop();
 		self.pc.close();
@@ -235,7 +236,6 @@ QBVideoChat.prototype.reject = function(userID) {
 // Stop call with user
 QBVideoChat.prototype.stop = function(userID) {
 	this.signalingService.stop(userID, "manual", this.sessionID);
-	this.state = QBVideoChatState.INACTIVE;
 	this.hangup();
 };
 
