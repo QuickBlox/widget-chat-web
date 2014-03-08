@@ -758,7 +758,10 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 	var popup;
 	
 	if (switches.isVideoChat) {
-		popup = window.open('', 'videoChat-offer');
+		if (sessionDescription)
+			popup = window.open('', 'videoChat-offer');
+		else
+			popup = window.open('', 'videoChat-answer');
 		loadPopup(popup);
 	} else {
 		if (sessionDescription)
@@ -852,11 +855,13 @@ function rejectCall(selector, sessionID) {
 
 function stopCall(popup) {
 	console.log('stopstop');
+
 	switches.isVideoChat = false;
 	var qbID;
 	qbID = $(popup.document).find('#videochat').data('qb');
 	videoChat.stop(qbID);
 	popup.close();
+	switches.isNoClosed = true;
 }
 
 // callbacks
