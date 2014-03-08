@@ -865,6 +865,7 @@ function stopCall(popup) {
 	videoChat.stop(qbID);
 	popup.close();
 	switches.isNoClosed = true;
+	videoChat = null;
 }
 
 // callbacks
@@ -926,4 +927,5 @@ function onStop(qbID) {
 	window.open('', 'videoChat-offer').close();
 	window.open('', 'videoChat-answer').close();
 	videoChat.hangup();
+	videoChat = null;
 }
