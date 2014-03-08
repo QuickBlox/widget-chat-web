@@ -761,15 +761,15 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 	
 	if (switches.isVideoChat) {
 		if (sessionDescription)
-			popup = window.open('', 'videoChat-offer');
-		else
 			popup = window.open('', 'videoChat-answer');
+		else
+			popup = window.open('', 'videoChat-offer');
 		loadPopup(popup);
 	} else {
 		if (sessionDescription)
-			popup = createVideoChatWindow('videoChat-offer');
-		else
 			popup = createVideoChatWindow('videoChat-answer');
+		else
+			popup = createVideoChatWindow('videoChat-offer');
 		switches.isVideoChat = true;
 	}
 	
@@ -909,22 +909,21 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 
 function onAccept(qbID) {
 	console.log('onAccept from ' + qbID);
-	var popup = window.open('', 'videoChat-offer');
+	var popup = window.open('', 'videoChat-answer');
 	getRemoteStream(popup.document);
 }
 
 function onReject(qbID) {
 	console.log('onReject from ' + qbID);
-	var popup = window.open('', 'videoChat-offer');
+	var popup = window.open('', 'videoChat-answer');
 	$(popup.document).find('.stopCall').hide().parent().find('.doCall').show();
 }
 
 function onStop(qbID) {
 	console.log('onStop from ' + qbID);
-	if (window.open('', 'videoChat-offer').closed)
+	var popup = window.open('', 'videoChat-offer');
+	if (popup.closed)
 		var popup = window.open('', 'videoChat-answer');
-	if (window.open('', 'videoChat-answer').closed)
-		var popup = window.open('', 'videoChat-offer');
 	switches.isNoClosed = true;
 	switches.isVideoChat = false;
 	popup.close();
