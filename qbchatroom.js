@@ -797,7 +797,8 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		$(selector).find('.stopCall').hide().parent().find('.doCall').show();
 		
 		if (sessionDescription) {
-			$(selector).find('.stopCall').show();
+			console.log(1111111111);
+			$(selector).find('.doCall').hide().parent().find('.stopCall').show();
 			getRemoteStream(selector);
 			
 			videoChat.remoteSessionDescription = sessionDescription;
