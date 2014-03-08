@@ -798,9 +798,8 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		videoChat.remoteStreamElement = $(selector).find('#remoteVideo')[0];
 		attachMediaStream(videoChat.localStreamElement, videoChat.localStream);
 		$(selector).find('.stopCall').hide().parent().find('.doCall').show();
-		console.log(sessionDescription);
+		
 		if (sessionDescription) {
-			console.log(1111111111);
 			$(selector).find('.doCall').hide().parent().find('.stopCall').show();
 			getRemoteStream(selector);
 			
