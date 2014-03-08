@@ -921,8 +921,7 @@ function onReject(qbID) {
 
 function onStop(qbID) {
 	console.log('onStop from ' + qbID);
-	var popup = window.open('', 'videoChat-offer');
-	if (popup.closed)
+	if (window.open('', 'videoChat-offer'))
 		var popup = window.open('', 'videoChat-offer');
 	else
 		var popup = window.open('', 'videoChat-answer');
