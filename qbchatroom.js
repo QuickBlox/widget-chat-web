@@ -748,7 +748,13 @@ function createVideoChatInstance(event, qbID, sessionDescription, sessionID) {
 	name = namesOccupants[qbID] || 'Test user';
 	// TODO: Here is need to put a "if block" for checking of existing users
 	
-	
+	videoChat = new QBVideoChat({audio: true, video: true}, signaling, sessionID);
+	videoChat.onGetUserMediaSuccess = function() {getMediaSuccess(qbID, name, sessionDescription)};
+	videoChat.onGetUserMediaError = function() {getMediaError(sessionID, sessionDescription)};
+	videoChat.getUserMedia();
+}
+
+function getMediaSuccess(qbID, name, sessionDescription) {
 	var popup;
 	
 	switches.isNoClosed = false;
@@ -767,13 +773,6 @@ function createVideoChatInstance(event, qbID, sessionDescription, sessionID) {
 		switches.isVideoChat = true;
 	}
 	
-	videoChat = new QBVideoChat({audio: true, video: true}, signaling, sessionID);
-	videoChat.onGetUserMediaSuccess = function() {getMediaSuccess(qbID, name, sessionDescription, popup)};
-	videoChat.onGetUserMediaError = function() {getMediaError(popup, sessionID)};
-	videoChat.getUserMedia();
-}
-
-function getMediaSuccess(qbID, name, sessionDescription, popup) {
 	popup.onload = function() {
 		loadPopup(popup);
 		
@@ -819,7 +818,18 @@ function getMediaSuccess(qbID, name, sessionDescription, popup) {
 	}
 }
 
-function getMediaError(popup, sessionID) {
+function getMediaError(sessionID, sessionDescription) {
+	var popup;
+	
+	if (switches.isVideoChat) {
+		if (sessionDescription)
+			popup = window.open('', 'videoChat-answer');
+		else
+			popup = window.open('', 'videoChat-offer');
+	}
+	
+	switches.isVideoChat = false;
+	switches.isNoClosed = false;
 	rejectCall(popup.document, sessionID);
 }
 
