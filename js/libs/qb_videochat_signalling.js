@@ -8,18 +8,18 @@
 
 /*
   Public methods:
-    - call(userID, sessionDescription, sessionID)
+    - call(userID, sessionDescription, sessionID, userAvatar)
     - accept(userID, sessionDescription, sessionID)
     - reject(userID, sessionID)
     - stop(userID, reason, sessionID)
     - sendCandidate(userID, candidate, sessionID)
   
   Public callbacks:
-    - onCall(fromUserID, sessionDescription, sessionID)
+    - onCall(fromUserID, sessionDescription, sessionID, fromUserAvatar)
     - onAccept(fromUserID)
-    - onInnerAccept(sessionDescription)
     - onReject(fromUserID)
     - onStop(fromUserID, reason)
+    - onInnerAccept(sessionDescription)
     - onCandidate(candidate)
  */
 
@@ -36,15 +36,16 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 	
 	this.onCallCallback = null;
  	this.onAcceptCallback = null;
- 	this.onInnerAcceptCallback = null;
  	this.onRejectCallback = null;
 	this.onStopCallback = null;
+	
+	this.onInnerAcceptCallback = null;
  	this.onCandidateCallback = null;
  	
  	this.appID = appID;
  	this.chatServer = chatServer;
  	this.connection = connection;
-	
+ 	
 	this.onMessage = function(msg) {
 		var author, type, body;
 		var qbID, sessionID, avatar;
@@ -94,6 +95,12 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 		this.connection.send(reply);
 	};
 	
+	// set WebRTC callbacks
+	$(Object.keys(QBSignalingType)).each(function() {
+		self.connection.addHandler(self.onMessage, null, 'message', QBSignalingType[this], null, null);
+	});
+	
+	// helpers
 	this.getJID = function(id) {
 		return id + "-" + this.appID + "@" + this.chatServer;
 	};

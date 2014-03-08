@@ -23,26 +23,30 @@ var SDP_CONSTRAINTS = {
 
 var QBVideoChatState = {
 	INACTIVE: 'inactive',
-	ESTABLISHING: 'establishing',
-	ACTIVE: 'active'
+	ESTABLISHING: 'establishing'
 };
 
 function QBVideoChat(constraints, signalingService, sessionID) {
  	var self = this;
 	
 	this.candidatesQueue = [];
+	this.state = QBVideoChatState.INACTIVE;
+	
+	this.onGetUserMediaSuccess = null;
+	this.onGetUserMediaError = null;
 	this.localStreamElement = null;
 	this.remoteStreamElement = null;
 	this.remoteSessionDescription = null;
-	this.onGetUserMediaSuccess = null;
-	this.onGetUserMediaError = null;
-	this.state = QBVideoChatState.INACTIVE;
 	
 	this.constraints = constraints;
 	this.sessionID = sessionID || new Date().getTime();
 	traceVC("sessionID " + this.sessionID);
 	
 	// Signalling callbacks
+	this.onAcceptSignalingCallback = function(sessionDescription) {
+		self.setRemoteDescription(sessionDescription, "answer");
+	};
+	
 	this.addCandidate = function(data) {
 		var jsonCandidate, candidate;
 		
@@ -52,19 +56,15 @@ function QBVideoChat(constraints, signalingService, sessionID) {
 		self.pc.addIceCandidate(candidate);
 	};
 	
-	this.onAcceptSignalingCallback = function(sessionDescription) {
-		self.setRemoteDescription(sessionDescription, "answer");
-	};
-	
 	this.signalingService = signalingService;
-	this.signalingService.onCandidateCallback = this.addCandidate;
 	this.signalingService.onInnerAcceptCallback = this.onAcceptSignalingCallback;
+	this.signalingService.onCandidateCallback = this.addCandidate;
 	
 	// MediaStream getUserMedia
 	this.getUserMedia = function() {
 		traceVC("getUserMedia...");
 		
-		getUserMedia(this.constraints, successCallback, errorCallback);
+		getUserMedia(self.constraints, successCallback, errorCallback);
 		
 		function successCallback(localMediaStream) {
 			traceVC("getUserMedia success");

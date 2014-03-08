@@ -1,57 +1,7 @@
-/* Helper functions for widget
------------------------------------------------------------------------*/
 var URL_REGEXP = /\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/gi;
 
-function connecting() {
-	$('#main').hide();
-	$('#connecting').show();
-}
-
-function connectFailure() {
-	$('#connecting').hide();
-	$('#main').show();
-	$('#login-form input').addClass('error');
-}
-
-function connectSuccess() {
-	$('#connecting').hide();
-	$('#chats-wrap, #chat-room').show();
-	$('.chat-content').html('');
-	$('.send-message').val('');
-	$('.users-list').html('<li class="list-title">Users</li>');
-	$('.chats-list').html('<li class="list-title">Chats</li>');
-	$('.chats-list').append('<li class="list-item switch-chat" data-id="chat-room">Chat Room <span class="messages-count"></span></li>');
-	switches.isLogout = false;
-	createAnimatedLoadingUsers();
-	createAnimatedLoadingMessages('.chat-content');
-}
-
-function signUpFailure() {
-	$('#signup-form fieldset > input').addClass('error');
-	$('#signup-form input').prop('disabled', false);
-}
-
-function signUpSuccess() {
-	$('#signup-form').hide();
-	$('#signup-success').show();
-	setTimeout(backToLogin, 3 * 1000);
-	
-	function backToLogin() {
-		$('#signup-success').hide();
-		$('#main').show();
-		$('#login-form input').val('').removeClass('error');
-	}
-}
-
-function logoutSuccess() {
-	$('.bubbles').removeClass('bubbles_login');
-	$('.header').removeClass('header_login');
-	$('#chats-wrap, #login-form, .chats').hide();
-	$('.chat:not(#chat-room)').remove();
-	$('#main, #auth').show();
-	if (!switches.isLogout) window.location.reload();
-}
-
+/* Onload Functions
+-----------------------------------------------------------------------*/
 function changeInputFileBehavior() {
 	$('.uploader-wrap input:file').change(function() {
 		var file = $(this).val();
@@ -131,6 +81,58 @@ function updateTime() {
 	setTimeout(updateTime, 60 * 1000);
 }
 
+/* Connecting Process
+-----------------------------------------------------------------------*/
+function connecting() {
+	$('#main').hide();
+	$('#connecting').show();
+}
+
+function connectFailure() {
+	$('#connecting').hide();
+	$('#main').show();
+	$('#login-form input').addClass('error');
+}
+
+function connectSuccess() {
+	$('#connecting').hide();
+	$('#chats-wrap, #chat-room').show();
+	$('.chat-content').html('');
+	$('.send-message').val('');
+	$('.users-list').html('<li class="list-title">Users</li>');
+	$('.chats-list').html('<li class="list-title">Chats</li>');
+	$('.chats-list').append('<li class="list-item switch-chat" data-id="chat-room">Chat Room <span class="messages-count"></span></li>');
+	switches.isLogout = false;
+	createAnimatedLoadingUsers();
+	createAnimatedLoadingMessages('.chat-content');
+}
+
+function signUpFailure() {
+	$('#signup-form fieldset > input').addClass('error');
+	$('#signup-form input').prop('disabled', false);
+}
+
+function signUpSuccess() {
+	$('#signup-form').hide();
+	$('#signup-success').show();
+	setTimeout(backToLogin, 3 * 1000);
+	
+	function backToLogin() {
+		$('#signup-success').hide();
+		$('#main').show();
+		$('#login-form input').val('').removeClass('error');
+	}
+}
+
+function logoutSuccess() {
+	$('.bubbles').removeClass('bubbles_login');
+	$('.header').removeClass('header_login');
+	$('#chats-wrap, #login-form, .chats').hide();
+	$('.chat:not(#chat-room)').remove();
+	$('#main, #auth').show();
+	if (!switches.isLogout) window.location.reload();
+}
+
 function trim(str) {
 	if (str.charAt(0) == ' ')
 		str = trim(str.substring(1, str.length));
@@ -139,6 +141,22 @@ function trim(str) {
 	return str;
 }
 
+/* Spinner
+-----------------------------------------------------------------------*/
+function createAnimatedLoadingUsers() {
+	$('.users-list').append('<li class="loading_users"><div id="floatingCirclesG_users"></div></li>');
+	for (var i = 1; i < 9; i++)
+		$('#floatingCirclesG_users').append('<div class="f_circleG_users" id="frotateG_0'+i+'_users"></div>');
+}
+
+function createAnimatedLoadingMessages(selector) {
+	$(selector).append('<div class="loading_messages"><div id="floatingCirclesG_messages"></div></div>');
+	for (var i = 1; i < 9; i++)
+		$('#floatingCirclesG_messages').append('<div class="f_circleG_messages" id="frotateG_0'+i+'_messages"></div>');
+}
+
+/* Chat Module
+-----------------------------------------------------------------------*/
 function getJID(id) {
 	return id + "-" + QBAPP.appID + "@" + CHAT.server;
 }
@@ -191,16 +209,21 @@ function parser(str, time) {
 	}
 }
 
-function createAnimatedLoadingUsers() {
-	$('.users-list').append('<li class="loading_users"><div id="floatingCirclesG_users"></div></li>');
-	for (var i = 1; i < 9; i++)
-		$('#floatingCirclesG_users').append('<div class="f_circleG_users" id="frotateG_0'+i+'_users"></div>');
+function choseSelector(id) {
+	return $('#chat-room').add('#chat-' + id).find('.chat-content');
 }
 
-function createAnimatedLoadingMessages(selector) {
-	$(selector).append('<div class="loading_messages"><div id="floatingCirclesG_messages"></div></div>');
-	for (var i = 1; i < 9; i++)
-		$('#floatingCirclesG_messages').append('<div class="f_circleG_messages" id="frotateG_0'+i+'_messages"></div>');
+function scrollToMessage(selector) {
+	selector.scrollTo('*:last', 0);
+}
+
+/* Typing
+-----------------------------------------------------------------------*/
+function checkTypeChatState(jid, type) {
+	if (jid)
+		connection.chatstates[type](jid);
+	else
+		connection.chatstates[type](CHAT.roomJID, 'groupchat');
 }
 
 function addTypingMessage(obj, name) {
@@ -212,14 +235,8 @@ function removeTypingMessage(obj, name) {
 	if (obj.text().length == 0) obj.remove();
 }
 
-function choseSelector(id) {
-	return $('#chat-room').add('#chat-' + id).find('.chat-content');
-}
-
-function scrollToMessage(selector) {
-	selector.scrollTo('*:last', 0);
-}
-
+/* Private Messages
+-----------------------------------------------------------------------*/
 function editUsersCount(selector, val) {
 	selector.parent().not('#chat-room').find('.users-count').text(val);
 }
@@ -239,6 +256,15 @@ function deleteMessageCount(id) {
 	$('.switch-chat[data-id=' + id + ']').find('.messages-count').text('').css('padding', '0');
 }
 
+function addRemoveButton() {
+	if ($(this).data('id') != 'chat-room')
+		$(this).append('<span class="remove">x</span>');
+}
+
+function deleteRemoveButton() {
+	$(this).find('.remove').remove();
+}
+
 function switchСhat(event) {
 	var id, selector;
 	
@@ -251,15 +277,6 @@ function switchСhat(event) {
 		scrollToMessage(selector);
 		deleteMessageCount($(this).data('id'));
 	}
-}
-
-function addRemoveButton() {
-	if ($(this).data('id') != 'chat-room')
-		$(this).append('<span class="remove">x</span>');
-}
-
-function deleteRemoveButton() {
-	$(this).find('.remove').remove();
 }
 
 function removeChat() {
@@ -281,49 +298,28 @@ function removeChat() {
 		$('.chats').hide();
 }
 
-function checkTypeChatState(jid, type) {
-	if (jid)
-		connection.chatstates[type](jid);
-	else
-		connection.chatstates[type](CHAT.roomJID, 'groupchat');
-}
-
-function setCallback(callback, name, type) {
-	connection.addHandler(callback, null, name, type, null, null);
-}
-
-function createVideoChatWindow(winName) {
-	var scrWidth, scrHeight, popupWidth, popupHeight, disWidth, disHeight;
-	var url, popup;
+/* Video Chat Module
+-----------------------------------------------------------------------*/
+function openPopup(winName, sizes, options) {
+	var scrWidth, scrHeight, winWidth, winHeight, disWidth, disHeight;
+	var popup, url, params;
 	
 	scrWidth = window.screen.availWidth;
 	scrHeight = window.screen.availHeight;
-	popupWidth = scrWidth / 2;
-	popupHeight = scrHeight / 2;
-	disWidth = scrWidth / 4;
-	disHeight = scrHeight / 4;
-	params = 'resizable=yes, width='+popupWidth+', height='+popupHeight+', left='+disWidth+', top='+disHeight;
+	
+	if (sizes) {
+		winWidth = sizes.width;
+		winHeight = sizes.height;
+	} else {
+		winWidth = scrWidth / 2;
+		winHeight = scrHeight / 2;
+	}
+	disWidth = (scrWidth - winWidth) / 2;
+	disHeight = (scrHeight - winHeight) / 2;
 	
 	url = window.location.toString() + 'popups/videochat.html';
-	popup = window.open(url, winName, params);
-	popup.focus();
+	params = ('width='+winWidth+', height='+winHeight+', left='+disWidth+', top='+disHeight+', ').concat(options);
 	
-	return popup;
-}
-
-function createRemoteCallWindow(winName) {
-	var scrWidth, scrHeight, popupWidth, popupHeight, disWidth, disHeight;
-	var url, popup;
-	
-	scrWidth = window.screen.availWidth;
-	scrHeight = window.screen.availHeight;
-	popupWidth = 250;
-	popupHeight = 280;
-	disWidth = (scrWidth - popupWidth) / 2;
-	disHeight = (scrHeight - popupHeight) / 2;
-	params = 'width='+popupWidth+', height='+popupHeight+', left='+disWidth+', top='+disHeight;
-	
-	url = window.location.toString() + 'popups/videochat.html';
 	popup = window.open(url, winName, params);
 	popup.focus();
 	
