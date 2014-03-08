@@ -765,6 +765,7 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 			win = popups[qbID].offer;
 		loadPopup(win);
 	} else {
+		popups[qbID] = {};
 		if (sessionDescription) {
 			popups[qbID].answer = openPopup('videoChatAnswer', null, 'resizable=yes');
 			win = popups[qbID].answer;
