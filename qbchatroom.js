@@ -915,6 +915,7 @@ function onStop(qbID) {
 	console.log('onStop from ' + qbID);
 	var popup = window.open('', 'videoChat-offer');
 	switches.isNoClosed = true;
+	switches.isVideoChat = false;
 	popup.close();
 	videoChat.hangup();
 }
