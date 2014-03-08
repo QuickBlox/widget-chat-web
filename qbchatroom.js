@@ -738,14 +738,15 @@ function createSignalingInstance() {
 }
 
 function createVideoChatInstance(event, userID, sessionID, sessionDescription) {
-	var qbID, name;
+	var qbID, name, selector;
 	
 	qbID = userID || $(this).data('qb');
 	name = namesOccupants[qbID];
 	
 	if (!name) {
 		$('.chat:visible .chat-content').append('<span class="service-message left" data-time="' + new Date().toISOString() + '">Sorry, this user is offline</span>');
-		return false;
+		scrollToMessage($('.chat:visible .chat-content'));
+		return true;
 	}
 	
 	videoChat = new QBVideoChat({audio: true, video: true}, signaling, sessionID);
