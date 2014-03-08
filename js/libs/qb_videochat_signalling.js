@@ -88,10 +88,13 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 			from: self.connection.jid, 
 			type: type
 		};
+		console.log(params);
 		
 		reply = $msg(params).c('body').t(data).up().c('session').t(sessionID);
 		if (userAvatar)
 			reply.up().c('avatar').t(userAvatar);
+			
+		console.log(reply);
 		this.connection.send(reply);
 	};
 	
