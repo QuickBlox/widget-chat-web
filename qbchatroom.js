@@ -777,7 +777,7 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		loadPopup(popup);
 		
 		$(popup.document).find('.doCall').click(doCall);
-		$(popup.document).find('.stopCall').click(stopCall);
+		$(popup.document).find('.stopCall').click(function(){stopCall(popup)});
 		
 		popup.onresize = function() {
 			var video, innerWidth, innerHeight;
