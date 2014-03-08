@@ -829,6 +829,7 @@ function acceptCall(popup) {
 	
 	audio.ring.pause();
 	qbID = $(popup.document).find('#remoteCall').data('qb');
+	delete namesWindowsRemoteCall[qbID];
 	sessionDescription = $(popup.document).find('.acceptCall').data('description');
 	sessionID = parseInt($(popup.document).find('.acceptCall').data('id'));
 	
@@ -912,7 +913,7 @@ function onReject(qbID) {
 
 function onStop(qbID) {
 	console.log('onStop from ' + qbID);
-	var popup = window.open('', 'videoChat-answer');
+	var popup = window.open('', 'videoChat-offer');
 	switches.isNoClosed = true;
 	popup.close();
 	videoChat.hangup();
