@@ -767,6 +767,13 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 	popup.onload = function() {
 		loadPopup(popup);
 		
+		$(popup.document).find('.doCall').click(function() {
+			doCall;
+		});
+		$(popup.document).find('.stopCall').click(function() {
+			stopCall;
+		});
+		
 		popup.onresize = function() {
 			var video, innerWidth, innerHeight;
 			video = $(popup.document).find('.fullVideo')[0];
@@ -786,14 +793,6 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		var selector = popup.document;
 		
 		htmlVideoChatBuilder(selector, qbID, name);
-		$(selector).find('.doCall').click(function(event) {
-			doCall;
-			event.stopImmediatePropagation();
-		});
-		$(selector).find('.stopCall').click(function(event) {
-			stopCall;
-			event.stopImmediatePropagation();
-		});
 		
 		videoChat.localStreamElement = $(selector).find('#localVideo')[0];
 		videoChat.remoteStreamElement = $(selector).find('#remoteVideo')[0];
@@ -870,6 +869,13 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 	popup.onload = function() {
 		loadPopup(popup);
 		
+		$(popup.document).find('.acceptCall').click(function() {
+			acceptCall;
+		});
+		$(popup.document).find('.rejectCall').click(function() {
+			popup.close();
+		});
+		
 		popup.onunload = function() {
 			rejectCall(this.document, sessionID);
 		};
@@ -880,14 +886,6 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 		
 		audio.ring.play();
 		htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, avatar, name);
-		$(selector).find('.acceptCall').click(function(event) {
-			acceptCall;
-			event.stopImmediatePropagation();
-		});
-		$(selector).find('.rejectCall').click(function(event) {
-			popup.close();
-			event.stopImmediatePropagation();
-		});
 	}
 }
 
