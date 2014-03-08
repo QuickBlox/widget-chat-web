@@ -786,8 +786,14 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		var selector = popup.document;
 		
 		htmlVideoChatBuilder(selector, qbID, name);
-		$(selector).one('click', '.doCall', doCall);
-		$(selector).one('click', '.stopCall', stopCall);
+		$(selector).find('.doCall').click(function(event) {
+			event.stopImmediatePropagation();
+			doCall;
+		});
+		$(selector).find('.stopCall').click(function(event) {
+			event.stopImmediatePropagation();
+			stopCall;
+		});
 		
 		videoChat.localStreamElement = $(selector).find('#localVideo')[0];
 		videoChat.remoteStreamElement = $(selector).find('#remoteVideo')[0];
@@ -874,8 +880,12 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 		
 		audio.ring.play();
 		htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, avatar, name);
-		$(selector).one('click', '.acceptCall', acceptCall);
-		$(selector).one('click', '.rejectCall', function() {
+		$(selector).find('.acceptCall').click(function(event) {
+			event.stopImmediatePropagation();
+			acceptCall;
+		});
+		$(selector).find('.rejectCall').click(function(event) {
+			event.stopImmediatePropagation();
 			popup.close();
 		});
 	}
