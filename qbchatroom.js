@@ -827,6 +827,7 @@ function acceptCall(popup) {
 	audio.ring.pause();
 	qbID = $(popup.document).find('#remoteCall').data('qb');
 	sessionDescription = $(this).data('description');
+	console.log(sessionDescription);
 	sessionID = parseInt($(this).data('id'));
 	
 	popup.close();
