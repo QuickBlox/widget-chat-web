@@ -921,13 +921,13 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 
 function onAccept(qbID) {
 	console.log('onAccept from ' + qbID);
-	var popup = window.open('', 'videoChat-answer');
+	var popup = window.open('', 'videoChat-offer');
 	getRemoteStream(popup.document);
 }
 
 function onReject(qbID) {
 	console.log('onReject from ' + qbID);
-	var popup = window.open('', 'videoChat-answer');
+	var popup = window.open('', 'videoChat-offer');
 	$(popup.document).find('.stopCall').hide().parent().find('.doCall').show();
 }
 
