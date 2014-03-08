@@ -758,10 +758,10 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 	var popup;
 	
 	if (switches.isVideoChat) {
-		popup = window.open('', 'videoChat');
+		popup = window.open('', 'videoChat-' + qbID);
 		loadPopup(popup);
 	} else {
-		popup = createVideoChatWindow();
+		popup = createVideoChatWindow('videoChat-' + qbID);
 		switches.isVideoChat = true;
 	}
 	
@@ -796,13 +796,13 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		attachMediaStream(videoChat.localStreamElement, videoChat.localStream);
 		$(selector).find('.stopCall').hide().parent().find('.doCall').show();
 		
-		/*if (sessionDescription) {
-			$('.stopCall').show();
-			getRemoteStream();
+		if (sessionDescription) {
+			$(selector).find('.stopCall').show();
+			getRemoteStream(selector);
 			
 			videoChat.remoteSessionDescription = sessionDescription;
 			videoChat.accept(qbID);
-		}*/
+		}
 	}
 }
 
@@ -821,12 +821,13 @@ function doCall() {
 function acceptCall(popup) {
 	var qbID, sessionDescription, sessionID;
 	
+	audio.ring.pause();
 	qbID = $(popup.document).find('#remoteCall').data('qb');
 	sessionDescription = $(this).data('description');
 	sessionID = parseInt($(this).data('id'));
 	
 	popup.close();
-	//makeVideoChat(null, qbID, sessionDescription, sessionID);
+	createVideoChatInstance(null, qbID, sessionDescription, sessionID);
 }
 
 function rejectCall(selector, sessionID) {
@@ -892,12 +893,13 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 
 function onAccept(qbID) {
 	console.log('onAccept from ' + qbID);
-	getRemoteStream();
+	var popup = window.open('', 'videoChat-' + qbID)
+	getRemoteStream(popup.document);
 }
 
 function onReject(qbID) {
 	console.log('onReject from ' + qbID);
-	var popup = window.open('', 'videoChat');
+	var popup = window.open('', 'videoChat-' + qbID);
 	$(popup.document).find('.stopCall').hide().parent().find('.doCall').show();
 }
 

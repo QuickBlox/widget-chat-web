@@ -292,7 +292,7 @@ function setCallback(callback, name, type) {
 	connection.addHandler(callback, null, name, type, null, null);
 }
 
-function createVideoChatWindow() {
+function createVideoChatWindow(winName) {
 	var scrWidth, scrHeight, popupWidth, popupHeight, disWidth, disHeight;
 	var url, popup;
 	
@@ -305,7 +305,7 @@ function createVideoChatWindow() {
 	params = 'resizable=yes, width='+popupWidth+', height='+popupHeight+', left='+disWidth+', top='+disHeight;
 	
 	url = window.location.toString() + 'popups/videochat.html';
-	popup = window.open(url, 'videoChat', params);
+	popup = window.open(url, winName, params);
 	popup.focus();
 	
 	return popup;
@@ -372,7 +372,7 @@ function htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, av
 	$(selector).find('#remoteCall').attr('data-qb', qbID).show();
 }
 
-function getRemoteStream() {
-	$('#localVideo').addClass('smallVideo').removeClass('fullVideo');
-	$('#remoteVideo').addClass('fullVideo').removeClass('smallVideo');
+function getRemoteStream(selector) {
+	$(selector).find('#localVideo').addClass('smallVideo').removeClass('fullVideo');
+	$(selector).find('#remoteVideo').addClass('fullVideo').removeClass('smallVideo');
 }
