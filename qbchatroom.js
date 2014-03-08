@@ -11,6 +11,7 @@ var signaling, videoChat, localVideo, remoteVideo;
 var switches = {
 	isComposing: {},
 	isLogout: false,
+	isNoClosed: false,
 	isVideoChat: false,
 	isFBconnected: false,
 	isOccupantsDownloaded: false
@@ -817,14 +818,14 @@ function doCall() {
 	videoChat.call(qbID, chatUser.avatar);
 }
 
-function acceptCall() {
+function acceptCall(popup) {
 	var qbID, sessionDescription, sessionID;
 	
-	qbID = $(this).parents('.remoteCall').data('qb');
+	qbID = $(popup.document).find('#remoteCall').data('qb');
 	sessionDescription = $(this).data('description');
 	sessionID = parseInt($(this).data('id'));
 	
-	closeCall(qbID);
+	popup.close();
 	makeVideoChat(null, qbID, sessionDescription, sessionID);
 }
 
@@ -865,13 +866,19 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 	popup.onload = function() {
 		loadPopup(popup);
 		
-		$(popup.document).find('.acceptCall').click(acceptCall);
+		$(popup.document).find('.acceptCall').click(function() {
+			switches.isNoClosed = true;
+			acceptCall(popup);
+		});
 		$(popup.document).find('.rejectCall').click(function() {
 			popup.close();
 		});
 		
 		popup.onunload = function() {
-			rejectCall(this.document, sessionID);
+			if (!switches.isNoClosed) {
+				rejectCall(this.document, sessionID);
+				switches.isNoClosed = false;
+			}
 		};
 	};
 	
