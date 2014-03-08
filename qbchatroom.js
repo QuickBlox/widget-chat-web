@@ -923,6 +923,8 @@ function onStop(qbID) {
 	console.log('onStop from ' + qbID);
 	var popup = window.open('', 'videoChat-offer');
 	if (popup.closed)
+		var popup = window.open('', 'videoChat-offer');
+	else
 		var popup = window.open('', 'videoChat-answer');
 	switches.isNoClosed = true;
 	switches.isVideoChat = false;
