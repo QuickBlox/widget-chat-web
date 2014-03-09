@@ -361,14 +361,14 @@ function htmlVideoChatBuilder(selector, qbID, name, sessionDescription) {
 }
 
 function htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, avatar, name) {
-	if (!avatar)
-		avatar = '../images/avatar_default.jpg';
+	avatar = avatar || '../images/avatar_default.jpg';
 	
 	selector.find('title').text('Remote call');
-	selector.find('.remoteCall-avatar').attr('src', avatar);
-	selector.find('.remoteCall-author').html('<b>' + name + '</b><br>is calling you');
-	selector.find('.acceptCall').attr('data-id', sessionID).attr('data-description', sessionDescription);
-	selector.find('#remoteCall').attr('data-qb', qbID).show();
+	selector.find('.avatar').attr('src', avatar);
+	selector.find('.author').html('<b>' + name + '</b><br>is calling you');
+	selector.find('#acceptCall, #rejectCall').attr('data-qb', qbID);
+	selector.find('#acceptCall').attr('data-id', sessionID).attr('data-description', sessionDescription);
+	selector.find('#remoteCall').show();
 }
 
 function getRemoteStream(selector) {

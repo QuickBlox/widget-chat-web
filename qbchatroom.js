@@ -810,10 +810,10 @@ function getMediaError(sessionID, sessionDescription) {
 function doCall() {
 	var qbID = $(this).data('qb');
 	$(this).hide().parent().find('#stopCall').show();
-	//videoChat.call(qbID, chatUser.avatar);
+	videoChat.call(qbID, chatUser.avatar);
 }
 
-function acceptCall(popup) {
+function acceptCall() {
 	var qbID, sessionDescription, sessionID;
 	
 	audio.ring.pause();
@@ -826,8 +826,9 @@ function acceptCall(popup) {
 	createVideoChatInstance(null, qbID, sessionID, sessionDescription);
 }
 
-function rejectCall(selector, sessionID) {
-	var qbID;
+function rejectCall(sessionID) {
+	console.log('rejectreject');
+	/*var qbID;
 	
 	qbID = $(selector).find('#remoteCall').data('qb');
 	delete namesWindowsRemoteCall[qbID];
@@ -836,7 +837,7 @@ function rejectCall(selector, sessionID) {
 	videoChat.reject(qbID);
 	
 	if (Object.keys(namesWindowsRemoteCall).length == 0)
-		audio.ring.pause();
+		audio.ring.pause();*/
 }
 
 function stopCall() {
@@ -854,41 +855,28 @@ function stopCall() {
 // callbacks
 function onCall(qbID, sessionDescription, sessionID, avatar) {
 	console.log('onCall from ' + qbID);
-	var popup, name = namesOccupants[qbID];
+	var win, selector, winName = 'remoteCall-' + qbID;
+	var name = namesOccupants[qbID];
 	
-	if (namesWindowsRemoteCall[qbID]) {
-		popup = window.open('', 'remoteCall-' + qbID);
-		loadPopup(popup);
-	} else {
-		popup = openRemoteCall('remoteCall-' + qbID, {width: 250, height: 280});
-		namesWindowsRemoteCall[qbID] = true;
-	}
+	if (popups[winName]) popups[winName].close();
 	
-	popup.onload = function() {
-		loadPopup(popup);
+	popups[winName] = openPopup(winName, {width: 250, height: 280});
+	win = popups[winName];
+	
+	win.onload = function() {
+		selector = $(win.document);
+		selector.find('#acceptCall').click(acceptCall);
+		selector.find('#rejectCall').click(rejectCall);
 		
-		$(popup.document).find('.acceptCall').click(function() {
-			switches.isNoClosed = true;
-			acceptCall(popup);
-		});
-		$(popup.document).find('.rejectCall').click(function() {
-			popup.close();
-		});
+		htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, avatar, name);
+		audio.ring.play();
 		
-		popup.onbeforeunload = function() {
-			if (!switches.isNoClosed) {
-				rejectCall(this.document, sessionID);
-				switches.isNoClosed = false;
-			}
+		win.onbeforeunload = function() {
+			if (switches.isPopupClosed)
+				rejectCall(sessionID);
+			switches.isPopupClosed = true;
 		};
 	};
-	
-	function loadPopup(popup) {
-		var selector = popup.document;
-		
-		audio.ring.play();
-		htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, avatar, name);
-	}
 }
 
 function onAccept(qbID) {
