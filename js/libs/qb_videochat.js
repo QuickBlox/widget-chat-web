@@ -26,7 +26,7 @@ var QBVideoChatState = {
 	ESTABLISHING: 'establishing'
 };
 
-function QBVideoChat(constraints, signalingService, sessionID) {
+function QBVideoChat(constraints, signalingService, sessionID, sessionDescription) {
  	var self = this;
 	
 	this.candidatesQueue = [];
@@ -36,10 +36,10 @@ function QBVideoChat(constraints, signalingService, sessionID) {
 	this.onGetUserMediaError = null;
 	this.localStreamElement = null;
 	this.remoteStreamElement = null;
-	this.remoteSessionDescription = null;
 	
 	this.constraints = constraints;
 	this.sessionID = sessionID || new Date().getTime();
+	this.remoteSessionDescription = sessionDescription;
 	traceVC("sessionID " + this.sessionID);
 	
 	// Signalling callbacks
@@ -83,6 +83,12 @@ function QBVideoChat(constraints, signalingService, sessionID) {
 	this.attachMediaStream = function(elem) {
 		elem.volume = 0.7;
 		attachMediaStream(elem, self.localStream);
+	}
+	
+	// MediaStream reattachMedia
+	this.reattachMediaStream = function(to, from) {
+		to.volume = 0.7;
+		reattachMediaStream(to, from);
 	}
 	
 	// RTCPeerConnection creation

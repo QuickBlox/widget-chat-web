@@ -352,11 +352,11 @@ function resize(win, innerWidth, innerHeight) {
 	                                 'top': elemTop + 'px'});
 }
 
-function htmlVideoChatBuilder(selector, qbID, name, sessionDescription) {
+function htmlVideoChatBuilder(selector, qbID, name, sessionID) {
 	selector.find('title').text('Video chat with ' + name);
 	selector.find('#doCall, #stopCall').attr('data-qb', qbID);
 	selector.find('#videochat, #videochat-footer').show();
-	if (sessionDescription)
+	if (sessionID)
 		selector.find('#doCall').hide().parent().find('#stopCall').show();
 }
 
@@ -372,6 +372,9 @@ function htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, av
 }
 
 function getRemoteStream(selector) {
-	$(selector).find('#localVideo').addClass('smallVideo').removeClass('fullVideo');
-	$(selector).find('#remoteVideo').addClass('fullVideo').removeClass('smallVideo');
+	var miniVideo = selector.find('#miniVideo')[0];
+	videoChat.reattachMediaStream(miniVideo, videoChat.localStreamElement);
+	
+	selector.find('#localVideo').hide();
+	selector.find('#remoteVideo, #miniVideo').show();
 }

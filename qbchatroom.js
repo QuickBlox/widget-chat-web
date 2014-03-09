@@ -748,13 +748,13 @@ function createVideoChatInstance(event, userID, sessionID, sessionDescription) {
 		return true;
 	}
 	
-	videoChat = new QBVideoChat({audio: true, video: true}, signaling, sessionID);
-	videoChat.onGetUserMediaSuccess = function() { getMediaSuccess(qbID, name, sessionDescription) };
-	videoChat.onGetUserMediaError = function() { getMediaError(sessionID, sessionDescription) };
+	videoChat = new QBVideoChat({audio: true, video: true}, signaling, sessionID, sessionDescription);
+	videoChat.onGetUserMediaSuccess = function() { getMediaSuccess(qbID, name, sessionID) };
+	videoChat.onGetUserMediaError = function() { getMediaError(sessionID) };
 	videoChat.getUserMedia();
 }
 
-function getMediaSuccess(qbID, name, sessionDescription) {
+function getMediaSuccess(qbID, name, sessionID) {
 	var win, selector, winName = 'videochat';
 	
 	if (popups[winName]) popups[winName].close();
@@ -767,15 +767,14 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		selector.find('#doCall').click(doCall);
 		selector.find('#stopCall').click(stopCall);
 		
-		htmlVideoChatBuilder(selector, qbID, name, sessionDescription);
+		htmlVideoChatBuilder(selector, qbID, name, sessionID);
 		
 		videoChat.localStreamElement = selector.find('#localVideo')[0];
 		videoChat.remoteStreamElement = selector.find('#remoteVideo')[0];
 		videoChat.attachMediaStream(videoChat.localStreamElement);
 		
-		if (sessionDescription) {
+		if (sessionID) {
 			getRemoteStream(selector);
-			videoChat.remoteSessionDescription = sessionDescription;
 			videoChat.accept(qbID);
 		}
 		
@@ -791,11 +790,11 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 	};
 }
 
-function getMediaError(sessionID, sessionDescription) {
+function getMediaError(sessionID) {
 	var popup;
 	
 	if (switches.isVideoChat) {
-		if (sessionDescription)
+		if (sessionID)
 			popup = window.open('', 'videoChat-answer');
 		else
 			popup = window.open('', 'videoChat-offer');
@@ -825,7 +824,7 @@ function acceptCall() {
 	delete popups['remoteCall-' + qbID];
 	
 	audio.ring.pause();
-	//createVideoChatInstance(null, qbID, sessionID, sessionDescription);
+	createVideoChatInstance(null, qbID, sessionID, sessionDescription);
 }
 
 function rejectCall(sessionID) {
@@ -883,8 +882,8 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 
 function onAccept(qbID) {
 	console.log('onAccept from ' + qbID);
-	var popup = window.open('', 'videoChat-offer');
-	getRemoteStream(popup.document);
+	var win = popups['videochat'];
+	getRemoteStream($(win.document));
 }
 
 function onReject(qbID) {
