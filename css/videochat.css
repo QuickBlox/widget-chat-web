@@ -1,20 +1,23 @@
 @import url(reset.css);
 
+/* Global
+----------------------------------------------------------*/
 html {
 	height: 100%;
 }
 body {
 	width: 100%;
 	height: 100%;
-	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-	font-size: 14px;
+	font: 16px/20px 'Helvetica Neue', Helvetica, Arial, sans-serif;
 	color: #c7c7c7;
 	background: #000;
 	-webkit-font-smoothing: antialiased;
 }
 button {
-	padding: 7px 15px;
-	font-weight: 800;
+	padding: 0 15px;
+	font-size: 14px;
+	line-height: 28px;
+	font-weight: bold;
 	color: #fff;
 	outline: 0;
 	border-radius: 4px;
@@ -39,50 +42,48 @@ button:hover {
 
 /* Video Chat
 ----------------------------------------------------------*/
+.fullVideo {
+	height: 100%;
+	max-height: 100%;
+}
+.smallVideo {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	width: 20%;
+}
 #videochat {
 	margin: 0 auto;
 	text-align: center;
 }
-	#videochat .fullVideo {
-		height: 100%;
-		max-height: 100%;
-	}
-	#videochat .smallVideo {
-		position: absolute;
-		right: 10px;
-		bottom: 44px;
-		width: 25%;
+	#videochat #localVideo,
+	#miniVideo {
+		-webkit-transform: scale(-1, 1);
+		transform: scale(-1, 1);
 	}
 	
 #videochat-footer {
 	position: absolute;
 	bottom: 0;
 	width: 100%;
-	height: 52px;
-	background: #181818;
+	height: 30px;
+	padding: 10px 0;
+	text-align: center;
+	background: rgba(24, 24, 24, 0.7);
 }
-	#videochat-footer .controls-wrap {
-		margin: 0 auto;
-	}
-		#videochat-footer button {
-			float: right;
-			margin: 10px;
-		}
 
 #remoteCall {
 	padding: 20px 10px;
 	text-align: center;
 }
-	#remoteCall .remoteCall-avatar {
+	#remoteCall .avatar {
 		width: 125px;
 		margin-bottom: 20px;
 		border-radius: 50%;
 	}
-	#remoteCall .remoteCall-author {
+	#remoteCall .author {
 		margin-bottom: 20px;
-		font-size: 16px;
-		line-height: 20px;
 	}
-	#remoteCall .rejectCall {
+	#remoteCall button:first-child {
 		margin-right: 15px;
 	}

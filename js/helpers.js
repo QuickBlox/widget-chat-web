@@ -351,10 +351,14 @@ function setSize(popup, innerWidth, innerHeight) {
 	$(popup.document).find('#videochat-footer .controls-wrap').css('width', videoWidth + 'px');
 }
 
-function htmlVideoChatBuilder(selector, qbID, name) {
+function htmlVideoChatBuilder(selector, qbID, name, sessionDescription) {
 	selector.find('title').text('Video chat with ' + name);
-	selector.find('#videochat, .doCall, .stopCall').attr('data-qb', qbID);
+	selector.find('#doCall, #stopCall').attr('data-qb', qbID);
 	selector.find('#videochat, #videochat-footer').show();
+	if (sessionDescription)
+		selector.find('#doCall').hide().parent().find('#stopCall').show();
+	else
+		selector.find('#doCall').show().parent().find('#stopCall').hide();
 }
 
 function htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, avatar, name) {

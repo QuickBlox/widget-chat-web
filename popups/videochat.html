@@ -8,21 +8,21 @@
 <body>
 	<div id="videochat" class="hidden">
 		<video id="localVideo" class="fullVideo" autoplay muted></video>
-		<video id="remoteVideo" class="smallVideo" autoplay></video>
+		<video id="remoteVideo" class="fullVideo hidden" autoplay></video>
 	</div>
 	
+	<video id="miniVideo" class="smallVideo hidden" autoplay muted></video>
+	
 	<footer id="videochat-footer" class="hidden">
-		<div class="controls-wrap">
-			<button class="stopCall btn_red hidden">Hang up</button>
-			<button class="doCall btn_green">Call user</button>
-		</div>
+		<button id="doCall" class="btn_green">Call user</button>
+		<button id="stopCall" class="btn_red">Hang up</button>
 	</footer>
 	
 	<div id="remoteCall" class="hidden">
-		<img class="remoteCall-avatar" src="" alt="avatar" />
-		<div class="remoteCall-author"></div>
-		<button class="rejectCall btn_red">Decline</button>
-		<button class="acceptCall btn_green">Accept</button>
+		<img class="avatar" src="" alt="avatar">
+		<div class="author"></div>
+		<button id="acceptCall" class="btn_green">Accept</button>
+		<button id="rejectCall" class="btn_red">Reject</button>
 	</div>
 </body>
 </html>

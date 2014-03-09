@@ -744,8 +744,6 @@ function createVideoChatInstance(event, userID, sessionID, sessionDescription) {
 	name = namesOccupants[qbID];
 	
 	if (!name) {
-		/*$('.chat:visible .chat-content').append('<span class="service-message left" data-time="' + new Date().toISOString() + '">Sorry, this user is offline</span>');
-		scrollToMessage($('.chat:visible .chat-content'));*/
 		alert('Sorry, this user is offline');
 		return true;
 	}
@@ -757,31 +755,24 @@ function createVideoChatInstance(event, userID, sessionID, sessionDescription) {
 }
 
 function getMediaSuccess(qbID, name, sessionDescription) {
-	var win, selector;
+	var win, selector, winName = sessionDescription ? 'answer' : 'offer';
 	
-	if (popups[qbID]) {
-		if (sessionDescription)
-			win = popups[qbID].answer;
-		else
-			win = popups[qbID].offer;
-		loadPopup(win);
+	if (popups[winName]) {
+		win = popups[winName];
+		selector = $(win.document);
+		loader(selector);
 	} else {
-		popups[qbID] = {};
-		if (sessionDescription) {
-			popups[qbID].answer = openPopup('videoChatAnswer', null, 'resizable=yes');
-			win = popups[qbID].answer;
-		} else {
-			popups[qbID].offer = openPopup('videoChatOffer', null, 'resizable=yes');
-			win = popups[qbID].offer;
-		}
+		popups[winName] = openPopup(winName, null, 'resizable=yes');
+		win = popups[winName];
 	}
 	
 	win.onload = function() {
 		selector = $(this.document);
+		loader(selector);
+		
 		console.log(11111111111);
-		selector.find('.doCall').click(doCall);
-		selector.find('.stopCall').click(function() { stopCall(win) });
-		//loader(selector);
+		selector.find('#doCall').click(doCall);
+		selector.find('#stopCall').click(function() { stopCall(win) });
 		
 		this.onresize = function() {
 			console.log(22222222222);
@@ -794,7 +785,7 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 			}
 		};
 		
-		this.onunload = function() {
+		this.onbeforeunload = function() {
 			console.log(333333333333);
 			if (switches.isPopupClosed)
 				stopCall(this);
@@ -802,19 +793,17 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 	};
 	
 	function loader(selector) {
-		htmlVideoChatBuilder(selector, qbID, name);
+		htmlVideoChatBuilder(selector, qbID, name, sessionDescription);
 		
-		videoChat.localStreamElement = $(selector).find('#localVideo')[0];
-		videoChat.remoteStreamElement = $(selector).find('#remoteVideo')[0];
+		videoChat.localStreamElement = selector.find('#localVideo')[0];
+		videoChat.remoteStreamElement = selector.find('#remoteVideo')[0];
 		attachMediaStream(videoChat.localStreamElement, videoChat.localStream);
-		selector.find('.stopCall').hide().parent().find('.doCall').show();
 		
 		if (sessionDescription) {
-			selector.find('.doCall').hide().parent().find('.stopCall').show();
-			getRemoteStream(selector);
-			
 			videoChat.remoteSessionDescription = sessionDescription;
 			videoChat.accept(qbID);
+			
+			getRemoteStream(selector);
 		}
 	}
 }
@@ -904,7 +893,7 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 			popup.close();
 		});
 		
-		popup.onunload = function() {
+		popup.onbeforeunload = function() {
 			if (!switches.isNoClosed) {
 				rejectCall(this.document, sessionID);
 				switches.isNoClosed = false;
