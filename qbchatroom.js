@@ -764,10 +764,15 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 	} else {
 		popups[winName] = openPopup(winName, null, 'resizable=yes');
 		win = popups[winName];
-		selector = $(win.document);
 	}
 	
 	win.onload = function() {
+		selector = $(win.document);
+		loader();
+		
+		selector.find('#doCall').click(doCall);
+		selector.find('#stopCall').click(stopCall);
+		
 		win.onresize = function() {
 			resize(win, this.innerWidth, this.innerHeight);
 		};
@@ -777,11 +782,6 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 				stopCall(win);
 			switches.isPopupClosed = true;
 		};
-		
-		selector.find('#doCall').click(doCall);
-		selector.find('#stopCall').click(stopCall);
-		
-		loader();
 	};
 	
 	function loader() {
