@@ -81,6 +81,7 @@ function QBVideoChat(constraints, signalingService, sessionID) {
 	
 	// MediaStream attachMedia
 	this.attachMediaStream = function(elem) {
+		elem.volume = 0.7;
 		attachMediaStream(elem, self.localStream);
 	}
 	
@@ -150,13 +151,13 @@ function QBVideoChat(constraints, signalingService, sessionID) {
                                 },
                                 
                                 function onError(error) {
-                                  traceVC('LocalDescription error: ' + error);
+                                  traceVC('LocalDescription error: ' + JSON.stringify(error));
                                 }
 		);
 	};
 
-	this.onCreateOfferFailureCallback = function(event) {
-		traceVC('createOffer() error: ', event);
+	this.onCreateOfferFailureCallback = function(error) {
+		traceVC('createOffer() error: ' + JSON.stringify(error));
 	};
 	
 	// Set RemoteDescription
@@ -177,7 +178,7 @@ function QBVideoChat(constraints, signalingService, sessionID) {
                                  },
                                  
                                  function onError(error) {
-                                   traceVC('RemoteDescription error: ' + error);
+                                   traceVC('RemoteDescription error: ' + JSON.stringify(error));
                                  }
 		);
 		
@@ -188,8 +189,8 @@ function QBVideoChat(constraints, signalingService, sessionID) {
 		}
 	};
 	
-	this.onCreateAnswerFailureCallback = function(event) {
-		traceVC('createAnswer() error: ', event);
+	this.onCreateAnswerFailureCallback = function(error) {
+		traceVC('createAnswer() error: ' + JSON.stringify(error));
 	};
 	
 	this.sendCallRequest = function() {

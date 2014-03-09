@@ -755,37 +755,18 @@ function createVideoChatInstance(event, userID, sessionID, sessionDescription) {
 }
 
 function getMediaSuccess(qbID, name, sessionDescription) {
-	var win, selector, winName = sessionDescription ? 'answer' : 'offer';
+	var win, selector, winName = 'videochat';
 	
-	if (popups[winName]) {
-		win = popups[winName];
-		selector = $(win.document);
-		loader();
-	} else {
-		popups[winName] = openPopup(winName, null, 'resizable=yes');
-		win = popups[winName];
-	}
+	if (popups[winName]) popups[winName].close();
+	
+	popups[winName] = openPopup(winName, null, 'resizable=yes');
+	win = popups[winName];
 	
 	win.onload = function() {
 		selector = $(win.document);
-		loader();
-		
 		selector.find('#doCall').click(doCall);
 		selector.find('#stopCall').click(stopCall);
 		
-		win.onresize = function() {
-			resize(win, this.innerWidth, this.innerHeight);
-		};
-		
-		win.onbeforeunload = function() {
-			if (switches.isPopupClosed)
-				stopCall(win);
-			switches.isPopupClosed = true;
-		};
-	};
-	
-	function loader() {
-		win.focus();
 		htmlVideoChatBuilder(selector, qbID, name, sessionDescription);
 		
 		videoChat.localStreamElement = selector.find('#localVideo')[0];
@@ -793,12 +774,21 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 		videoChat.attachMediaStream(videoChat.localStreamElement);
 		
 		if (sessionDescription) {
+			getRemoteStream(selector);
 			videoChat.remoteSessionDescription = sessionDescription;
 			videoChat.accept(qbID);
-			
-			getRemoteStream(selector);
 		}
-	}
+		
+		win.onresize = function() {
+			resize(win, this.innerWidth, this.innerHeight);
+		};
+		
+		win.onbeforeunload = function() {
+			if (switches.isPopupClosed)
+				stopCall();
+			switches.isPopupClosed = true;
+		};
+	};
 }
 
 function getMediaError(sessionID, sessionDescription) {
