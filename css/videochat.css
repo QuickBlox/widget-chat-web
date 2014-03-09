@@ -84,6 +84,6 @@ button:hover {
 	#remoteCall .author {
 		margin-bottom: 20px;
 	}
-	#remoteCall button:first-child {
-		margin-right: 15px;
+	#remoteCall button:last-child {
+		margin-left: 15px;
 	}
