@@ -79,6 +79,11 @@ function QBVideoChat(constraints, signalingService, sessionID) {
 		}
 	};
 	
+	// MediaStream attachMedia
+	this.attachMediaStream = function(elem) {
+		attachMediaStream(elem, self.localStream);
+	}
+	
 	// RTCPeerConnection creation
 	this.createRTCPeerConnection = function() {
 		traceVC("RTCPeerConnection...");

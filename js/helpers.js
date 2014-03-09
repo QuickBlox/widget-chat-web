@@ -302,7 +302,7 @@ function removeChat() {
 -----------------------------------------------------------------------*/
 function openPopup(winName, sizes, options) {
 	var scrWidth, scrHeight, winWidth, winHeight, disWidth, disHeight;
-	var popup, url, params;
+	var url, params;
 	
 	scrWidth = window.screen.availWidth;
 	scrHeight = window.screen.availHeight;
@@ -320,35 +320,36 @@ function openPopup(winName, sizes, options) {
 	url = window.location.toString() + 'popups/videochat.html';
 	params = ('width='+winWidth+', height='+winHeight+', left='+disWidth+', top='+disHeight+', ').concat(options);
 	
-	popup = window.open(url, winName, params);
-	popup.focus();
-	
-	return popup;
+	return window.open(url, winName, params);
 }
 
-function setSize(popup, innerWidth, innerHeight) {
-	var video, videoWidth, videoHeight, videoTop, videoLeft, aspectRatio, footerHeight = 52;
+function resize(win, innerWidth, innerHeight) {
+	var elem, elemWidth, elemHeight, elemLeft, elemTop;
+	var selector, footerHeight, aspectRatio;
 	
-	video = $(popup.document).find('.fullVideo')[0];
-	aspectRatio = video.videoWidth / video.videoHeight;
+	selector = $(win.document);
+	footerHeight = selector.find('#videochat-footer').height();
 	
-	videoWidth = innerWidth < aspectRatio * popup.innerHeight ?
-	             innerWidth : aspectRatio * popup.innerHeight;
-	videoHeight = innerHeight < popup.innerWidth / aspectRatio ?
-	              innerHeight : popup.innerWidth / aspectRatio;
-	videoTop = (innerHeight - videoHeight - footerHeight) / 2;
-	videoLeft = (innerWidth - videoWidth) / 2;
+	elem = selector.find('.fullVideo:visible')[0];
+	aspectRatio = elem.videoWidth / elem.videoHeight;
 	
-	$(popup.document).find('#videochat').css({'width': videoWidth + 'px',
-	                                          'height': videoHeight + 'px',
-	                                          'top': videoTop + 'px',
-	                                          'left': videoLeft + 'px'});
-	if (videoTop <= 0)
-		$(popup.document).find('#videochat').css('position', 'static');
+	elemWidth = innerWidth < aspectRatio * win.innerHeight ?
+	             innerWidth : aspectRatio * win.innerHeight;
+	elemHeight = innerHeight < win.innerWidth / aspectRatio ?
+	              innerHeight : win.innerWidth / aspectRatio;
+	
+	elemLeft = (innerWidth - elemWidth) / 2;
+	elemTop = (innerHeight - elemHeight - footerHeight) / 2;
+	
+	if (elemTop > 0)
+		selector.find('#videochat').css('position', 'absolute');
 	else
-		$(popup.document).find('#videochat').css('position', 'absolute');
-	
-	$(popup.document).find('#videochat-footer .controls-wrap').css('width', videoWidth + 'px');
+		selector.find('#videochat').css('position', 'static');
+		
+	selector.find('#videochat').css({'width': elemWidth + 'px',
+	                                 'height': elemHeight + 'px',
+	                                 'left': elemLeft + 'px',
+	                                 'top': elemTop + 'px'});
 }
 
 function htmlVideoChatBuilder(selector, qbID, name, sessionDescription) {

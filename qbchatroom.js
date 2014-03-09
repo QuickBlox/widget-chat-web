@@ -760,44 +760,37 @@ function getMediaSuccess(qbID, name, sessionDescription) {
 	if (popups[winName]) {
 		win = popups[winName];
 		selector = $(win.document);
-		loader(selector);
+		loader();
 	} else {
 		popups[winName] = openPopup(winName, null, 'resizable=yes');
 		win = popups[winName];
+		selector = $(win.document);
 	}
 	
 	win.onload = function() {
-		selector = $(this.document);
-		loader(selector);
-		
-		console.log(11111111111);
-		selector.find('#doCall').click(doCall);
-		selector.find('#stopCall').click(function() { stopCall(win) });
-		
-		this.onresize = function() {
-			console.log(22222222222);
-			var video, innerWidth, innerHeight;
-			video = selector.find('.fullVideo')[0];
-			if (video && video.videoWidth > 0) {
-				innerWidth = this.innerWidth;
-				innerHeight = this.innerHeight;
-				setSize(this, innerWidth, innerHeight);
-			}
+		win.onresize = function() {
+			resize(win, this.innerWidth, this.innerHeight);
 		};
 		
-		this.onbeforeunload = function() {
-			console.log(333333333333);
+		win.onbeforeunload = function() {
 			if (switches.isPopupClosed)
-				stopCall(this);
+				stopCall(win);
+			switches.isPopupClosed = true;
 		};
+		
+		selector.find('#doCall').click(doCall);
+		selector.find('#stopCall').click(stopCall);
+		
+		loader();
 	};
 	
-	function loader(selector) {
+	function loader() {
+		win.focus();
 		htmlVideoChatBuilder(selector, qbID, name, sessionDescription);
 		
 		videoChat.localStreamElement = selector.find('#localVideo')[0];
 		videoChat.remoteStreamElement = selector.find('#remoteVideo')[0];
-		attachMediaStream(videoChat.localStreamElement, videoChat.localStream);
+		videoChat.attachMediaStream(videoChat.localStreamElement);
 		
 		if (sessionDescription) {
 			videoChat.remoteSessionDescription = sessionDescription;
@@ -825,10 +818,9 @@ function getMediaError(sessionID, sessionDescription) {
 
 // methods
 function doCall() {
-	var qbID;
-	qbID = $(this).data('qb');
-	$(this).hide().parent().find('.stopCall').show();
-	videoChat.call(qbID, chatUser.avatar);
+	var qbID = $(this).data('qb');
+	$(this).hide().parent().find('#stopCall').show();
+	//videoChat.call(qbID, chatUser.avatar);
 }
 
 function acceptCall(popup) {
@@ -857,16 +849,16 @@ function rejectCall(selector, sessionID) {
 		audio.ring.pause();
 }
 
-function stopCall(popup) {
+function stopCall() {
 	console.log('stopstop');
 
-	switches.isVideoChat = false;
+	/*switches.isVideoChat = false;
 	var qbID;
 	qbID = $(popup.document).find('#videochat').data('qb');
 	videoChat.stop(qbID);
 	popup.close();
 	switches.isNoClosed = true;
-	videoChat = null;
+	videoChat = null;*/
 }
 
 // callbacks
