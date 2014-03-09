@@ -816,14 +816,16 @@ function doCall() {
 function acceptCall() {
 	var qbID, sessionDescription, sessionID;
 	
-	audio.ring.pause();
-	qbID = $(popup.document).find('#remoteCall').data('qb');
-	delete namesWindowsRemoteCall[qbID];
-	sessionDescription = $(popup.document).find('.acceptCall').data('description');
-	sessionID = parseInt($(popup.document).find('.acceptCall').data('id'));
+	qbID = $(this).data('qb');
+	sessionID = parseInt($(this).data('id'));
+	sessionDescription = $(this).data('description');
 	
-	popup.close();
-	createVideoChatInstance(null, qbID, sessionID, sessionDescription);
+	switches.isPopupClosed = false;
+	popups['remoteCall-' + qbID].close();
+	delete popups['remoteCall-' + qbID];
+	
+	audio.ring.pause();
+	//createVideoChatInstance(null, qbID, sessionID, sessionDescription);
 }
 
 function rejectCall(sessionID) {
