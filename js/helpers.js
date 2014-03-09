@@ -352,20 +352,20 @@ function setSize(popup, innerWidth, innerHeight) {
 }
 
 function htmlVideoChatBuilder(selector, qbID, name) {
-	$(selector).find('title').text('Video chat with ' + name);
-	$(selector).find('#videochat, .doCall, .stopCall').attr('data-qb', qbID);
-	$(selector).find('#videochat, #videochat-footer').show();
+	selector.find('title').text('Video chat with ' + name);
+	selector.find('#videochat, .doCall, .stopCall').attr('data-qb', qbID);
+	selector.find('#videochat, #videochat-footer').show();
 }
 
 function htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, avatar, name) {
 	if (!avatar)
 		avatar = '../images/avatar_default.jpg';
 	
-	$(selector).find('title').text('Remote call');
-	$(selector).find('.remoteCall-avatar').attr('src', avatar);
-	$(selector).find('.remoteCall-author').html('<b>' + name + '</b><br>is calling you');
-	$(selector).find('.acceptCall').attr('data-id', sessionID).attr('data-description', sessionDescription);
-	$(selector).find('#remoteCall').attr('data-qb', qbID).show();
+	selector.find('title').text('Remote call');
+	selector.find('.remoteCall-avatar').attr('src', avatar);
+	selector.find('.remoteCall-author').html('<b>' + name + '</b><br>is calling you');
+	selector.find('.acceptCall').attr('data-id', sessionID).attr('data-description', sessionDescription);
+	selector.find('#remoteCall').attr('data-qb', qbID).show();
 }
 
 function getRemoteStream(selector) {
