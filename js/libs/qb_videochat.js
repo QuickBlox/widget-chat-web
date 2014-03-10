@@ -14,6 +14,12 @@
     - stop(userID)
  */
 
+var PC_CONSTRAINTS = {
+	'optional': [{
+		'DtlsSrtpKeyAgreement': true
+	}]
+};
+
 var SDP_CONSTRAINTS = {
 	'mandatory': {
 		'OfferToReceiveAudio': true,
@@ -95,7 +101,7 @@ function QBVideoChat(constraints, signalingService, sessionID, sessionDescriptio
 	this.createRTCPeerConnection = function() {
 		traceVC("RTCPeerConnection...");
 		try {
-			this.pc = new RTCPeerConnection(ICE_SERVERS);
+			this.pc = new RTCPeerConnection(ICE_SERVERS, PC_CONSTRAINTS);
 			this.pc.addStream(this.localStream);
 			this.pc.onicecandidate = this.onIceCandidateCallback;
 			this.pc.onaddstream = this.onRemoteStreamAddedCallback;

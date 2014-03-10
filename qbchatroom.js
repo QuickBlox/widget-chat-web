@@ -791,7 +791,7 @@ function getMediaSuccess(qbID, name, sessionID) {
 }
 
 function getMediaError(sessionID) {
-	var popup;
+	/*var popup;
 	
 	if (switches.isVideoChat) {
 		if (sessionID)
@@ -802,7 +802,7 @@ function getMediaError(sessionID) {
 	
 	switches.isVideoChat = false;
 	switches.isNoClosed = false;
-	rejectCall(popup.document, sessionID);
+	rejectCall(popup.document, sessionID);*/
 }
 
 // methods
@@ -888,8 +888,8 @@ function onAccept(qbID) {
 }
 
 function onReject(qbID) {
-	var popup = window.open('', 'videoChat-offer');
-	$(popup.document).find('.stopCall').hide().parent().find('.doCall').show();
+	/*var popup = window.open('', 'videoChat-offer');
+	$(popup.document).find('.stopCall').hide().parent().find('.doCall').show();*/
 }
 
 function onStop(qbID) {
