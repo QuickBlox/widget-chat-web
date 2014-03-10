@@ -14,13 +14,25 @@
     - stop(userID)
  */
 
-if (webrtcDetectedBrowser == 'chrome') {
-	var PC_CONSTRAINTS = {
-		'optional': [{
-			'DtlsSrtpKeyAgreement': true
-		}]
-	};
-}
+var ICE_SERVERS = {
+	urls: [
+		'stun:stun.l.google.com:19302',
+		'turn:turnserver.quickblox.com:3478?transport=udp',
+		'turn:turnserver.quickblox.com:3478?transport=tcp'
+	],
+	username: 'user',
+	password: 'user'
+};
+
+var PC_CONFIG = {
+	'iceServers': createIceServers(ICE_SERVERS.urls, ICE_SERVERS.username, ICE_SERVERS.password)
+};
+
+console.log(PC_CONFIG);
+
+var PC_CONSTRAINTS = {
+	'optional': []
+};
 
 var SDP_CONSTRAINTS = {
 	'mandatory': {
@@ -103,7 +115,7 @@ function QBVideoChat(constraints, signalingService, sessionID, sessionDescriptio
 	this.createRTCPeerConnection = function() {
 		traceVC("RTCPeerConnection...");
 		try {
-			this.pc = new RTCPeerConnection(ICE_SERVERS, PC_CONSTRAINTS);
+			this.pc = new RTCPeerConnection(PC_CONFIG, PC_CONSTRAINTS);
 			this.pc.addStream(this.localStream);
 			this.pc.onicecandidate = this.onIceCandidateCallback;
 			this.pc.onaddstream = this.onRemoteStreamAddedCallback;

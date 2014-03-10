@@ -15,7 +15,7 @@ var CHAT = {
 var FBAPP_ID = '368137086642884';
 
 /* STUN/TURN servers */
-var ICE_SERVERS = {
+/*var ICE_SERVERS = {
 	'iceServers': [
 		{
 			'url': 'stun:stun.l.google.com:19302'
@@ -31,4 +31,4 @@ var ICE_SERVERS = {
 			'credential': 'user'
 		}
 	]
-};
+};*/
