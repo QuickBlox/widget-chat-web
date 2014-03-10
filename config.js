@@ -15,20 +15,12 @@ var CHAT = {
 var FBAPP_ID = '368137086642884';
 
 /* STUN/TURN servers */
-/*var ICE_SERVERS = {
-	'iceServers': [
-		{
-			'url': 'stun:stun.l.google.com:19302'
-		},
-		{
-			'url': 'turn:turnserver.quickblox.com:3478?transport=udp',
-			'username': 'user',
-			'credential': 'user'
-		},
-		{
-			'url': 'turn:turnserver.quickblox.com:3478?transport=tcp',
-			'username': 'user',
-			'credential': 'user'
-		}
-	]
-};*/
+var ICE_SERVERS = {
+	urls: [
+		'stun:stun.l.google.com:19302',
+		'turn:turnserver.quickblox.com:3478?transport=udp',
+		'turn:turnserver.quickblox.com:3478?transport=tcp'
+	],
+	username: 'user',
+	password: 'user'
+};

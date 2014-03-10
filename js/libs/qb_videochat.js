@@ -13,54 +13,17 @@
     - reject(userID)
     - stop(userID)
  */
-var STUN = webrtcDetectedBrowser == 'chrome' ? "stun:stun.l.google.com:19302" : 'stun:23.21.150.121'
-
-var ICE_SERVERS = {
-	urls: [
-		STUN,
-		'turn:turnserver.quickblox.com:3478?transport=udp',
-		'turn:turnserver.quickblox.com:3478?transport=tcp'
-	],
-	username: 'user',
-	password: 'user'
-};
 
 var PC_CONFIG = {
 	'iceServers': createIceServers(ICE_SERVERS.urls, ICE_SERVERS.username, ICE_SERVERS.password)
 };
 
-if (webrtcDetectedBrowser == 'firefox') {
-	var PC_CONSTRAINTS = {
-		'optional': []
-	};
-} else if (webrtcDetectedBrowser == 'chrome') {
-	var PC_CONSTRAINTS = {
-		'optional': [{
-			'DtlsSrtpKeyAgreement': true
-		}]
-	};
-}
+var PC_CONSTRAINTS = {
+	'optional': []
+};
 
-if (webrtcDetectedBrowser == 'firefox') {
-	var SDP_CONSTRAINTS_OFFER = {
-		'optional': [],
-		'mandatory': {
-			'OfferToReceiveAudio': true,
-			'OfferToReceiveVideo': true,
-			'MozDontOfferDataChannel': true
-		}
-	};
-} else if (webrtcDetectedBrowser == 'chrome') {
-	var SDP_CONSTRAINTS_OFFER = {
-		'optional': [],
-		'mandatory': {
-			'OfferToReceiveAudio': true,
-			'OfferToReceiveVideo': true
-		}
-	};
-}
-
-var SDP_CONSTRAINTS_ANSWER = {
+var SDP_CONSTRAINTS = {
+	'optional': [],
 	'mandatory': {
 		'OfferToReceiveAudio': true,
 		'OfferToReceiveVideo': true
@@ -189,11 +152,6 @@ function QBVideoChat(constraints, signalingService, sessionID, sessionDescriptio
 	this.onGetSessionDescriptionSuccessCallback = function(sessionDescription) {
 		traceVC('LocalDescription...');
 		
-		var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
-		    extractedChars = '';
-		    
-		sessionDescription.sdp = getInteropSDP(sessionDescription.sdp);
-		
 		self.pc.setLocalDescription(sessionDescription,
                                 
                                 function onSuccess() {
@@ -211,24 +169,6 @@ function QBVideoChat(constraints, signalingService, sessionID, sessionDescriptio
                                   traceVC('LocalDescription error: ' + JSON.stringify(error));
                                 }
 		);
-		
-		
-		
-		function getChars() {
-		    extractedChars += chars[parseInt(Math.random() * 40)] || '';
-		    if (extractedChars.length < 40) getChars();
-		
-		    return extractedChars;
-		}
-		
-		function getInteropSDP(sdp) {
-		    var inline = getChars() + '\r\n' + (extractedChars = '');
-		    sdp = sdp.indexOf('a=crypto') == -1 ? sdp.replace(/c=IN/g,
-		        'a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:' + inline +
-		        'c=IN') : sdp;
-		
-		    return sdp;
-		}
 	};
 
 	this.onCreateOfferFailureCallback = function(error) {
@@ -243,18 +183,13 @@ function QBVideoChat(constraints, signalingService, sessionID, sessionDescriptio
 		this.state = QBVideoChatState.ESTABLISHING;
 		sessionDescription = new RTCSessionDescription({sdp: descriptionSDP, type: descriptionType});
 		
-		var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
-		    extractedChars = '';
-		    
-		sessionDescription.sdp = getInteropSDP(sessionDescription.sdp);
-		
 		this.pc.setRemoteDescription(sessionDescription,
                                  
                                  function onSuccess() {
                                    traceVC("RemoteDescription success");
                                    
                                    if (sessionDescription.type === 'offer')
-                                     self.pc.createAnswer(self.onGetSessionDescriptionSuccessCallback, self.onCreateAnswerFailureCallback, SDP_CONSTRAINTS_ANSWER);
+                                     self.pc.createAnswer(self.onGetSessionDescriptionSuccessCallback, self.onCreateAnswerFailureCallback, SDP_CONSTRAINTS);
                                  },
                                  
                                  function onError(error) {
@@ -266,22 +201,6 @@ function QBVideoChat(constraints, signalingService, sessionID, sessionDescriptio
 		for (var i = 0; i < this.candidatesQueue.length; i++) {
 			candidate = this.candidatesQueue.pop();
 			self.signalingService.sendCandidate(self.opponentID, candidate, self.sessionID);
-		}
-		
-		function getChars() {
-		    extractedChars += chars[parseInt(Math.random() * 40)] || '';
-		    if (extractedChars.length < 40) getChars();
-		
-		    return extractedChars;
-		}
-		
-		function getInteropSDP(sdp) {
-		    var inline = getChars() + '\r\n' + (extractedChars = '');
-		    sdp = sdp.indexOf('a=crypto') == -1 ? sdp.replace(/c=IN/g,
-		        'a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:' + inline +
-		        'c=IN') : sdp;
-		
-		    return sdp;
 		}
 	};
 	
@@ -320,7 +239,7 @@ QBVideoChat.prototype.call = function(userID, userAvatar) {
 	} else {
 		this.opponentID = userID;
 		this.opponentAvatar = userAvatar;
-		this.pc.createOffer(this.onGetSessionDescriptionSuccessCallback, this.onCreateOfferFailureCallback, SDP_CONSTRAINTS_OFFER);
+		this.pc.createOffer(this.onGetSessionDescriptionSuccessCallback, this.onCreateOfferFailureCallback, SDP_CONSTRAINTS);
 	}
 };
 
