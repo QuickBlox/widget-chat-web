@@ -22,23 +22,12 @@ if (webrtcDetectedBrowser == 'chrome') {
 	};
 }
 
-if (webrtcDetectedBrowser == 'firefox') {
-	var SDP_CONSTRAINTS = {
-		'optional': [],
-		'mandatory': {
-			'OfferToReceiveAudio': true,
-			'OfferToReceiveVideo': true,
-			'MozDontOfferDataChannel': true
-		}
-	};
-} else {
-	var SDP_CONSTRAINTS = {
-		'mandatory': {
-			'OfferToReceiveAudio': true,
-			'OfferToReceiveVideo': true
-		}
-	};
-}
+var SDP_CONSTRAINTS = {
+	'mandatory': {
+		'OfferToReceiveAudio': true,
+		'OfferToReceiveVideo': true
+	}
+};
 
 var QBVideoChatState = {
 	INACTIVE: 'inactive',
