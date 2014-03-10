@@ -18,10 +18,6 @@ var PC_CONFIG = {
 	'iceServers': createIceServers(ICE_SERVERS.urls, ICE_SERVERS.username, ICE_SERVERS.password)
 };
 
-var PC_CONSTRAINTS = {
-	'optional': []
-};
-
 var SDP_CONSTRAINTS = {
 	'mandatory': {
 		'OfferToReceiveAudio': true,
@@ -103,7 +99,7 @@ function QBVideoChat(constraints, signalingService, sessionID, sessionDescriptio
 	this.createRTCPeerConnection = function() {
 		traceVC("RTCPeerConnection...");
 		try {
-			this.pc = new RTCPeerConnection(PC_CONFIG, PC_CONSTRAINTS);
+			this.pc = new RTCPeerConnection(PC_CONFIG);
 			this.pc.addStream(this.localStream);
 			this.pc.onicecandidate = this.onIceCandidateCallback;
 			this.pc.onaddstream = this.onRemoteStreamAddedCallback;
