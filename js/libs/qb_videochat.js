@@ -32,14 +32,24 @@ var PC_CONSTRAINTS = {
 	'optional': []
 };
 
-var SDP_CONSTRAINTS_OFFER = {
-	'optional': [],
-	'mandatory': {
-		'OfferToReceiveAudio': true,
-		'OfferToReceiveVideo': true,
-		'MozDontOfferDataChannel': true
-	}
-};
+if (webrtcDetectedBrowser == 'firefox') {
+	var SDP_CONSTRAINTS_OFFER = {
+		'optional': [],
+		'mandatory': {
+			'OfferToReceiveAudio': true,
+			'OfferToReceiveVideo': true,
+			'MozDontOfferDataChannel': true
+		}
+	};
+} else if (webrtcDetectedBrowser == 'chrome') {
+	var SDP_CONSTRAINTS_OFFER = {
+		'optional': [],
+		'mandatory': {
+			'OfferToReceiveAudio': true,
+			'OfferToReceiveVideo': true
+		}
+	};
+}
 
 var SDP_CONSTRAINTS_ANSWER = {
 	'mandatory': {
