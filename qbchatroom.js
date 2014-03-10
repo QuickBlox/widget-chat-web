@@ -746,6 +746,8 @@ function createVideoChatInstance(event, userID, sessionID, sessionDescription) {
 	if (!name) {
 		alert('Sorry, this user is offline');
 		return true;
+	} else if (popups['videochat']) {
+		popups['videochat'].close();
 	}
 	
 	videoChat = new QBVideoChat({audio: true, video: true}, signaling, sessionID, sessionDescription);
@@ -756,10 +758,6 @@ function createVideoChatInstance(event, userID, sessionID, sessionDescription) {
 
 function getMediaSuccess(qbID, name, sessionID) {
 	var win, selector, winName = 'videochat';
-	
-	if (popups['videochat']) {
-		popups['videochat'].close();
-	}
 	
 	popups[winName] = openPopup(winName, null, 'resizable=yes');
 	win = popups[winName];
@@ -786,7 +784,7 @@ function getMediaSuccess(qbID, name, sessionID) {
 		
 		win.onbeforeunload = function() {
 			if (switches.isPopupClosed)
-				//stopCall();
+				stopCall();
 			switches.isPopupClosed = true;
 		};
 	};
@@ -819,7 +817,7 @@ function acceptCall() {
 }
 
 function rejectCall(sessionID) {
-	/*var qbID = $(this).data('qb');
+	var qbID = $(this).data('qb');
 	
 	switches.isPopupClosed = false;
 	popups['remoteCall-' + qbID].close();
@@ -827,7 +825,7 @@ function rejectCall(sessionID) {
 	
 	stopRing(popups);
 	videoChat = videoChat || new QBVideoChat(null, signaling, sessionID, null);
-	videoChat.reject(qbID);*/
+	videoChat.reject(qbID);
 }
 
 function stopCall() {

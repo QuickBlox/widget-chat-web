@@ -14,17 +14,6 @@
     - stop(userID)
  */
 
-/* STUN/TURN servers */
-var ICE_SERVERS = {
-	urls: [
-		'stun:stun.l.google.com:19302',
-		'turn:turnserver.quickblox.com:3478?transport=udp',
-		'turn:turnserver.quickblox.com:3478?transport=tcp'
-	],
-	username: 'user',
-	password: 'user'
-};
-
 var PC_CONFIG = {
 	'iceServers': createIceServers(ICE_SERVERS.urls, ICE_SERVERS.username, ICE_SERVERS.password)
 };
