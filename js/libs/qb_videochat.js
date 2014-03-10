@@ -32,8 +32,15 @@ var PC_CONSTRAINTS = {
 	'optional': []
 };
 
-var SDP_CONSTRAINTS = {
+var SDP_CONSTRAINTS_OFFER = {
 	'optional': [],
+	'mandatory': {
+		'OfferToReceiveAudio': true,
+		'OfferToReceiveVideo': true
+	}
+};
+
+var SDP_CONSTRAINTS_ANSWER = {
 	'mandatory': {
 		'OfferToReceiveAudio': true,
 		'OfferToReceiveVideo': true
@@ -199,7 +206,7 @@ function QBVideoChat(constraints, signalingService, sessionID, sessionDescriptio
                                    traceVC("RemoteDescription success");
                                    
                                    if (sessionDescription.type === 'offer')
-                                     self.pc.createAnswer(self.onGetSessionDescriptionSuccessCallback, self.onCreateAnswerFailureCallback, SDP_CONSTRAINTS);
+                                     self.pc.createAnswer(self.onGetSessionDescriptionSuccessCallback, self.onCreateAnswerFailureCallback, SDP_CONSTRAINTS_ANSWER);
                                  },
                                  
                                  function onError(error) {
@@ -249,7 +256,7 @@ QBVideoChat.prototype.call = function(userID, userAvatar) {
 	} else {
 		this.opponentID = userID;
 		this.opponentAvatar = userAvatar;
-		this.pc.createOffer(this.onGetSessionDescriptionSuccessCallback, this.onCreateOfferFailureCallback, SDP_CONSTRAINTS);
+		this.pc.createOffer(this.onGetSessionDescriptionSuccessCallback, this.onCreateOfferFailureCallback, SDP_CONSTRAINTS_OFFER);
 	}
 };
 
