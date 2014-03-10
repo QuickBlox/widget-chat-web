@@ -23,7 +23,8 @@ var PC_CONSTRAINTS = {
 var SDP_CONSTRAINTS = {
 	'mandatory': {
 		'OfferToReceiveAudio': true,
-		'OfferToReceiveVideo': true
+		'OfferToReceiveVideo': true,
+		'MozDontOfferDataChannel': true
 	}
 };
 
