@@ -248,7 +248,6 @@ QBVideoChat.prototype.reject = function(userID) {
 // Stop call with user
 QBVideoChat.prototype.stop = function(userID) {
 	this.signalingService.stop(userID, "manual", this.sessionID);
-	this.hangup();
 };
 
 function traceVC(text) {
