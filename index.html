@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>QB Group Chat Room (XMPP)</title>
+	<link rel="stylesheet" href="qbchatroom.css">
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	
+	<style>
+		body {
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			margin: auto;
+			
+			/* Change sizes of sample */
+			width: 400px;
+			height: 499px;
+		}
+	</style>
+</head>
+<body>
+	<div id="fb-root"></div>
+	<script src="js/flexible_styles.js"></script>
+	
+	<div id="main" class="layout">
+		<div class="bubbles">
+			<div class="bubble bubble_green version"></div>
+			<div class="bubble bubble_blue"></div>
+			<div class="bubble bubble_light_blue"></div>
+		</div>
+		<header class="header">
+			<h1>Chat Room<br>
+				<a href="http://quickblox.com" target="_blank"><img src="images/qb_logo.png" alt="quickblox logo">by QuickBlox</a>
+			</h1>
+		</header>
+		
+		<div id="auth">
+			<div class="center">
+				<button id="authFB" class="btn btn_fb"><span>Login with FB</span></button>
+				<button id="authQB" class="btn btn_qb"><span>Login with QB</span></button>
+			</div>
+		</div>
+		
+		<div id="login-form" class="hidden">
+			<form action="#" class="center">
+				<fieldset>
+					<input id="login" type="text" placeholder="Login or email">
+					<input id="pass" type="password" placeholder="Password">
+				</fieldset>
+				<button id="dataLogin" class="btn btn_qb"><span>Connect</span></button>
+				<span class="not-registered">Not registered yet?<br>
+					<a href="#" id="signUp">Register a QuickBlox account</a>
+				</span>
+			</form>
+		</div>
+	</div>
+	
+	<div id="signup-form" class="layout hidden">
+		<form action="#" class="center" enctype="multipart/form-data">
+			<fieldset>
+				<input id="signup_name" type="text" placeholder="Full Name">
+				<input id="signup_email" type="text" placeholder="Email">
+				<input id="signup_login" type="text" placeholder="Login">
+				<input id="signup_pass" type="password" placeholder="Password">
+				<div class="uploader-wrap">
+					<img src="images/upload.png" alt="upload">
+					<input class="uploader-text" type="text" placeholder="User picture">
+					<input id="signup_avatar" type="file" accept="image/*">
+				</div>
+			</fieldset>
+			<button id="dataSignup" class="btn btn_qb"><span>Register</span></button>
+		</form>
+	</div>
+	
+	<div id="signup-success" class="layout hidden">
+		<span class="progress">Thanks for your<br>registration!</span>
+	</div>
+	
+	<div id="connecting" class="layout hidden">
+		<span class="progress">
+			<p>Connecting. Please wait...</p>
+			<progress></progress>
+		</span>
+	</div>
+	
+	<div id="chats-wrap" class="layout hidden">
+		<div id="chat-room" class="chat">
+			<header class="chat-header">
+				<a href="#" class="users show-list"><span class="users-count">0</span></a>
+				<a href="#" class="chats show-list hidden"><span class="chats-count">0</span></a>
+				<a href="#" class="logout"><img src="images/logout.png" alt="logout"></a>
+				<h2 class="chat-name" title="Chat Room">Chat Room</h2>
+				<ul class="users-list list hidden"></ul>
+			</header>
+			
+			<section class="chat-content"></section>
+			
+			<footer class="chat-footer">
+				<textarea class="send-message" placeholder="Enter Message" rows="1"></textarea>
+				<a href="#" class="smiles show-list"><img src="images/smile.png" alt="smile"></a>
+			</footer>
+		</div>
+		
+		<ul class="chats-list list hidden"></ul>
+		<div class="smiles-list list hidden"></div>
+		
+		<div class="actions-wrap hide-actions hidden">
+			<div class="actions"></div>
+		</div>
+	</div>
+	
+	<div id="audio-container">
+		<audio id="signal">
+			<source src="audio/signal.ogg"></source>
+			<source src="audio/signal.mp3"></source>
+		</audio>
+		<audio id="ring" loop>
+			<source src="audio/ring.ogg"></source>
+			<source src="audio/ring.mp3"></source>
+		</audio>
+	</div>
+	
+	<script src="js/libs/quickblox.js"></script>
+	<script src="js/libs/strophe.js"></script>
+	<script src="js/libs/strophe.muc.js"></script>
+	<script src="js/libs/strophe.chatstates.js"></script>
+	<script src="js/libs/jquery.timeago.js"></script>
+	<script src="js/libs/jquery.scrollTo-min.js"></script>
+	
+	<!-- QBVideoChat elements -->
+	<script src="js/libs/adapter.js"></script>
+	<script src="js/libs/qb_videochat_signalling.js"></script>
+	<script src="js/libs/qb_videochat.js"></script>
+	
+	<script src="config.js"></script>
+	<script src="js/smiles.js"></script>
+	<script src="js/helpers.js"></script>
+	<script src="qbchatroom.js"></script>
+</body>
+</html>
