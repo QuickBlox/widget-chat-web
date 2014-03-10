@@ -142,11 +142,6 @@ function QBVideoChat(constraints, signalingService, sessionID, sessionDescriptio
 		attachMediaStream(self.remoteStreamElement, event.stream);
 		self.remoteStream = event.stream;
 	};
-
-	// onRemoteStreamRemoved callback
-	this.onRemoteStreamRemovedCallback = function(event) {
-		traceVC('Remote stream removed');
-	};
 	
 	// Set LocalDescription
 	this.onGetSessionDescriptionSuccessCallback = function(sessionDescription) {

@@ -752,7 +752,7 @@ function createVideoChatInstance(event, userID, sessionID, sessionDescription) {
 	
 	videoChat = new QBVideoChat({audio: true, video: true}, signaling, sessionID, sessionDescription);
 	videoChat.onGetUserMediaSuccess = function() { getMediaSuccess(qbID, name, sessionID) };
-	videoChat.onGetUserMediaError = function() { getMediaError(sessionID) };
+	videoChat.onGetUserMediaError = function() { getMediaError(qbID) };
 	videoChat.getUserMedia();
 }
 
@@ -790,19 +790,8 @@ function getMediaSuccess(qbID, name, sessionID) {
 	};
 }
 
-function getMediaError(sessionID) {
-	/*var popup;
-	
-	if (switches.isVideoChat) {
-		if (sessionID)
-			popup = window.open('', 'videoChat-answer');
-		else
-			popup = window.open('', 'videoChat-offer');
-	}
-	
-	switches.isVideoChat = false;
-	switches.isNoClosed = false;
-	rejectCall(popup.document, sessionID);*/
+function getMediaError(qbID) {
+	videoChat.reject(qbID);
 }
 
 // methods
@@ -828,17 +817,15 @@ function acceptCall() {
 }
 
 function rejectCall(sessionID) {
-	console.log('rejectreject');
-	/*var qbID;
+	var qbID = $(this).data('qb');
 	
-	qbID = $(selector).find('#remoteCall').data('qb');
-	delete namesWindowsRemoteCall[qbID];
+	switches.isPopupClosed = false;
+	popups['remoteCall-' + qbID].close();
+	delete popups['remoteCall-' + qbID];
 	
-	videoChat = videoChat || new QBVideoChat(null, signaling, sessionID);
+	stopRing(popups);
+	videoChat = videoChat || new QBVideoChat(null, signaling, sessionID, null);
 	videoChat.reject(qbID);
-	
-	if (Object.keys(namesWindowsRemoteCall).length == 0)
-		audio.ring.pause();*/
 }
 
 function stopCall() {
@@ -869,7 +856,7 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 	win.onload = function() {
 		selector = $(win.document);
 		selector.find('#acceptCall').click(acceptCall);
-		selector.find('#rejectCall').click(rejectCall);
+		selector.find('#rejectCall').click(function() {rejectCall(sessionID)});
 		
 		htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, avatar, name);
 		audio.ring.play();
@@ -888,8 +875,9 @@ function onAccept(qbID) {
 }
 
 function onReject(qbID) {
-	/*var popup = window.open('', 'videoChat-offer');
-	$(popup.document).find('.stopCall').hide().parent().find('.doCall').show();*/
+	var win = popups['videochat'];
+	if (win)
+		$(win.document).find('#stopCall').hide().parent().find('#doCall').show();
 }
 
 function onStop(qbID) {
