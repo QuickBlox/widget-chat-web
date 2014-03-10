@@ -13,10 +13,11 @@
     - reject(userID)
     - stop(userID)
  */
+var STUN = webrtcDetectedBrowser == 'chrome' ? "stun:stun.l.google.com:19302" : 'stun:23.21.150.121'
 
 var ICE_SERVERS = {
 	urls: [
-		'stun:stun.l.google.com:19302',
+		STUN,
 		'turn:turnserver.quickblox.com:3478?transport=udp',
 		'turn:turnserver.quickblox.com:3478?transport=tcp'
 	],
@@ -25,7 +26,7 @@ var ICE_SERVERS = {
 };
 
 var PC_CONFIG = {
-	'iceServers': [{"url": webrtcDetectedBrowser == 'chrome' ? "stun:stun.l.google.com:19302" : 'stun:23.21.150.121'}]//createIceServers(ICE_SERVERS.urls, ICE_SERVERS.username, ICE_SERVERS.password)
+	'iceServers': createIceServers(ICE_SERVERS.urls, ICE_SERVERS.username, ICE_SERVERS.password)
 };
 
 if (webrtcDetectedBrowser == 'firefox') {
@@ -188,6 +189,9 @@ function QBVideoChat(constraints, signalingService, sessionID, sessionDescriptio
 	this.onGetSessionDescriptionSuccessCallback = function(sessionDescription) {
 		traceVC('LocalDescription...');
 		
+		if (webrtcDetectedBrowser == 'firefox')
+			sessionDescription.sdp = getInteropSDP(sessionDescription.sdp);
+		
 		self.pc.setLocalDescription(sessionDescription,
                                 
                                 function onSuccess() {
@@ -205,6 +209,13 @@ function QBVideoChat(constraints, signalingService, sessionID, sessionDescriptio
                                   traceVC('LocalDescription error: ' + JSON.stringify(error));
                                 }
 		);
+		
+		function getInteropSDP(sdp) {
+		    var inline = 'a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890abc\r\nc=IN';
+		    sdp = sdp.indexOf('a=crypto') == -1 ? sdp.replace(/c=IN/g, inline) : sdp;
+		
+		    return sdp;
+		}
 	};
 
 	this.onCreateOfferFailureCallback = function(error) {
