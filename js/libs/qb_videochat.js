@@ -25,7 +25,7 @@ var ICE_SERVERS = {
 };
 
 var PC_CONFIG = {
-	'iceServers': [{"urls": "stun:stun.l.google.com:19302"}]//createIceServers(ICE_SERVERS.urls, ICE_SERVERS.username, ICE_SERVERS.password)
+	'iceServers': [{"url": webrtcDetectedBrowser == 'chrome' ? "stun:stun.l.google.com:19302" : 'stun:23.21.150.121'}]//createIceServers(ICE_SERVERS.urls, ICE_SERVERS.username, ICE_SERVERS.password)
 };
 
 if (webrtcDetectedBrowser == 'firefox') {
