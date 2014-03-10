@@ -36,7 +36,8 @@ var SDP_CONSTRAINTS_OFFER = {
 	'optional': [],
 	'mandatory': {
 		'OfferToReceiveAudio': true,
-		'OfferToReceiveVideo': true
+		'OfferToReceiveVideo': true,
+		'MozDontOfferDataChannel': true
 	}
 };
 
