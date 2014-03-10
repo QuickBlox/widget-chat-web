@@ -23,7 +23,6 @@ var PC_CONSTRAINTS = {
 };
 
 var SDP_CONSTRAINTS = {
-	'optional': [],
 	'mandatory': {
 		'OfferToReceiveAudio': true,
 		'OfferToReceiveVideo': true
