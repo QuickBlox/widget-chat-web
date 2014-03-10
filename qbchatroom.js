@@ -784,7 +784,7 @@ function getMediaSuccess(qbID, name, sessionID) {
 		
 		win.onbeforeunload = function() {
 			if (switches.isPopupClosed)
-				stopCall();
+				//stopCall();
 			switches.isPopupClosed = true;
 		};
 	};
