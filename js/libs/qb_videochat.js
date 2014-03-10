@@ -28,13 +28,12 @@ var PC_CONFIG = {
 	'iceServers': createIceServers(ICE_SERVERS.urls, ICE_SERVERS.username, ICE_SERVERS.password)
 };
 
-console.log(PC_CONFIG);
-
 var PC_CONSTRAINTS = {
 	'optional': []
 };
 
 var SDP_CONSTRAINTS = {
+	'optional': [],
 	'mandatory': {
 		'OfferToReceiveAudio': true,
 		'OfferToReceiveVideo': true
