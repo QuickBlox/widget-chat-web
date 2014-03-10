@@ -378,3 +378,8 @@ function getRemoteStream(selector) {
 	selector.find('#localVideo').hide();
 	selector.find('#remoteVideo, #miniVideo').show();
 }
+
+function stopRing(popups) {
+	if (Object.keys(popups).length == 0 || Object.keys(popups).length == 1 && popups['videochat'])
+		audio.ring.pause();
+}

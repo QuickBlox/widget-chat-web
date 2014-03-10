@@ -60,16 +60,20 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 		
 		switch (type) {
 		case QBSignalingType.CALL:
+			traceS('onCall from ' + qbID);
 			self.onCallCallback(qbID, body, sessionID, avatar);
 			break;
 		case QBSignalingType.ACCEPT:
+			traceS('onAccept from ' + qbID);
 			self.onAcceptCallback(qbID);
 			self.onInnerAcceptCallback(body);
 			break;
 		case QBSignalingType.REJECT:
+			traceS('onReject from ' + qbID);
 			self.onRejectCallback(qbID);
 			break;
 		case QBSignalingType.STOP:
+			traceS('onStop from ' + qbID);
 			self.onStopCallback(qbID, body);
 			break;
 		case QBSignalingType.CANDIDATE:

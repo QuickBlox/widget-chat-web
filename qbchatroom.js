@@ -823,7 +823,7 @@ function acceptCall() {
 	popups['remoteCall-' + qbID].close();
 	delete popups['remoteCall-' + qbID];
 	
-	audio.ring.pause();
+	stopRing(popups);
 	createVideoChatInstance(null, qbID, sessionID, sessionDescription);
 }
 
@@ -842,20 +842,21 @@ function rejectCall(sessionID) {
 }
 
 function stopCall() {
-	console.log('stopstop');
-
-	/*switches.isVideoChat = false;
-	var qbID;
-	qbID = $(popup.document).find('#videochat').data('qb');
+	var win, qbID;
+	
+	win = popups['videochat'];
+	qbID = $(win.document).find('#stopCall').data('qb');
+	
+	switches.isPopupClosed = false;
+	win.close();
+	delete popups['videochat'];
+	
 	videoChat.stop(qbID);
-	popup.close();
-	switches.isNoClosed = true;
-	videoChat = null;*/
+	videoChat = null;
 }
 
 // callbacks
 function onCall(qbID, sessionDescription, sessionID, avatar) {
-	console.log('onCall from ' + qbID);
 	var win, selector, winName = 'remoteCall-' + qbID;
 	var name = namesOccupants[qbID];
 	
@@ -881,27 +882,34 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 }
 
 function onAccept(qbID) {
-	console.log('onAccept from ' + qbID);
 	var win = popups['videochat'];
 	getRemoteStream($(win.document));
 }
 
 function onReject(qbID) {
-	console.log('onReject from ' + qbID);
 	var popup = window.open('', 'videoChat-offer');
 	$(popup.document).find('.stopCall').hide().parent().find('.doCall').show();
 }
 
 function onStop(qbID) {
-	console.log('onStop from ' + qbID);
-	switches.isNoClosed = true;
-	switches.isVideoChat = false;
-	window.open('', 'videoChat-offer').close();
-	window.open('', 'videoChat-answer').close();
-	window.open('', 'remoteCall-' + qbID).close();
-	videoChat.hangup();
-	videoChat = null;
+	var win;
 	
-	if (Object.keys(namesWindowsRemoteCall).length == 0)
-		audio.ring.pause();
+	win = popups['videochat'];
+	if (win && qbID == $(win.document).find('#stopCall').data('qb')) {
+		switches.isPopupClosed = false;
+		win.close();
+		delete popups['videochat'];
+		
+		videoChat.hangup();
+		videoChat = null;
+	}
+	
+	win = popups['remoteCall-' + qbID];
+	if (win) {
+		switches.isPopupClosed = false;
+		win.close();
+		delete popups['remoteCall-' + qbID];
+		
+		stopRing(popups);
+	}
 }
