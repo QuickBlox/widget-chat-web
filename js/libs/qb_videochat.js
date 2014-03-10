@@ -249,7 +249,7 @@ QBVideoChat.prototype.call = function(userID, userAvatar) {
 	} else {
 		this.opponentID = userID;
 		this.opponentAvatar = userAvatar;
-		this.pc.createOffer(this.onGetSessionDescriptionSuccessCallback, this.onCreateOfferFailureCallback);
+		this.pc.createOffer(this.onGetSessionDescriptionSuccessCallback, this.onCreateOfferFailureCallback, SDP_CONSTRAINTS);
 	}
 };
 
