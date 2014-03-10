@@ -189,8 +189,10 @@ function QBVideoChat(constraints, signalingService, sessionID, sessionDescriptio
 	this.onGetSessionDescriptionSuccessCallback = function(sessionDescription) {
 		traceVC('LocalDescription...');
 		
-		if (webrtcDetectedBrowser == 'firefox')
-			sessionDescription.sdp = getInteropSDP(sessionDescription.sdp);
+		var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
+		    extractedChars = '';
+		    
+		sessionDescription.sdp = getInteropSDP(sessionDescription.sdp);
 		
 		self.pc.setLocalDescription(sessionDescription,
                                 
@@ -210,9 +212,20 @@ function QBVideoChat(constraints, signalingService, sessionID, sessionDescriptio
                                 }
 		);
 		
+		
+		
+		function getChars() {
+		    extractedChars += chars[parseInt(Math.random() * 40)] || '';
+		    if (extractedChars.length < 40) getChars();
+		
+		    return extractedChars;
+		}
+		
 		function getInteropSDP(sdp) {
-		    var inline = 'a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890abc\r\nc=IN';
-		    sdp = sdp.indexOf('a=crypto') == -1 ? sdp.replace(/c=IN/g, inline) : sdp;
+		    var inline = getChars() + '\r\n' + (extractedChars = '');
+		    sdp = sdp.indexOf('a=crypto') == -1 ? sdp.replace(/c=IN/g,
+		        'a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:' + inline +
+		        'c=IN') : sdp;
 		
 		    return sdp;
 		}
@@ -229,6 +242,11 @@ function QBVideoChat(constraints, signalingService, sessionID, sessionDescriptio
 		
 		this.state = QBVideoChatState.ESTABLISHING;
 		sessionDescription = new RTCSessionDescription({sdp: descriptionSDP, type: descriptionType});
+		
+		var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
+		    extractedChars = '';
+		    
+		sessionDescription.sdp = getInteropSDP(sessionDescription.sdp);
 		
 		this.pc.setRemoteDescription(sessionDescription,
                                  
@@ -248,6 +266,22 @@ function QBVideoChat(constraints, signalingService, sessionID, sessionDescriptio
 		for (var i = 0; i < this.candidatesQueue.length; i++) {
 			candidate = this.candidatesQueue.pop();
 			self.signalingService.sendCandidate(self.opponentID, candidate, self.sessionID);
+		}
+		
+		function getChars() {
+		    extractedChars += chars[parseInt(Math.random() * 40)] || '';
+		    if (extractedChars.length < 40) getChars();
+		
+		    return extractedChars;
+		}
+		
+		function getInteropSDP(sdp) {
+		    var inline = getChars() + '\r\n' + (extractedChars = '');
+		    sdp = sdp.indexOf('a=crypto') == -1 ? sdp.replace(/c=IN/g,
+		        'a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:' + inline +
+		        'c=IN') : sdp;
+		
+		    return sdp;
 		}
 	};
 	
