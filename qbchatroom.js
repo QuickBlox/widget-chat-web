@@ -817,7 +817,7 @@ function acceptCall() {
 }
 
 function rejectCall(sessionID) {
-	var qbID = $(this).data('qb');
+	/*var qbID = $(this).data('qb');
 	
 	switches.isPopupClosed = false;
 	popups['remoteCall-' + qbID].close();
@@ -825,7 +825,7 @@ function rejectCall(sessionID) {
 	
 	stopRing(popups);
 	videoChat = videoChat || new QBVideoChat(null, signaling, sessionID, null);
-	videoChat.reject(qbID);
+	videoChat.reject(qbID);*/
 }
 
 function stopCall() {
