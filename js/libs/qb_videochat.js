@@ -28,9 +28,17 @@ var PC_CONFIG = {
 	'iceServers': createIceServers(ICE_SERVERS.urls, ICE_SERVERS.username, ICE_SERVERS.password)
 };
 
-var PC_CONSTRAINTS = {
-	'optional': []
-};
+if (webrtcDetectedBrowser == 'firefox') {
+	var PC_CONSTRAINTS = {
+		'optional': []
+	};
+} else if (webrtcDetectedBrowser == 'chrome') {
+	var PC_CONSTRAINTS = {
+		'optional': [{
+			'DtlsSrtpKeyAgreement': true
+		}]
+	};
+}
 
 if (webrtcDetectedBrowser == 'firefox') {
 	var SDP_CONSTRAINTS_OFFER = {
