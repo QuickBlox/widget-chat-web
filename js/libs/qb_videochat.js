@@ -14,20 +14,31 @@
     - stop(userID)
  */
 
-var PC_CONSTRAINTS = {
-	'optional': [{
-		'DtlsSrtpKeyAgreement': true
-	}]
-};
+if (webrtcDetectedBrowser == 'chrome') {
+	var PC_CONSTRAINTS = {
+		'optional': [{
+			'DtlsSrtpKeyAgreement': true
+		}]
+	};
+}
 
-var SDP_CONSTRAINTS = {
-	'optional': [],
-	'mandatory': {
-		'OfferToReceiveAudio': true,
-		'OfferToReceiveVideo': true,
-		'MozDontOfferDataChannel': true
-	}
-};
+if (webrtcDetectedBrowser == 'firefox') {
+	var SDP_CONSTRAINTS = {
+		'optional': [],
+		'mandatory': {
+			'OfferToReceiveAudio': true,
+			'OfferToReceiveVideo': true,
+			'MozDontOfferDataChannel': true
+		}
+	};
+} else {
+	var SDP_CONSTRAINTS = {
+		'mandatory': {
+			'OfferToReceiveAudio': true,
+			'OfferToReceiveVideo': true
+		}
+	};
+}
 
 var QBVideoChatState = {
 	INACTIVE: 'inactive',
