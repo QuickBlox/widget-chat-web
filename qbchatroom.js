@@ -1,17 +1,24 @@
 /**
  * QB Group Chat Room (XMPP)
- * version 2.2.1
+ * version 2.3.0
  * 
  * author: Andrey Povelichenko <andrey.povelichenko@quickblox.com>
  */
 
-var params, connection, chatUser = {}, namesOccupants = {};
+var params, connection, chatUser = {}, namesOccupants = {}, popups = {};
+var signaling, videoChat;
 
 var switches = {
 	isComposing: {},
 	isLogout: false,
+	isPopupClosed: true,
 	isFBconnected: false,
 	isOccupantsDownloaded: false
+};
+
+var audio = {
+	signal: $('#signal')[0],
+	ring: $('#ring')[0]
 };
 
 $(document).ready(function() {
@@ -38,6 +45,7 @@ $(document).ready(function() {
 		$('.smiles-list img').click(choseSmile);
 		
 		$('#chats-wrap').on('click', '.logout', logout);
+		$('#chats-wrap').on('keydown', '.send-message', sendMesage);
 		$('#chats-wrap').on('click', '.show-actions', showActionToolbar);
 		$('#chats-wrap').on('click', '.users', {list: '.users-list'}, showList);
 		$('#chats-wrap').on('click', '.chats', {list: '.chats-list'}, showList);
@@ -48,8 +56,7 @@ $(document).ready(function() {
 		$('.chats-list').on('click', '.remove', removeChat);
 		$('.actions-wrap').on('click', '.btn_quote', makeQuote);
 		$('.actions-wrap').on('click', '.btn_private', createPrivateChat);
-		
-		$('#chats-wrap').on('keydown', '.send-message', sendMesage);
+		$('.actions-wrap').on('click', '.btn_videocall', createVideoChatInstance);
 	});
 });
 
@@ -162,7 +169,7 @@ function getQBUser(user_id, token, pass) {
 					}
 				});
 			} else {
-				chatUser.avatar = chatUser.fbID ? 'https://graph.facebook.com/' + chatUser.fbID + '/picture/' : null;
+				chatUser.avatar = chatUser.fbID ? 'https://graph.facebook.com/' + chatUser.fbID + '/picture?width=150&height=150' : null;
 			}
 			
 			connectChat(chatUser);
@@ -318,12 +325,14 @@ function connectChat(chatUser) {
 			break;
 		case Strophe.Status.CONNECTED:
 			console.log('[Connection] Connected');
-			connectSuccess();
-			
-			connection.addHandler(getMessage, null, 'message', 'chat');
-			connection.muc.join(CHAT.roomJID, chatUser.qbID, getMessage, getPresence, getRoster);
 			
 			localStorage['QBChatUser'] = JSON.stringify(chatUser);
+			connectSuccess();
+			
+			connection.addHandler(getMessage, null, 'message', 'chat', null, null);
+			connection.muc.join(CHAT.roomJID, chatUser.qbID, getMessage, getPresence, getRoster);
+			createSignalingInstance();
+			
 			setTimeout(function() {$('.loading_messages').remove()}, 2 * 1000);
 			break;
 		case Strophe.Status.DISCONNECTING:
@@ -375,11 +384,11 @@ function sendMesage(event) {
 				showMessage(qbID,
 				            post,
 				            chatUser.name,
-				            (chatUser.avatar || 'images/avatar_default.png'),
-				            (chatUser.fbID || ''),
+				            chatUser.avatar || 'images/avatar_default.jpg',
+				            chatUser.fbID || '',
 				            null,
 				            null,
-				            (new Date()).toISOString(),
+				            new Date().toISOString(),
 				            $('.chat:visible'));
 			}
 			else
@@ -409,8 +418,12 @@ function logout(event) {
 	switches.isLogout = true;
 	disconnectChat(chatUser.qbID);
 	
+	popups = {};
 	chatUser = {};
 	namesOccupants = {};
+	signaling = null;
+	videoChat = null;
+	switches.isPopupClosed = true;
 	switches.isOccupantsDownloaded = false;
 	localStorage.removeItem('QBChatUser');
 }
@@ -437,7 +450,7 @@ function getPresence(stanza, room) {
 	
 	user = $(stanza).attr('from');
 	type = $(stanza).attr('type');
-	time = (new Date()).toISOString();
+	time = new Date().toISOString();
 	qbID = getIDFromResource(user);
 	
 	if (type) {
@@ -466,7 +479,7 @@ function getPresence(stanza, room) {
 
 function getMessage(stanza, room) {
 	var type, author, response, createTime, messageTime, composing, paused;
-	var qbID, message, name, avatar, fbID, icon, defaultAvatar = 'images/avatar_default.png';
+	var qbID, message, name, avatar, fbID, icon, defaultAvatar = 'images/avatar_default.jpg';
 	var chatID, selector;
 	
 	if (!switches.isOccupantsDownloaded && $('#chat-room .message').length > 1)
@@ -495,7 +508,7 @@ function getMessage(stanza, room) {
 			$('.loading_messages').remove();
 		
 		response = checkResponse(response);
-		messageTime = createTime || (new Date()).toISOString();
+		messageTime = createTime || new Date().toISOString();
 		
 		message = response.message || response;
 		name = response.name || qbID;
@@ -627,6 +640,8 @@ function showActionToolbar() {
 		html += '<button class="btn btn_action btn_quote" data-name="' + name + '"><span>Reply</span></button>';
 		html += '<button class="btn btn_action btn_private" data-qb="' + qbID + '" data-fb="' + fbID + '" data-name="' + name + '"><span>Private message</span></button>';
 	}
+	if (qbID != chatUser.qbID)
+		html += '<button class="btn btn_action btn_videocall" data-qb="' + qbID + '"><span>Video call</span></button>';
 	html += fbID ? '<a href="https://facebook.com/' + fbID + '" target="_blank" class="btn btn_action"><span>View profile</span></a>' : '';
 	html += '</div><div class="action-group">';
 	html += '<button class="btn btn_action btn_cancel"><span>Cancel</span></button>';
@@ -644,13 +659,13 @@ function makeQuote() {
 }
 
 function takeQuote(str, time) {
-	var quote, signal = $('#signal')[0];
+	var quote;
 	
 	quote = str.split(' ')[0].charAt(0) == '@' && str.split(' ')[0];
 	
 	if (quote) {
 		if (escapeSpace(quote.split('@')[1]) == chatUser.name && !time)
-			signal.play();
+			audio.signal.play();
 		return str.replace(quote, '<b>' + escapeSpace(quote) + '</b>');
 	} else {
 		return str;
@@ -683,7 +698,7 @@ function createPrivateChat() {
 }
 
 function htmlChatBuilder(qbID, fbID, name, chatID, isOwner) {
-	var obj, htmlUsersList, chatsCount, usersCount = 1, signal = $('#signal')[0];
+	var obj, htmlUsersList, chatsCount, usersCount = 1;
 	
 	$('.chats-list').append('<li class="list-item switch-chat" data-id="chat-' + qbID + '">' + name + ' <span class="messages-count"></span></li>')
 	chatsCount = $('.chats-list .list-item').length;
@@ -702,7 +717,7 @@ function htmlChatBuilder(qbID, fbID, name, chatID, isOwner) {
 	} else {
 		$('#chat-room').clone().hide().insertAfter('.chat:last');
 		obj = $('.chat:last');
-		signal.play();
+		audio.signal.play();
 	}
 	
 	obj.attr('id', chatID.substring(1));
@@ -710,4 +725,182 @@ function htmlChatBuilder(qbID, fbID, name, chatID, isOwner) {
 	obj.find('.chat-name').attr('title', name).text(name);
 	obj.find('.users-list .list-title').nextAll().remove().end().after(htmlUsersList);
 	obj.find('.chat-content').empty();
+}
+
+/* Video Chat Module
+-------------------------------------------------------------------------*/
+function createSignalingInstance() {
+	signaling = new QBVideoChatSignaling(QBAPP.appID, CHAT.server, connection);
+	signaling.onCallCallback = onCall;
+	signaling.onAcceptCallback = onAccept;
+	signaling.onRejectCallback = onReject;
+	signaling.onStopCallback = onStop;
+}
+
+function createVideoChatInstance(event, userID, sessionID, sessionDescription) {
+	var qbID, name;
+	
+	qbID = userID || $(this).data('qb');
+	name = namesOccupants[qbID];
+	
+	if (!name) {
+		alert('Sorry, this user is offline');
+		return true;
+	} else if (popups['videochat']) {
+		popups['videochat'].close();
+		delete popups['videochat'];
+	}
+	
+	videoChat = new QBVideoChat({audio: true, video: true}, ICE_SERVERS, signaling, sessionID, sessionDescription);
+	videoChat.onGetUserMediaSuccess = function() { getMediaSuccess(qbID, name, sessionID) };
+	videoChat.onGetUserMediaError = function() { getMediaError(qbID) };
+	videoChat.getUserMedia();
+}
+
+function getMediaSuccess(qbID, name, sessionID) {
+	var win, selector, winName = 'videochat' + chatUser.qbID + '_' + qbID;
+	
+	popups['videochat'] = openPopup(winName, null, 'resizable=yes');
+	win = popups['videochat'];
+	
+	win.onload = function() {
+		selector = $(win.document);
+		selector.find('#doCall').click(doCall);
+		selector.find('#stopCall').click(stopCall);
+		
+		htmlVideoChatBuilder(selector, qbID, name, sessionID);
+		
+		videoChat.localStreamElement = selector.find('#localVideo')[0];
+		videoChat.remoteStreamElement = selector.find('#remoteVideo')[0];
+		videoChat.attachMediaStream(videoChat.localStreamElement, videoChat.localStream);
+		
+		if (sessionID) {
+			getRemoteStream(selector);
+			videoChat.accept(qbID);
+		}
+		
+		win.onresize = function() {
+			resize(win, this.innerWidth, this.innerHeight);
+		};
+		
+		win.onbeforeunload = function() {
+			if (switches.isPopupClosed)
+				stopCall();
+			switches.isPopupClosed = true;
+		};
+	};
+}
+
+function getMediaError(qbID) {
+	videoChat.reject(qbID);
+}
+
+// methods
+function doCall() {
+	var qbID = $(this).data('qb');
+	$(this).hide().parent().find('#stopCall').show();
+	videoChat.call(qbID, chatUser.avatar);
+}
+
+function acceptCall() {
+	var qbID, sessionDescription, sessionID;
+	
+	qbID = $(this).data('qb');
+	sessionID = $(this).data('id');
+	sessionDescription = $(this).data('description');
+	
+	switches.isPopupClosed = false;
+	popups['remoteCall' + qbID].close();
+	delete popups['remoteCall' + qbID];
+	
+	stopRing(popups);
+	createVideoChatInstance(null, qbID, sessionID, sessionDescription);
+}
+
+function rejectCall(qbID, sessionID) {
+	switches.isPopupClosed = false;
+	popups['remoteCall' + qbID].close();
+	delete popups['remoteCall' + qbID];
+	
+	stopRing(popups);
+	videoChat = videoChat || new QBVideoChat(null, ICE_SERVERS, signaling, sessionID, null);
+	videoChat.reject(qbID);
+}
+
+function stopCall() {
+	var win, qbID;
+	
+	win = popups['videochat'];
+	qbID = $(win.document).find('#stopCall').data('qb');
+	
+	switches.isPopupClosed = false;
+	win.close();
+	delete popups['videochat'];
+	
+	videoChat.stop(qbID);
+	videoChat.hangup();
+	videoChat = null;
+}
+
+// callbacks
+function onCall(qbID, sessionDescription, sessionID, avatar) {
+	var win, selector, winName = 'remoteCall' + qbID;
+	var name = namesOccupants[qbID];
+	
+	if (popups[winName]) {
+		popups[winName].close();
+		delete popups[winName];
+	}
+	
+	popups[winName] = openPopup(winName, {width: 250, height: 280});
+	win = popups[winName];
+	
+	win.onload = function() {
+		selector = $(win.document);
+		selector.find('#acceptCall').click(acceptCall);
+		selector.find('#rejectCall').click(function() {rejectCall(qbID, sessionID)});
+		
+		htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, avatar, name);
+		audio.ring.play();
+		
+		win.onbeforeunload = function() {
+			if (switches.isPopupClosed)
+				rejectCall(qbID, sessionID);
+			switches.isPopupClosed = true;
+		};
+	};
+}
+
+function onAccept(qbID) {
+	var win = popups['videochat'];
+	getRemoteStream($(win.document));
+}
+
+function onReject(qbID) {
+	var win = popups['videochat'];
+	if (win)
+		$(win.document).find('#stopCall').hide().parent().find('#doCall').show();
+}
+
+function onStop(qbID) {
+	var win;
+	
+	win = popups['videochat'];
+	if (win && qbID == $(win.document).find('#stopCall').data('qb')) {
+		switches.isPopupClosed = false;
+		win.close();
+		delete popups['videochat'];
+		
+		videoChat.hangup();
+		videoChat = null;
+	}
+	
+	win = popups['remoteCall' + qbID];
+	if (win) {
+		switches.isPopupClosed = false;
+		win.close();
+		delete popups['remoteCall' + qbID];
+		
+		stopRing(popups);
+	}
 }

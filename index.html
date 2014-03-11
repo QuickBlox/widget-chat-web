@@ -112,10 +112,16 @@
 		</div>
 	</div>
 	
-	<audio id="signal">
-		<source src="audio/signal.ogg"></source>
-		<source src="audio/signal.mp3"></source>
-	</audio>
+	<div id="audio-container">
+		<audio id="signal">
+			<source src="audio/signal.ogg"></source>
+			<source src="audio/signal.mp3"></source>
+		</audio>
+		<audio id="ring" loop>
+			<source src="audio/ring.ogg"></source>
+			<source src="audio/ring.mp3"></source>
+		</audio>
+	</div>
 	
 	<script src="js/libs/quickblox.js"></script>
 	<script src="js/libs/strophe.js"></script>
@@ -123,6 +129,11 @@
 	<script src="js/libs/strophe.chatstates.js"></script>
 	<script src="js/libs/jquery.timeago.js"></script>
 	<script src="js/libs/jquery.scrollTo-min.js"></script>
+	
+	<!-- QBVideoChat elements -->
+	<script src="js/libs/adapter.js"></script>
+	<script src="js/libs/qb_videochat_signalling.js"></script>
+	<script src="js/libs/qb_videochat.js"></script>
 	
 	<script src="config.js"></script>
 	<script src="js/smiles.js"></script>
