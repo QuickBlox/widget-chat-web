@@ -61,23 +61,23 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 		switch (type) {
 		case QBSignalingType.CALL:
 			traceS('onCall from ' + qbID);
-			this.onCallCallback(qbID, body, sessionID, avatar);
+			_this.onCallCallback(qbID, body, sessionID, avatar);
 			break;
 		case QBSignalingType.ACCEPT:
 			traceS('onAccept from ' + qbID);
-			this.onAcceptCallback(qbID);
-			this.onInnerAcceptCallback(body);
+			_this.onAcceptCallback(qbID);
+			_this.onInnerAcceptCallback(body);
 			break;
 		case QBSignalingType.REJECT:
 			traceS('onReject from ' + qbID);
-			this.onRejectCallback(qbID);
+			_this.onRejectCallback(qbID);
 			break;
 		case QBSignalingType.STOP:
 			traceS('onStop from ' + qbID);
-			this.onStopCallback(qbID, body);
+			_this.onStopCallback(qbID, body);
 			break;
 		case QBSignalingType.CANDIDATE:
-			this.onCandidateCallback(body);
+			_this.onCandidateCallback(body);
 			break;
 		}
 		

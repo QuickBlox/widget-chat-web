@@ -147,7 +147,7 @@ function QBVideoChat(constraints, iceServers, signalingService, sessionID, sessi
 	this.onGetSessionDescriptionSuccessCallback = function(sessionDescription) {
 		traceVC('LocalDescription...');
 		
-		this.pc.setLocalDescription(sessionDescription,
+		_this.pc.setLocalDescription(sessionDescription,
                                 
                                 function onSuccess() {
                                   traceVC('LocalDescription success');
@@ -178,7 +178,7 @@ function QBVideoChat(constraints, iceServers, signalingService, sessionID, sessi
 		this.state = QBVideoChatState.ESTABLISHING;
 		sessionDescription = new RTCSessionDescription({sdp: descriptionSDP, type: descriptionType});
 		
-		this.pc.setRemoteDescription(sessionDescription,
+		_this.pc.setRemoteDescription(sessionDescription,
                                  
                                  function onSuccess() {
                                    traceVC("RemoteDescription success");
