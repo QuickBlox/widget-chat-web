@@ -771,7 +771,7 @@ function getMediaSuccess(qbID, name, sessionID) {
 		
 		videoChat.localStreamElement = selector.find('#localVideo')[0];
 		videoChat.remoteStreamElement = selector.find('#remoteVideo')[0];
-		videoChat.attachMediaStream(videoChat.localStreamElement);
+		videoChat.attachMediaStream(videoChat.localStreamElement, videoChat.localStream);
 		
 		if (sessionID) {
 			getRemoteStream(selector);

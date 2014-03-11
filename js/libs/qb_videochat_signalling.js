@@ -1,8 +1,8 @@
 /**
  * QuickBlox VideoChat WebRTC signaling library
- * version 0.1.0
+ * version 0.2.0
  *
- * Author: Igor Khomenko (igor@quickblox.com)
+ * Authors: Igor Khomenko (igor@quickblox.com), Andrey Povelichenko (andrey.povelichenko@quickblox.com)
  *
  */
 

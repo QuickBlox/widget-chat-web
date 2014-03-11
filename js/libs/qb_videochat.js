@@ -1,8 +1,8 @@
 /**
  * QuickBlox VideoChat WebRTC library
- * version 0.1.0
+ * version 0.2.0
  *
- * Author: Igor Khomenko (igor@quickblox.com)
+ * Authors: Igor Khomenko (igor@quickblox.com), Andrey Povelichenko (andrey.povelichenko@quickblox.com)
  *
  */
 
@@ -86,9 +86,9 @@ function QBVideoChat(constraints, iceServers, signalingService, sessionID, sessi
 	};
 	
 	// MediaStream attachMedia
-	this.attachMediaStream = function(elem) {
+	this.attachMediaStream = function(elem, stream) {
 		elem.volume = 0.7;
-		attachMediaStream(elem, self.localStream);
+		attachMediaStream(elem, stream);
 	}
 	
 	// MediaStream reattachMedia
@@ -103,7 +103,6 @@ function QBVideoChat(constraints, iceServers, signalingService, sessionID, sessi
 		var pcConfig = {
 			'iceServers': createIceServers(this.iceServers.urls, this.iceServers.username, this.iceServers.password)
 		};
-		console.log(pcConfig);
 		try {
 			this.pc = new RTCPeerConnection(pcConfig, PC_CONSTRAINTS);
 			this.pc.addStream(this.localStream);
@@ -140,8 +139,8 @@ function QBVideoChat(constraints, iceServers, signalingService, sessionID, sessi
 	// onRemoteStreamAdded callback
 	this.onRemoteStreamAddedCallback = function(event) {
 		traceVC('Remote stream added');
-		attachMediaStream(self.remoteStreamElement, event.stream);
 		self.remoteStream = event.stream;
+		self.attachMediaStream(self.remoteStreamElement, event.stream);
 	};
 	
 	// Set LocalDescription
