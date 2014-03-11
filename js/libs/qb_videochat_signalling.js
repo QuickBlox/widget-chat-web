@@ -56,7 +56,7 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 		sessionID = $(msg).find('session')[0].textContent;
 		avatar = $(msg).find('avatar')[0] && $(msg).find('avatar')[0].textContent;
 		
-		qbID = this.getIDFromNode(author);
+		qbID = _this.getIDFromNode(author);
 		
 		switch (type) {
 		case QBSignalingType.CALL:
@@ -85,18 +85,18 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 	};
 	
 	this.sendMessage = function(userID, type, data, sessionID, userAvatar) {
-		var reply, params, opponentJID = this.getJID(userID);
+		var reply, params, opponentJID = _this.getJID(userID);
 		
 		params = {
 			to: opponentJID,
-			from: this.connection.jid, 
+			from: _this.connection.jid, 
 			type: type
 		};
 		
 		reply = $msg(params).c('body').t(data).up().c('session').t(sessionID);
 		if (userAvatar)
 			reply.up().c('avatar').t(userAvatar);
-		this.connection.send(reply);
+		_this.connection.send(reply);
 	};
 	
 	// set WebRTC callbacks
@@ -106,7 +106,7 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 	
 	// helpers
 	this.getJID = function(id) {
-		return id + "-" + this.appID + "@" + this.chatServer;
+		return id + "-" + _this.appID + "@" + _this.chatServer;
 	};
 	
 	this.getIDFromNode = function(jid) {
