@@ -34,8 +34,8 @@ var QBVideoChatState = {
 function QBVideoChat(constraints, iceServers, signalingService, sessionID, sessionDescription) {
  	var _this = this;
 	
-	this.candidatesQueue = [];
 	this.state = QBVideoChatState.INACTIVE;
+	this.candidatesQueue = [];
 	
 	this.onGetUserMediaSuccess = null;
 	this.onGetUserMediaError = null;
@@ -44,7 +44,7 @@ function QBVideoChat(constraints, iceServers, signalingService, sessionID, sessi
 	
 	this.constraints = constraints;
 	this.iceServers = iceServers;
-	this.sessionID = sessionID || new Date().getTime();
+	this.sessionID = parseInt(sessionID || new Date().getTime());
 	this.remoteSessionDescription = sessionDescription;
 	traceVC("sessionID " + this.sessionID);
 	

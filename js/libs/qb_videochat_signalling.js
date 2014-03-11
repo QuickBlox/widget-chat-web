@@ -85,7 +85,7 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 	};
 	
 	this.sendMessage = function(userID, type, data, sessionID, userAvatar) {
-		var reply, opponentJID = this.getJID(userID);
+		var reply, params, opponentJID = this.getJID(userID);
 		
 		params = {
 			to: opponentJID,

@@ -757,10 +757,10 @@ function createVideoChatInstance(event, userID, sessionID, sessionDescription) {
 }
 
 function getMediaSuccess(qbID, name, sessionID) {
-	var win, selector, winName = 'videochat';
+	var win, selector, winName = 'videochat' + chatUser.qbID + '_' + qbID;
 	
-	popups[winName] = openPopup(winName, null, 'resizable=yes');
-	win = popups[winName];
+	popups['videochat'] = openPopup(winName, null, 'resizable=yes');
+	win = popups['videochat'];
 	
 	win.onload = function() {
 		selector = $(win.document);
@@ -805,26 +805,24 @@ function acceptCall() {
 	var qbID, sessionDescription, sessionID;
 	
 	qbID = $(this).data('qb');
-	sessionID = parseInt($(this).data('id'));
+	sessionID = $(this).data('id');
 	sessionDescription = $(this).data('description');
 	
 	switches.isPopupClosed = false;
-	popups['remoteCall-' + qbID].close();
-	delete popups['remoteCall-' + qbID];
+	popups['remoteCall' + qbID].close();
+	delete popups['remoteCall' + qbID];
 	
 	stopRing(popups);
 	createVideoChatInstance(null, qbID, sessionID, sessionDescription);
 }
 
-function rejectCall(sessionID) {
-	var qbID = $(this).data('qb');
-	
+function rejectCall(qbID, sessionID) {
 	switches.isPopupClosed = false;
-	popups['remoteCall-' + qbID].close();
-	delete popups['remoteCall-' + qbID];
+	popups['remoteCall' + qbID].close();
+	delete popups['remoteCall' + qbID];
 	
 	stopRing(popups);
-	videoChat = videoChat || new QBVideoChat(null, signaling, sessionID, null);
+	videoChat = videoChat || new QBVideoChat(null, ICE_SERVERS, signaling, sessionID, null);
 	videoChat.reject(qbID);
 }
 
@@ -845,7 +843,7 @@ function stopCall() {
 
 // callbacks
 function onCall(qbID, sessionDescription, sessionID, avatar) {
-	var win, selector, winName = 'remoteCall-' + qbID;
+	var win, selector, winName = 'remoteCall' + qbID;
 	var name = namesOccupants[qbID];
 	
 	if (popups[winName]) popups[winName].close();
@@ -856,14 +854,14 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 	win.onload = function() {
 		selector = $(win.document);
 		selector.find('#acceptCall').click(acceptCall);
-		selector.find('#rejectCall').click(function() {rejectCall(sessionID)});
+		selector.find('#rejectCall').click(function() {rejectCall(qbID, sessionID)});
 		
 		htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, avatar, name);
 		audio.ring.play();
 		
 		win.onbeforeunload = function() {
 			if (switches.isPopupClosed)
-				rejectCall(sessionID);
+				rejectCall(qbID, sessionID);
 			switches.isPopupClosed = true;
 		};
 	};
@@ -893,11 +891,11 @@ function onStop(qbID) {
 		videoChat = null;
 	}
 	
-	win = popups['remoteCall-' + qbID];
+	win = popups['remoteCall' + qbID];
 	if (win) {
 		switches.isPopupClosed = false;
 		win.close();
-		delete popups['remoteCall-' + qbID];
+		delete popups['remoteCall' + qbID];
 		
 		stopRing(popups);
 	}
