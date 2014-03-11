@@ -17,6 +17,16 @@ var FBAPP_ID = '368137086642884';
 /* STUN/TURN servers */
 var ICE_SERVERS = {
 	urls: [
+		'stun:stun.l.google.com:19302',
+		'turn:turnserver.quickblox.com:3478?transport=udp',
+		'turn:turnserver.quickblox.com:3478?transport=tcp'
+	],
+	username: 'user',
+	password: 'user'
+};
+
+// Other public ICE Servers
+/*
 		'stun:stun01.sipphone.com',
 		'stun:stun.ekiga.net',
 		'stun:stun.fwdnet.net',
@@ -36,17 +46,6 @@ var ICE_SERVERS = {
 		'stun:stun.voipstunt.com',
 		'stun:stun.voxgratia.org',
 		'stun:stun.xten.com',
-		//'turn:numb.viagenie.ca',
-		//'turn:192.158.29.39:3478?transport=udp',
-		//'turn:192.158.29.39:3478?transport=tcp',
-		//'stun:stun.l.google.com:19302',
-		'turn:turnserver.quickblox.com:3478?transport=udp',
-		'turn:turnserver.quickblox.com:3478?transport=tcp'
-	],
-	username: 'user',
-	password: 'user'
-};
-/*
 {
     url: 'turn:numb.viagenie.ca',
     credential: 'muazkh',
