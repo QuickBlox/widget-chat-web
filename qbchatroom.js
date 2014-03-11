@@ -750,7 +750,7 @@ function createVideoChatInstance(event, userID, sessionID, sessionDescription) {
 		popups['videochat'].close();
 	}
 	
-	videoChat = new QBVideoChat({audio: true, video: true}, signaling, sessionID, sessionDescription);
+	videoChat = new QBVideoChat({audio: true, video: true}, ICE_SERVERS, signaling, sessionID, sessionDescription);
 	videoChat.onGetUserMediaSuccess = function() { getMediaSuccess(qbID, name, sessionID) };
 	videoChat.onGetUserMediaError = function() { getMediaError(qbID) };
 	videoChat.getUserMedia();

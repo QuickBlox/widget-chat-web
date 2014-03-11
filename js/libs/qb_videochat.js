@@ -14,11 +14,12 @@
     - stop(userID)
  */
 
-var PC_CONFIG = {
-	'iceServers': createIceServers(ICE_SERVERS.urls, ICE_SERVERS.username, ICE_SERVERS.password)
+var PC_CONSTRAINTS = {
+	'optional': []
 };
 
 var SDP_CONSTRAINTS = {
+	'optional': [],
 	'mandatory': {
 		'OfferToReceiveAudio': true,
 		'OfferToReceiveVideo': true
@@ -30,7 +31,7 @@ var QBVideoChatState = {
 	ESTABLISHING: 'establishing'
 };
 
-function QBVideoChat(constraints, signalingService, sessionID, sessionDescription) {
+function QBVideoChat(constraints, iceServers, signalingService, sessionID, sessionDescription) {
  	var self = this;
 	
 	this.candidatesQueue = [];
@@ -42,6 +43,7 @@ function QBVideoChat(constraints, signalingService, sessionID, sessionDescriptio
 	this.remoteStreamElement = null;
 	
 	this.constraints = constraints;
+	this.iceServers = iceServers;
 	this.sessionID = sessionID || new Date().getTime();
 	this.remoteSessionDescription = sessionDescription;
 	traceVC("sessionID " + this.sessionID);
@@ -98,8 +100,12 @@ function QBVideoChat(constraints, signalingService, sessionID, sessionDescriptio
 	// RTCPeerConnection creation
 	this.createRTCPeerConnection = function() {
 		traceVC("RTCPeerConnection...");
+		var pcConfig = {
+			'iceServers': createIceServers(this.iceServers.urls, this.iceServers.username, this.iceServers.password)
+		};
+		console.log(pcConfig);
 		try {
-			this.pc = new RTCPeerConnection(PC_CONFIG);
+			this.pc = new RTCPeerConnection(pcConfig, PC_CONSTRAINTS);
 			this.pc.addStream(this.localStream);
 			this.pc.onicecandidate = this.onIceCandidateCallback;
 			this.pc.onaddstream = this.onRemoteStreamAddedCallback;
@@ -229,7 +235,7 @@ QBVideoChat.prototype.call = function(userID, userAvatar) {
 	} else {
 		this.opponentID = userID;
 		this.opponentAvatar = userAvatar;
-		this.pc.createOffer(this.onGetSessionDescriptionSuccessCallback, this.onCreateOfferFailureCallback);
+		this.pc.createOffer(this.onGetSessionDescriptionSuccessCallback, this.onCreateOfferFailureCallback, SDP_CONSTRAINTS);
 	}
 };
 
