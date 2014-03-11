@@ -748,6 +748,7 @@ function createVideoChatInstance(event, userID, sessionID, sessionDescription) {
 		return true;
 	} else if (popups['videochat']) {
 		popups['videochat'].close();
+		delete popups['videochat'];
 	}
 	
 	videoChat = new QBVideoChat({audio: true, video: true}, ICE_SERVERS, signaling, sessionID, sessionDescription);
@@ -846,7 +847,10 @@ function onCall(qbID, sessionDescription, sessionID, avatar) {
 	var win, selector, winName = 'remoteCall' + qbID;
 	var name = namesOccupants[qbID];
 	
-	if (popups[winName]) popups[winName].close();
+	if (popups[winName]) {
+		popups[winName].close();
+		delete popups[winName];
+	}
 	
 	popups[winName] = openPopup(winName, {width: 250, height: 280});
 	win = popups[winName];
