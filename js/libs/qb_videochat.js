@@ -32,7 +32,7 @@ var QBVideoChatState = {
 };
 
 function QBVideoChat(constraints, iceServers, signalingService, sessionID, sessionDescription) {
- 	var self = this;
+ 	var _this = this;
 	
 	this.candidatesQueue = [];
 	this.state = QBVideoChatState.INACTIVE;
@@ -50,16 +50,16 @@ function QBVideoChat(constraints, iceServers, signalingService, sessionID, sessi
 	
 	// Signalling callbacks
 	this.onAcceptSignalingCallback = function(sessionDescription) {
-		self.setRemoteDescription(sessionDescription, "answer");
+		this.setRemoteDescription(sessionDescription, "answer");
 	};
 	
 	this.addCandidate = function(data) {
 		var jsonCandidate, candidate;
 		
-		jsonCandidate = self.signalingService.xmppTextToDictionary(data);
+		jsonCandidate = this.signalingService.xmppTextToDictionary(data);
 		candidate = new RTCIceCandidate(jsonCandidate);
 		
-		self.pc.addIceCandidate(candidate);
+		this.pc.addIceCandidate(candidate);
 	};
 	
 	this.signalingService = signalingService;
@@ -70,18 +70,18 @@ function QBVideoChat(constraints, iceServers, signalingService, sessionID, sessi
 	this.getUserMedia = function() {
 		traceVC("getUserMedia...");
 		
-		getUserMedia(self.constraints, successCallback, errorCallback);
+		getUserMedia(this.constraints, successCallback, errorCallback);
 		
 		function successCallback(localMediaStream) {
 			traceVC("getUserMedia success");
-			self.localStream = localMediaStream;
-			self.onGetUserMediaSuccess();
-			self.createRTCPeerConnection();
+			_this.localStream = localMediaStream;
+			_this.onGetUserMediaSuccess();
+			_this.createRTCPeerConnection();
 		}
 		
 		function errorCallback(error) {
 			traceVC("getUserMedia error: " + JSON.stringify(error));
-			self.onGetUserMediaError();
+			_this.onGetUserMediaError();
 		}
 	};
 	
@@ -125,13 +125,13 @@ function QBVideoChat(constraints, iceServers, signalingService, sessionID, sessi
 				sdpMid: candidate.sdpMid
 			};
 			
-			iceDataAsmessage = self.signalingService.xmppDictionaryToText(iceData);
+			iceDataAsmessage = this.signalingService.xmppDictionaryToText(iceData);
 			
-			if (self.state == QBVideoChatState.INACTIVE)
-				self.candidatesQueue.push(iceDataAsmessage);
+			if (this.state == QBVideoChatState.INACTIVE)
+				this.candidatesQueue.push(iceDataAsmessage);
 			else {
 				// Send ICE candidate to opponent
-				self.signalingService.sendCandidate(self.opponentID, iceDataAsmessage, self.sessionID);
+				this.signalingService.sendCandidate(this.opponentID, iceDataAsmessage, this.sessionID);
 			}
 		}
 	};
@@ -139,25 +139,25 @@ function QBVideoChat(constraints, iceServers, signalingService, sessionID, sessi
 	// onRemoteStreamAdded callback
 	this.onRemoteStreamAddedCallback = function(event) {
 		traceVC('Remote stream added');
-		self.remoteStream = event.stream;
-		self.attachMediaStream(self.remoteStreamElement, event.stream);
+		this.remoteStream = event.stream;
+		this.attachMediaStream(this.remoteStreamElement, event.stream);
 	};
 	
 	// Set LocalDescription
 	this.onGetSessionDescriptionSuccessCallback = function(sessionDescription) {
 		traceVC('LocalDescription...');
 		
-		self.pc.setLocalDescription(sessionDescription,
+		this.pc.setLocalDescription(sessionDescription,
                                 
                                 function onSuccess() {
                                   traceVC('LocalDescription success');
-                                  self.localSessionDescription = sessionDescription;
+                                  _this.localSessionDescription = sessionDescription;
                                   
                                   // ICE gathering starts work here
                                   if (sessionDescription.type === 'offer')
-                                    self.sendCallRequest();
+                                    _this.sendCallRequest();
                                   else if (sessionDescription.type === 'answer')
-                                    self.sendAceptRequest();
+                                    _this.sendAceptRequest();
                                 },
                                 
                                 function onError(error) {
@@ -184,7 +184,7 @@ function QBVideoChat(constraints, iceServers, signalingService, sessionID, sessi
                                    traceVC("RemoteDescription success");
                                    
                                    if (sessionDescription.type === 'offer')
-                                     self.pc.createAnswer(self.onGetSessionDescriptionSuccessCallback, self.onCreateAnswerFailureCallback, SDP_CONSTRAINTS);
+                                     _this.pc.createAnswer(_this.onGetSessionDescriptionSuccessCallback, _this.onCreateAnswerFailureCallback, SDP_CONSTRAINTS);
                                  },
                                  
                                  function onError(error) {
@@ -195,7 +195,7 @@ function QBVideoChat(constraints, iceServers, signalingService, sessionID, sessi
 		// send candidates
 		for (var i = 0; i < this.candidatesQueue.length; i++) {
 			candidate = this.candidatesQueue.pop();
-			self.signalingService.sendCandidate(self.opponentID, candidate, self.sessionID);
+			this.signalingService.sendCandidate(this.opponentID, candidate, this.sessionID);
 		}
 	};
 	
@@ -207,23 +207,23 @@ function QBVideoChat(constraints, iceServers, signalingService, sessionID, sessi
 		// Send only string representation of sdp
 		// http://www.w3.org/TR/webrtc/#rtcsessiondescription-class
 	
-		self.signalingService.call(self.opponentID, self.localSessionDescription.sdp, self.sessionID, self.opponentAvatar);
+		this.signalingService.call(this.opponentID, this.localSessionDescription.sdp, this.sessionID, this.opponentAvatar);
 	};
 	
 	this.sendAceptRequest = function() {
 		// Send only string representation of sdp
 		// http://www.w3.org/TR/webrtc/#rtcsessiondescription-class
 	
-		self.signalingService.accept(self.opponentID, self.localSessionDescription.sdp, self.sessionID);
+		this.signalingService.accept(this.opponentID, this.localSessionDescription.sdp, this.sessionID);
 	};
 
 	// Cleanup 
 	this.hangup = function() {
-		self.state = QBVideoChatState.INACTIVE;
-		self.signalingService = null;
-		self.localStream.stop();
-		self.pc.close();
-		self.pc = null;
+		this.state = QBVideoChatState.INACTIVE;
+		this.signalingService = null;
+		this.localStream.stop();
+		this.pc.close();
+		this.pc = null;
 	};
 }
 

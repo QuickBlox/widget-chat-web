@@ -32,7 +32,7 @@ var QBSignalingType = {
 };
 
 function QBVideoChatSignaling(appID, chatServer, connection) {
-	var self = this;
+	var _this = this;
 	
 	this.onCallCallback = null;
  	this.onAcceptCallback = null;
@@ -56,28 +56,28 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 		sessionID = $(msg).find('session')[0].textContent;
 		avatar = $(msg).find('avatar')[0] && $(msg).find('avatar')[0].textContent;
 		
-		qbID = self.getIDFromNode(author);
+		qbID = this.getIDFromNode(author);
 		
 		switch (type) {
 		case QBSignalingType.CALL:
 			traceS('onCall from ' + qbID);
-			self.onCallCallback(qbID, body, sessionID, avatar);
+			this.onCallCallback(qbID, body, sessionID, avatar);
 			break;
 		case QBSignalingType.ACCEPT:
 			traceS('onAccept from ' + qbID);
-			self.onAcceptCallback(qbID);
-			self.onInnerAcceptCallback(body);
+			this.onAcceptCallback(qbID);
+			this.onInnerAcceptCallback(body);
 			break;
 		case QBSignalingType.REJECT:
 			traceS('onReject from ' + qbID);
-			self.onRejectCallback(qbID);
+			this.onRejectCallback(qbID);
 			break;
 		case QBSignalingType.STOP:
 			traceS('onStop from ' + qbID);
-			self.onStopCallback(qbID, body);
+			this.onStopCallback(qbID, body);
 			break;
 		case QBSignalingType.CANDIDATE:
-			self.onCandidateCallback(body);
+			this.onCandidateCallback(body);
 			break;
 		}
 		
@@ -85,11 +85,11 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 	};
 	
 	this.sendMessage = function(userID, type, data, sessionID, userAvatar) {
-		var reply, opponentJID = self.getJID(userID);
+		var reply, opponentJID = this.getJID(userID);
 		
 		params = {
 			to: opponentJID,
-			from: self.connection.jid, 
+			from: this.connection.jid, 
 			type: type
 		};
 		
@@ -101,7 +101,7 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 	
 	// set WebRTC callbacks
 	$(Object.keys(QBSignalingType)).each(function() {
-		self.connection.addHandler(self.onMessage, null, 'message', QBSignalingType[this], null, null);
+		_this.connection.addHandler(_this.onMessage, null, 'message', QBSignalingType[this], null, null);
 	});
 	
 	// helpers
