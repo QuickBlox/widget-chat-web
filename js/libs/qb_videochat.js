@@ -87,13 +87,11 @@ function QBVideoChat(constraints, iceServers, signalingService, sessionID, sessi
 	
 	// MediaStream attachMedia
 	this.attachMediaStream = function(elem, stream) {
-		elem.volume = 0.7;
 		attachMediaStream(elem, stream);
 	}
 	
 	// MediaStream reattachMedia
 	this.reattachMediaStream = function(to, from) {
-		to.volume = 0.7;
 		reattachMediaStream(to, from);
 	}
 	
