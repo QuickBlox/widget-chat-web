@@ -45,7 +45,7 @@ $(document).ready(function() {
 		$('.smiles-list img').click(choseSmile);
 		
 		$('#chats-wrap').on('click', '.logout', logout);
-		$('#chats-wrap').on('keydown', '.send-message', sendMesage);
+		$('#chats-wrap').on('keydown', '.send-message', sendMessage);
 		$('#chats-wrap').on('click', '.show-actions', showActionToolbar);
 		$('#chats-wrap').on('click', '.users', {list: '.users-list'}, showList);
 		$('#chats-wrap').on('click', '.chats', {list: '.chats-list'}, showList);
@@ -352,7 +352,7 @@ function connectChat(chatUser) {
 function rawInput(data) {/*console.log('RECV: ' + data);*/}
 function rawOutput(data) {/*console.log('SENT: ' + data);*/}
 
-function sendMesage(event) {
+function sendMessage(event) {
 	var message, post, userJID, qbID = getIDFromChat();
 	if (!$('.chat:visible').is('#chat-room'))
 		userJID = getJID(qbID);
