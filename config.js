@@ -1,4 +1,4 @@
-/* Insert your QB application credentials
+/* Insert your QB application credentials here
 -----------------------------------------------*/
 var QBAPP = {
 	appID: 6566,
