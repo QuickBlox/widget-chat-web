@@ -95,7 +95,7 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 		
 		params = {
 			to: opponentJID,
-			from: _this.connection.jid, 
+			from: _this.connection.jid,
 			type: signalingType
 		};
 		
