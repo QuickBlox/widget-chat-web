@@ -317,7 +317,7 @@ function openPopup(winName, sizes, options) {
 	disWidth = (scrWidth - winWidth) / 2;
 	disHeight = (scrHeight - winHeight) / 2;
 	
-	url = window.location.origin + window.location.pathname + '/popups/videochat.html';
+	url = window.location.origin + window.location.pathname + 'popups/videochat.html';
 	params = ('width='+winWidth+', height='+winHeight+', left='+disWidth+', top='+disHeight+', ').concat(options);
 	
 	return window.open(url, winName, params);
