@@ -53,12 +53,13 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
  	
 	this.onMessage = function(msg) {
 		var author, type, body;
-		var qbID, sessionID, avatar;
+		var qbID, sessionID, name, avatar;
 		
 		author = $(msg).attr('from');
 		type = $(msg).attr('type');
 		body = $(msg).find('body')[0].textContent;
 		sessionID = $(msg).find('session')[0].textContent;
+		name = $(msg).find('full_name')[0].textContent;
 		avatar = $(msg).find('avatar')[0] && $(msg).find('avatar')[0].textContent;
 		
 		qbID = _this.getIDFromNode(author);
@@ -66,7 +67,7 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 		switch (type) {
 		case QBSignalingType.CALL:
 			traceS('onCall from ' + qbID);
-			_this.onCallCallback(qbID, body, sessionID, avatar);
+			_this.onCallCallback(qbID, body, sessionID, name, avatar);
 			break;
 		case QBSignalingType.ACCEPT:
 			traceS('onAccept from ' + qbID);

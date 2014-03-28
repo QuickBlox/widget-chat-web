@@ -843,9 +843,8 @@ function stopCall() {
 }
 
 // callbacks
-function onCall(qbID, sessionDescription, sessionID, avatar) {
+function onCall(qbID, sessionDescription, sessionID, name, avatar) {
 	var win, selector, winName = 'remoteCall' + qbID;
-	var name = namesOccupants[qbID];
 	
 	if (popups[winName]) {
 		popups[winName].close();
