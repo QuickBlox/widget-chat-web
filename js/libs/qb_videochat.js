@@ -124,6 +124,7 @@ function QBVideoChat(constraints, iceServers, signalingService, sessionID, sessi
 			};
 			
 			iceDataAsmessage = _this.signalingService.xmppDictionaryToText(iceData);
+			console.log(iceDataAsmessage);
 			
 			if (_this.state == QBVideoChatState.INACTIVE)
 				_this.candidatesQueue.push(iceDataAsmessage);

@@ -124,11 +124,13 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 	};
 	
 	this.xmppTextToDictionary = function(data) {
-		return $.parseJSON(Strophe.unescapeNode(data));
+		//return $.parseJSON(Strophe.unescapeNode(data));
+		return $.parseJSON(data);
 	};
 	
 	this.xmppDictionaryToText = function(data) {
-		return Strophe.escapeNode(JSON.stringify(data));
+		//return Strophe.escapeNode(JSON.stringify(data));
+		return JSON.stringify(data);
 	};
 }
 
