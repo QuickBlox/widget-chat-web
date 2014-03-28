@@ -776,7 +776,7 @@ function getMediaSuccess(qbID, name, sessionID) {
 		
 		if (sessionID) {
 			getRemoteStream(selector);
-			videoChat.accept(qbID);
+			videoChat.accept(qbID, chatUser.name);
 		}
 		
 		win.onresize = function() {
@@ -792,14 +792,14 @@ function getMediaSuccess(qbID, name, sessionID) {
 }
 
 function getMediaError(qbID) {
-	videoChat.reject(qbID);
+	videoChat.reject(qbID, chatUser.name);
 }
 
 // methods
 function doCall() {
 	var qbID = $(this).data('qb');
 	$(this).hide().parent().find('#stopCall').show();
-	videoChat.call(qbID, chatUser.avatar);
+	videoChat.call(qbID, chatUser.name, chatUser.avatar);
 }
 
 function acceptCall() {
@@ -824,7 +824,7 @@ function rejectCall(qbID, sessionID) {
 	
 	stopRing(popups);
 	videoChat = videoChat || new QBVideoChat(null, ICE_SERVERS, signaling, sessionID, null);
-	videoChat.reject(qbID);
+	videoChat.reject(qbID, chatUser.name);
 }
 
 function stopCall() {
@@ -837,7 +837,7 @@ function stopCall() {
 	win.close();
 	delete popups['videochat'];
 	
-	videoChat.stop(qbID);
+	videoChat.stop(qbID, chatUser.name);
 	videoChat.hangup();
 	videoChat = null;
 }

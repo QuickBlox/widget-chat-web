@@ -1,6 +1,6 @@
 /**
  * QuickBlox VideoChat WebRTC library
- * version 0.2.0
+ * version 0.2.1
  *
  * Authors: Igor Khomenko (igor@quickblox.com), Andrey Povelichenko (andrey.povelichenko@quickblox.com)
  *
@@ -8,10 +8,10 @@
 
 /*
   Public methods:
-    - call(userID, userAvatar)
-    - accept(userID)
-    - reject(userID)
-    - stop(userID)
+    - call(userID, userName, userAvatar)
+    - accept(userID, userName)
+    - reject(userID, userName)
+    - stop(userID, userName)
  */
 
 var PC_CONSTRAINTS = {
@@ -129,7 +129,7 @@ function QBVideoChat(constraints, iceServers, signalingService, sessionID, sessi
 				_this.candidatesQueue.push(iceDataAsmessage);
 			else {
 				// Send ICE candidate to opponent
-				_this.signalingService.sendCandidate(_this.opponentID, iceDataAsmessage, _this.sessionID);
+				_this.signalingService.sendCandidate(_this.opponentID, iceDataAsmessage, _this.sessionID, _this.opponentUsername);
 			}
 		}
 	};
@@ -193,7 +193,7 @@ function QBVideoChat(constraints, iceServers, signalingService, sessionID, sessi
 		// send candidates
 		for (var i = 0; i < _this.candidatesQueue.length; i++) {
 			candidate = _this.candidatesQueue.pop();
-			_this.signalingService.sendCandidate(_this.opponentID, candidate, _this.sessionID);
+			_this.signalingService.sendCandidate(_this.opponentID, candidate, _this.sessionID, _this.opponentUsername);
 		}
 	};
 	
@@ -205,14 +205,14 @@ function QBVideoChat(constraints, iceServers, signalingService, sessionID, sessi
 		// Send only string representation of sdp
 		// http://www.w3.org/TR/webrtc/#rtcsessiondescription-class
 	
-		_this.signalingService.call(_this.opponentID, _this.localSessionDescription.sdp, _this.sessionID, _this.opponentAvatar);
+		_this.signalingService.call(_this.opponentID, _this.localSessionDescription.sdp, _this.sessionID, _this.opponentUsername, _this.opponentAvatar);
 	};
 	
 	this.sendAceptRequest = function() {
 		// Send only string representation of sdp
 		// http://www.w3.org/TR/webrtc/#rtcsessiondescription-class
 	
-		_this.signalingService.accept(_this.opponentID, _this.localSessionDescription.sdp, _this.sessionID);
+		_this.signalingService.accept(_this.opponentID, _this.localSessionDescription.sdp, _this.sessionID, _this.opponentUsername);
 	};
 
 	// Cleanup 
@@ -226,30 +226,32 @@ function QBVideoChat(constraints, iceServers, signalingService, sessionID, sessi
 }
 
 // Call to user
-QBVideoChat.prototype.call = function(userID, userAvatar) {
+QBVideoChat.prototype.call = function(userID, userName, userAvatar) {
 	if (this.localSessionDescription) {
 		this.sendCallRequest();
 	} else {
 		this.opponentID = userID;
+		this.opponentUsername = userName;
 		this.opponentAvatar = userAvatar;
 		this.pc.createOffer(this.onGetSessionDescriptionSuccessCallback, this.onCreateOfferFailureCallback, SDP_CONSTRAINTS);
 	}
 };
 
 // Accept call from user 
-QBVideoChat.prototype.accept = function(userID) {
+QBVideoChat.prototype.accept = function(userID, userName) {
 	this.opponentID = userID;
+	this.opponentUsername = userName;
 	this.setRemoteDescription(this.remoteSessionDescription, "offer");
 };
 
 // Reject call from user
-QBVideoChat.prototype.reject = function(userID) {
-	this.signalingService.reject(userID, this.sessionID);
+QBVideoChat.prototype.reject = function(userID, userName) {
+	this.signalingService.reject(userID, this.sessionID, userName);
 };
 
 // Stop call with user
-QBVideoChat.prototype.stop = function(userID) {
-	this.signalingService.stop(userID, "manual", this.sessionID);
+QBVideoChat.prototype.stop = function(userID, userName) {
+	this.signalingService.stop(userID, "manual", this.sessionID, userName);
 };
 
 function traceVC(text) {

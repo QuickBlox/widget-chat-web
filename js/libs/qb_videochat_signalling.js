@@ -1,6 +1,6 @@
 /**
  * QuickBlox VideoChat WebRTC signaling library
- * version 0.2.0
+ * version 0.2.1
  *
  * Authors: Igor Khomenko (igor@quickblox.com), Andrey Povelichenko (andrey.povelichenko@quickblox.com)
  *
@@ -8,11 +8,11 @@
 
 /*
   Public methods:
-    - call(userID, sessionDescription, sessionID, userAvatar)
-    - accept(userID, sessionDescription, sessionID)
-    - reject(userID, sessionID)
-    - stop(userID, reason, sessionID)
-    - sendCandidate(userID, candidate, sessionID)
+    - call(userID, sessionDescription, sessionID, userName, userAvatar)
+    - accept(userID, sessionDescription, sessionID, userName)
+    - reject(userID, sessionID, userName)
+    - stop(userID, reason, sessionID, userName)
+    - sendCandidate(userID, candidate, sessionID, userName)
   
   Public callbacks:
     - onCall(fromUserID, sessionDescription, sessionID, fromUserAvatar)
@@ -29,6 +29,11 @@ var QBSignalingType = {
 	REJECT: 'qbvideochat_rejectCall',
 	STOP: 'qbvideochat_stopCall',
 	CANDIDATE: 'qbvideochat_candidate'
+};
+
+var QBCallType = {
+	VIDEO_AUDIO: 'VIDEO_AUDIO',
+    AUDIO: 'AUDIO'
 };
 
 function QBVideoChatSignaling(appID, chatServer, connection) {
@@ -84,18 +89,22 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 		return true;
 	};
 	
-	this.sendMessage = function(userID, type, data, sessionID, userAvatar) {
+	this.sendMessage = function(userID, signalingType, data, sessionID, userName, userAvatar, callType) {
 		var reply, params, opponentJID = _this.getJID(userID);
 		
 		params = {
 			to: opponentJID,
 			from: _this.connection.jid, 
-			type: type
+			type: signalingType
 		};
 		
-		reply = $msg(params).c('body').t(data).up().c('session').t(sessionID);
+		reply = $msg(params).c('body').t(data).up().c('extraParams')
+		                                           .c('session').t(sessionID).up()
+		                                           .c('full_name').t(userName).up();
 		if (userAvatar)
-			reply.up().c('avatar').t(userAvatar);
+			reply.c('avatar').t(userAvatar).up();
+		if (callType)
+			reply.c('callType').t(callType);
 		_this.connection.send(reply);
 	};
 	
@@ -122,28 +131,28 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 	};
 }
 
-QBVideoChatSignaling.prototype.call = function(userID, sessionDescription, sessionID, userAvatar) {
+QBVideoChatSignaling.prototype.call = function(userID, sessionDescription, sessionID, userName, userAvatar) {
 	traceS('call to ' + userID);
-	this.sendMessage(userID, QBSignalingType.CALL, sessionDescription, sessionID, userAvatar);
+	this.sendMessage(userID, QBSignalingType.CALL, sessionDescription, sessionID, userName, userAvatar, QBCallType.VIDEO_AUDIO);
 };
 
-QBVideoChatSignaling.prototype.accept = function(userID, sessionDescription, sessionID) {
+QBVideoChatSignaling.prototype.accept = function(userID, sessionDescription, sessionID, userName) {
 	traceS('accept ' + userID);
-	this.sendMessage(userID, QBSignalingType.ACCEPT, sessionDescription, sessionID);
+	this.sendMessage(userID, QBSignalingType.ACCEPT, sessionDescription, sessionID, userName);
 };
 
-QBVideoChatSignaling.prototype.reject = function(userID, sessionID) {
+QBVideoChatSignaling.prototype.reject = function(userID, sessionID, userName) {
 	traceS('reject ' + userID);
-	this.sendMessage(userID, QBSignalingType.REJECT, null, sessionID);
+	this.sendMessage(userID, QBSignalingType.REJECT, null, sessionID, userName);
 };
 
-QBVideoChatSignaling.prototype.stop = function(userID, reason, sessionID) {
+QBVideoChatSignaling.prototype.stop = function(userID, reason, sessionID, userName) {
 	traceS('stop ' + userID);
-	this.sendMessage(userID, QBSignalingType.STOP, reason, sessionID);
+	this.sendMessage(userID, QBSignalingType.STOP, reason, sessionID, userName);
 };
 
-QBVideoChatSignaling.prototype.sendCandidate = function(userID, candidate, sessionID) {
-	this.sendMessage(userID, QBSignalingType.CANDIDATE, candidate, sessionID);
+QBVideoChatSignaling.prototype.sendCandidate = function(userID, candidate, sessionID, userName) {
+	this.sendMessage(userID, QBSignalingType.CANDIDATE, candidate, sessionID, userName);
 };
 
 function traceS(text) {
