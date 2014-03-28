@@ -44,6 +44,8 @@ $(document).ready(function() {
 		$('#dataSignup').click(prepareDataForSignUp);
 		$('.smiles-list img').click(choseSmile);
 		
+		$('#callToAndroid').click(createVideoChatInstance);
+		
 		$('#chats-wrap').on('click', '.logout', logout);
 		$('#chats-wrap').on('keydown', '.send-message', sendMessage);
 		$('#chats-wrap').on('click', '.show-actions', showActionToolbar);
@@ -737,11 +739,11 @@ function createSignalingInstance() {
 	signaling.onStopCallback = onStop;
 }
 
-function createVideoChatInstance(event, userID, sessionID, sessionDescription) {
+function createVideoChatInstance(event, userID, sessionID, sessionDescription, userName) {
 	var qbID, name;
 	
 	qbID = userID || $(this).data('qb');
-	name = namesOccupants[qbID];
+	name = namesOccupants[qbID] || userName || $(this).data('name');
 	
 	if (!name) {
 		alert('Sorry, this user is offline');
@@ -803,9 +805,10 @@ function doCall() {
 }
 
 function acceptCall() {
-	var qbID, sessionDescription, sessionID;
+	var qbID, name, sessionDescription, sessionID;
 	
 	qbID = $(this).data('qb');
+	name = $(this).data('name');
 	sessionID = $(this).data('id');
 	sessionDescription = $(this).data('description');
 	
@@ -814,7 +817,7 @@ function acceptCall() {
 	delete popups['remoteCall' + qbID];
 	
 	stopRing(popups);
-	createVideoChatInstance(null, qbID, sessionID, sessionDescription);
+	createVideoChatInstance(null, qbID, sessionID, sessionDescription, name);
 }
 
 function rejectCall(qbID, sessionID) {

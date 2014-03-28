@@ -609,3 +609,7 @@ fieldset {
 					line-height: 3.8rem;
 					color: #000;
 				}
+				
+#callToAndroid {
+	margin-top: 10px;
+}

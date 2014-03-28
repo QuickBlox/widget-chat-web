@@ -105,6 +105,8 @@ function connectSuccess() {
 	switches.isLogout = false;
 	createAnimatedLoadingUsers();
 	createAnimatedLoadingMessages();
+	
+	$('#callToAndroid').show();
 }
 
 function signUpFailure() {
@@ -366,7 +368,7 @@ function htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, av
 	selector.find('title').text('Remote call');
 	selector.find('.avatar').attr('src', avatar);
 	selector.find('.author').html('<b>' + name + '</b><br>is calling you');
-	selector.find('#acceptCall').attr('data-qb', qbID).attr('data-id', sessionID).attr('data-description', sessionDescription);
+	selector.find('#acceptCall').attr('data-qb', qbID).attr('data-name', name).attr('data-id', sessionID).attr('data-description', sessionDescription);
 	selector.find('#remoteCall').show();
 }
 
