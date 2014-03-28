@@ -125,7 +125,7 @@ function QBVideoChatSignaling(appID, chatServer, connection) {
 	
 	this.xmppTextToDictionary = function(data) {
 		//return $.parseJSON(Strophe.unescapeNode(data));
-		return $.parseJSON(data);
+		return $.parseJSON(Strophe.xmlunescape(data));
 	};
 	
 	this.xmppDictionaryToText = function(data) {
