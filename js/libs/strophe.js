@@ -78,6 +78,7 @@ var Base64 = (function () {
 
     return obj;
 })();
+
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined
  * in FIPS PUB 180-1
@@ -93,6 +94,7 @@ var Base64 = (function () {
  * These are the functions you'll usually want to call
  * They take string arguments and return either hex or base-64 encoded strings
  */
+function b64_sha1(s){return binb2b64(core_sha1(str2binb(s),s.length * 8));}
 function str_sha1(s){return binb2str(core_sha1(str2binb(s),s.length * 8));}
 function b64_hmac_sha1(key, data){ return binb2b64(core_hmac_sha1(key, data));}
 function str_hmac_sha1(key, data){ return binb2str(core_hmac_sha1(key, data));}
@@ -253,6 +255,7 @@ function binb2b64(binarray)
   }
   return str;
 }
+
 /*
  * A JavaScript implementation of the RSA Data Security, Inc. MD5 Message
  * Digest Algorithm, as defined in RFC 1321.
@@ -460,6 +463,7 @@ var MD5 = (function () {
 
     return obj;
 })();
+
 /*
     This program is distributed under the terms of the MIT license.
     Please see the LICENSE file for details.
@@ -467,11 +471,11 @@ var MD5 = (function () {
     Copyright 2006-2008, OGG, LLC
 */
 
-/* jslint configuration: */
+/* jshint undef: true, unused: true:, noarg: true, latedef: true */
 /*global document, window, setTimeout, clearTimeout, console,
-    XMLHttpRequest, ActiveXObject,
-    Base64, MD5,
-    Strophe, $build, $msg, $iq, $pres */
+    ActiveXObject, Base64, MD5, DOMParser */
+// from sha1.js
+/*global core_hmac_sha1, binb2str, str_hmac_sha1, str_sha1, b64_hmac_sha1*/
 
 /** File: strophe.js
  *  A JavaScript library for XMPP BOSH/XMPP over Websocket.
@@ -624,7 +628,7 @@ Strophe = {
      *  The version of the Strophe library. Unreleased builds will have
      *  a version of head-HASH where HASH is a partial revision.
      */
-    VERSION: "1.1.2",
+    VERSION: "1.1.3",
 
     /** Constants: XMPP Namespace Constants
      *  Common namespace constants from the XMPP RFCs and XEPs.
@@ -1004,6 +1008,25 @@ Strophe = {
         text = text.replace(/"/g,  "&quot;");
         return text;
     },
+    
+    /*  Function: xmlunescape
+     *  Unexcapes invalid xml characters.
+     *
+     *  Parameters:
+     *     (String) text - text to unescape.
+     *
+     *  Returns:
+     *      Unescaped text.
+     */
+    xmlunescape: function(text)
+    {
+        text = text.replace(/\&amp;/g, "&");
+        text = text.replace(/&lt;/g,  "<");
+        text = text.replace(/&gt;/g,  ">");
+        text = text.replace(/&apos;/g,  "'");
+        text = text.replace(/&quot;/g,  "\"");
+        return text;
+    },
 
     /** Function: xmlTextNode
      *  Creates an XML DOM text node.
@@ -1032,9 +1055,10 @@ Strophe = {
      */
     xmlHtmlNode: function (html)
     {
+        var node;
         //ensure text is escaped
         if (window.DOMParser) {
-            parser = new DOMParser();
+            var parser = new DOMParser();
             node = parser.parseFromString(html, "text/xml");
         } else {
             node = new ActiveXObject("Microsoft.XMLDOM");
@@ -1120,7 +1144,7 @@ Strophe = {
      */
     createHtml: function (elem)
     {
-        var i, el, j, tag, attribute, value, css, cssAttrs, attr, cssName, cssValue, children, child;
+        var i, el, j, tag, attribute, value, css, cssAttrs, attr, cssName, cssValue;
         if (elem.nodeType == Strophe.ElementType.NORMAL) {
             tag = elem.nodeName.toLowerCase();
             if(Strophe.XHTML.validTag(tag)) {
@@ -1325,10 +1349,12 @@ Strophe = {
      *      be one of the values in Strophe.LogLevel.
      *    (String) msg - The log message.
      */
+    /* jshint ignore:start */
     log: function (level, msg)
     {
         return;
     },
+    /* jshint ignore:end */
 
     /** Function: debug
      *  Log a message at the Strophe.LogLevel.DEBUG level.
@@ -2060,7 +2086,7 @@ Strophe.Connection = function (service, options)
         if (Strophe._connectionPlugins.hasOwnProperty(k)) {
             var ptype = Strophe._connectionPlugins[k];
             // jslint complaints about the below line, but this is fine
-            var F = function () {};
+            var F = function () {}; // jshint ignore:line
             F.prototype = ptype;
             this[k] = new F();
             this[k].init(this);
@@ -2211,8 +2237,8 @@ Strophe.Connection.prototype = {
         this.authenticated = false;
         this.errors = 0;
 
-        // parse jid for domain and resource
-        this.domain = this.domain || Strophe.getDomainFromJid(this.jid);
+        // parse jid for domain
+        this.domain = Strophe.getDomainFromJid(this.jid);
 
         this._changeConnectStatus(Strophe.Status.CONNECTING, null);
 
@@ -2266,10 +2292,12 @@ Strophe.Connection.prototype = {
      *  Parameters:
      *    (XMLElement) elem - The XML data received by the connection.
      */
+    /* jshint unused:false */
     xmlInput: function (elem)
     {
         return;
     },
+    /* jshint unused:true */
 
     /** Function: xmlOutput
      *  User overrideable function that receives XML data sent to the
@@ -2289,10 +2317,12 @@ Strophe.Connection.prototype = {
      *  Parameters:
      *    (XMLElement) elem - The XMLdata sent by the connection.
      */
+    /* jshint unused:false */
     xmlOutput: function (elem)
     {
         return;
     },
+    /* jshint unused:true */
 
     /** Function: rawInput
      *  User overrideable function that receives raw data coming into the
@@ -2306,10 +2336,12 @@ Strophe.Connection.prototype = {
      *  Parameters:
      *    (String) data - The data received by the connection.
      */
+    /* jshint unused:false */
     rawInput: function (data)
     {
         return;
     },
+    /* jshint unused:true */
 
     /** Function: rawOutput
      *  User overrideable function that receives raw data sent to the
@@ -2323,10 +2355,12 @@ Strophe.Connection.prototype = {
      *  Parameters:
      *    (String) data - The data sent by the connection.
      */
+    /* jshint unused:false */
     rawOutput: function (data)
     {
         return;
     },
+    /* jshint unused:true */
 
     /** Function: send
      *  Send a stanza.
@@ -2855,8 +2889,7 @@ Strophe.Connection.prototype = {
         }
         var mechanisms = bodyWrap.getElementsByTagName("mechanism");
         var matched = [];
-        var i, mech, auth_str, hashed_auth_str,
-            found_authentication = false;
+        var i, mech, found_authentication = false;
         if (!hasFeatures) {
             this._proto._no_auth_received(_callback);
             return;
@@ -2996,6 +3029,7 @@ Strophe.Connection.prototype = {
      *  Returns:
      *    false to remove the handler.
      */
+    /* jshint unused:false */
     _auth1_cb: function (elem)
     {
         // build plaintext auth iq
@@ -3020,6 +3054,7 @@ Strophe.Connection.prototype = {
 
         return false;
     },
+    /* jshint unused:true */
 
     /** PrivateFunction: _sasl_success_cb
      *  _Private_ handler for succesful SASL authentication.
@@ -3036,7 +3071,7 @@ Strophe.Connection.prototype = {
             var serverSignature;
             var success = Base64.decode(Strophe.getText(elem));
             var attribMatch = /([a-z]+)=([^,]+)(,|$)/;
-            matches = success.match(attribMatch);
+            var matches = success.match(attribMatch);
             if (matches[1] == "v") {
                 serverSignature = matches[2];
             }
@@ -3210,6 +3245,7 @@ Strophe.Connection.prototype = {
      *  Returns:
      *    false to remove the handler.
      */
+    /* jshint unused:false */
     _sasl_failure_cb: function (elem)
     {
         // delete unneeded handlers
@@ -3227,6 +3263,7 @@ Strophe.Connection.prototype = {
         this._changeConnectStatus(Strophe.Status.AUTHFAIL, null);
         return false;
     },
+    /* jshint unused:true */
 
     /** PrivateFunction: _auth2_cb
      *  _Private_ handler to finish legacy authentication.
@@ -3359,8 +3396,6 @@ Strophe.Connection.prototype = {
         }
         this.timedHandlers = newList;
 
-        var body, time_elapsed;
-
         clearTimeout(this._idleTimeout);
 
         this._proto._onIdle();
@@ -3433,8 +3468,6 @@ Strophe.SASLMechanism = function(name, isClientFirst, priority) {
 };
 
 Strophe.SASLMechanism.prototype = {
-  _sasl_data: {},
-
   /**
    *  Function: test
    *  Checks if mechanism able to run.
@@ -3453,9 +3486,11 @@ Strophe.SASLMechanism.prototype = {
    *  Returns:
    *    (Boolean) If mechanism was able to run.
    */
+  /* jshint unused:false */
   test: function(connection) {
     return true;
   },
+  /* jshint unused:true */
 
   /** PrivateFunction: onStart
    *  Called before starting mechanism on some connection.
@@ -3479,9 +3514,11 @@ Strophe.SASLMechanism.prototype = {
    *  Returns:
    *    (String) Mechanism response.
    */
+  /* jshint unused:false */
   onChallenge: function(connection, challenge) {
     throw new Error("You should implement challenge handling!");
   },
+  /* jshint unused:true */
 
   /** PrivateFunction: onFailure
    *  Protocol informs mechanism implementation about SASL failure.
@@ -3533,7 +3570,7 @@ Strophe.SASLPlain.test = function(connection) {
   return connection.authcid !== null;
 };
 
-Strophe.SASLPlain.prototype.onChallenge = function(connection, challenge) {
+Strophe.SASLPlain.prototype.onChallenge = function(connection) {
   var auth_str = connection.authzid;
   auth_str = auth_str + "\u0000";
   auth_str = auth_str + connection.authcid;
@@ -3576,23 +3613,23 @@ Strophe.SASLSHA1.prototype.onChallenge = function(connection, challenge, test_cn
   auth_str += ",r=";
   auth_str += cnonce;
 
-  this._sasl_data.cnonce = cnonce;
-  this._sasl_data["client-first-message-bare"] = auth_str;
+  connection._sasl_data.cnonce = cnonce;
+  connection._sasl_data["client-first-message-bare"] = auth_str;
 
   auth_str = "n,," + auth_str;
 
   this.onChallenge = function (connection, challenge)
   {
-    var nonce, salt, iter, Hi, U, U_old;
+    var nonce, salt, iter, Hi, U, U_old, i, k;
     var clientKey, serverKey, clientSignature;
     var responseText = "c=biws,";
-    var authMessage = this._sasl_data["client-first-message-bare"] + "," +
+    var authMessage = connection._sasl_data["client-first-message-bare"] + "," +
       challenge + ",";
-    var cnonce = this._sasl_data.cnonce;
+    var cnonce = connection._sasl_data.cnonce;
     var attribMatch = /([a-z]+)=([^,]+)(,|$)/;
 
     while (challenge.match(attribMatch)) {
-      matches = challenge.match(attribMatch);
+      var matches = challenge.match(attribMatch);
       challenge = challenge.replace(matches[0], "");
       switch (matches[1]) {
       case "r":
@@ -3608,7 +3645,7 @@ Strophe.SASLSHA1.prototype.onChallenge = function(connection, challenge, test_cn
     }
 
     if (nonce.substr(0, cnonce.length) !== cnonce) {
-      this._sasl_data = {};
+      connection._sasl_data = {};
       return connection._sasl_failure_cb();
     }
 
@@ -3728,7 +3765,7 @@ Strophe.SASLMD5.prototype.onChallenge = function(connection, challenge, test_cno
                                               MD5.hexdigest(A2)) + ",";
   responseText += 'qop=auth';
 
-  this.onChallenge = function (connection, challenge)
+  this.onChallenge = function ()
   {
     return "";
   }.bind(this);
@@ -3745,6 +3782,7 @@ Strophe.Connection.prototype.mechanisms[Strophe.SASLMD5.prototype.name] = Stroph
     window.$iq = arguments[3];
     window.$pres = arguments[4];
 });
+
 /*
     This program is distributed under the terms of the MIT license.
     Please see the LICENSE file for details.
@@ -3752,11 +3790,10 @@ Strophe.Connection.prototype.mechanisms[Strophe.SASLMD5.prototype.name] = Stroph
     Copyright 2006-2008, OGG, LLC
 */
 
-/* jslint configuration: */
-/*global document, window, setTimeout, clearTimeout, console,
+/* jshint undef: true, unused: true:, noarg: true, latedef: true */
+/*global window, setTimeout, clearTimeout,
     XMLHttpRequest, ActiveXObject,
-    Base64, MD5,
-    Strophe, $build, $msg, $iq, $pres */
+    Strophe, $build */
 
 
 /** PrivateClass: Strophe.Request
@@ -4163,7 +4200,7 @@ Strophe.Bosh.prototype = {
             req.xhr.abort();
             // jslint complains, but this is fine. setting to empty func
             // is necessary for IE6
-            req.xhr.onreadystatechange = function () {};
+            req.xhr.onreadystatechange = function () {}; // jshint ignore:line
         }
     },
 
@@ -4185,8 +4222,8 @@ Strophe.Bosh.prototype = {
 
         if (this._requests.length < 2 && data.length > 0 &&
             !this._conn.paused) {
-            body = this._buildBody();
-            for (i = 0; i < data.length; i++) {
+            var body = this._buildBody();
+            for (var i = 0; i < data.length; i++) {
                 if (data[i] !== null) {
                     if (data[i] === "restart") {
                         body.attrs({
@@ -4211,7 +4248,7 @@ Strophe.Bosh.prototype = {
         }
 
         if (this._requests.length > 0) {
-            time_elapsed = this._requests[0].age();
+            var time_elapsed = this._requests[0].age();
             if (this._requests[0].dead !== null) {
                 if (this._requests[0].timeDead() >
                     Math.floor(Strophe.SECONDARY_TIMEOUT * this.wait)) {
@@ -4414,6 +4451,18 @@ Strophe.Bosh.prototype = {
                         }
                     }
                 }
+                
+                /* This is a webkit CORS fix,
+                 * Safari and old Chrome changes the request method from POST to
+                 * OPTIONS thus not carriying the initial xml stanza.
+                 * this keeps the http request pending for random time
+                 * period before restarting it.
+                 * Setting content type of the request to text/plain avoids
+                 * this problem
+                 * 
+                 * https://groups.google.com/forum/#!topic/strophe/kzDYjPo4LQY
+                */
+                req.xhr.setRequestHeader('Content-Type', 'text/plain');
                 req.xhr.send(req.data);
             };
 
@@ -4588,6 +4637,7 @@ Strophe.Bosh.prototype = {
         }
     }
 };
+
 /*
     This program is distributed under the terms of the MIT license.
     Please see the LICENSE file for details.
@@ -4595,10 +4645,9 @@ Strophe.Bosh.prototype = {
     Copyright 2006-2008, OGG, LLC
 */
 
-/*global document, window, setTimeout, clearTimeout, console,
-    XMLHttpRequest, ActiveXObject,
-    Base64, MD5,
-    Strophe, $build, $msg, $iq, $pres */
+/* jshint undef: true, unused: true:, noarg: true, latedef: true */
+/*global document, window, clearTimeout, WebSocket,
+    DOMParser, Strophe, $build */
 
 /** Class: Strophe.WebSocket
  *  _Private_ helper class that handles WebSocket Connections
@@ -4693,9 +4742,9 @@ Strophe.Websocket.prototype = {
         var condition = "";
         var text = "";
 
-        ns = "urn:ietf:params:xml:ns:xmpp-streams";
-        for (i = 0; i < error.childNodes.length; i++) {
-            e = error.childNodes[i];
+        var ns = "urn:ietf:params:xml:ns:xmpp-streams";
+        for (var i = 0; i < error.childNodes.length; i++) {
+            var e = error.childNodes[i];
             if (e.getAttribute("xmlns") !== ns) {
                 break;
             } if (e.nodeName === "text") {
@@ -4705,7 +4754,7 @@ Strophe.Websocket.prototype = {
             }
         }
 
-        errorString = "WebSocket stream error: ";
+        var errorString = "WebSocket stream error: ";
 
         if (condition) {
             errorString += condition;
@@ -4841,7 +4890,7 @@ Strophe.Websocket.prototype = {
         } else if (message.data === "</stream:stream>") {
             this._conn.rawInput(message.data);
             this._conn.xmlInput(document.createElement("stream:stream"));
-            this._conn._changeConnectStatus(Strophe.Status.CONNFAIL, error);
+            this._conn._changeConnectStatus(Strophe.Status.CONNFAIL, "Received closing stream");
             this._conn._doDisconnect();
             return;
         } else {
@@ -4929,7 +4978,7 @@ Strophe.Websocket.prototype = {
      *
      * Nothing to do here for WebSockets
      */
-    _onClose: function(event) {
+    _onClose: function() {
         if(this._conn.connected && !this._conn.disconnecting) {
             Strophe.error("Websocket closed unexcectedly");
             this._conn._doDisconnect();
@@ -4981,7 +5030,7 @@ Strophe.Websocket.prototype = {
     _onIdle: function () {
         var data = this._conn._data;
         if (data.length > 0 && !this._conn.paused) {
-            for (i = 0; i < data.length; i++) {
+            for (var i = 0; i < data.length; i++) {
                 if (data[i] !== null) {
                     var stanza, rawStanza;
                     if (data[i] === "restart") {
@@ -5014,7 +5063,7 @@ Strophe.Websocket.prototype = {
      * (string) message - The websocket message.
      */
     _onMessage: function(message) {
-        var elem;
+        var elem, data;
         // check for closing stream
         if (message.data === "</stream:stream>") {
             var close = "</stream:stream>";

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<link rel="stylesheet" href="../css/videochat.css">
+</head>
+<body>
+	<div id="videochat" class="hidden">
+		<video id="localVideo" class="fullVideo" autoplay muted></video>
+		<video id="remoteVideo" class="fullVideo hidden" autoplay></video>
+	</div>
+	
+	<video id="miniVideo" class="smallVideo hidden" autoplay muted></video>
+	
+	<footer id="videochat-footer" class="hidden">
+		<button id="doCall" class="btn_green">Call user</button>
+		<button id="stopCall" class="btn_red hidden">Hang up</button>
+	</footer>
+	
+	<div id="remoteCall" class="hidden">
+		<img class="avatar" src="" alt="avatar">
+		<div class="author"></div>
+		<button id="acceptCall" class="btn_green">Accept</button>
+		<button id="rejectCall" class="btn_red">Reject</button>
+	</div>
+</body>
+</html>

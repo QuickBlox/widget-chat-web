@@ -1,57 +1,7 @@
-/* Helper functions for widget
------------------------------------------------------------------------*/
 var URL_REGEXP = /\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/gi;
 
-function connecting() {
-	$('#main').hide();
-	$('#connecting').show();
-}
-
-function connectFailure() {
-	$('#connecting').hide();
-	$('#main').show();
-	$('#login-form input').addClass('error');
-}
-
-function connectSuccess() {
-	$('#connecting').hide();
-	$('#chats-wrap, #chat-room').show();
-	$('.chat-content').html('');
-	$('.send-message').val('');
-	$('.users-list').html('<li class="list-title">Users</li>');
-	$('.chats-list').html('<li class="list-title">Chats</li>');
-	$('.chats-list').append('<li class="list-item switch-chat" data-id="chat-room">Chat Room <span class="messages-count"></span></li>');
-	switches.isLogout = false;
-	createAnimatedLoadingUsers();
-	createAnimatedLoadingMessages('.chat-content');
-}
-
-function signUpFailure() {
-	$('#signup-form fieldset > input').addClass('error');
-	$('#signup-form input').prop('disabled', false);
-}
-
-function signUpSuccess() {
-	$('#signup-form').hide();
-	$('#signup-success').show();
-	setTimeout(backToLogin, 3 * 1000);
-	
-	function backToLogin() {
-		$('#signup-success').hide();
-		$('#main').show();
-		$('#login-form input').val('').removeClass('error');
-	}
-}
-
-function logoutSuccess() {
-	$('.bubbles').removeClass('bubbles_login');
-	$('.header').removeClass('header_login');
-	$('#chats-wrap, #login-form, .chats').hide();
-	$('.chat:not(#chat-room)').remove();
-	$('#main, #auth').show();
-	if (!switches.isLogout) window.location.reload();
-}
-
+/* Onload Functions
+-----------------------------------------------------------------------*/
 function changeInputFileBehavior() {
 	$('.uploader-wrap input:file').change(function() {
 		var file = $(this).val();
@@ -131,6 +81,60 @@ function updateTime() {
 	setTimeout(updateTime, 60 * 1000);
 }
 
+/* Connecting Process
+-----------------------------------------------------------------------*/
+function connecting() {
+	$('#main').hide();
+	$('#connecting').show();
+}
+
+function connectFailure() {
+	$('#connecting').hide();
+	$('#main').show();
+	$('#login-form input').addClass('error');
+}
+
+function connectSuccess() {
+	$('#connecting').hide();
+	$('#chats-wrap, #chat-room').show();
+	$('.chat-content').html('');
+	$('.send-message').val('');
+	$('.users-list').html('<li class="list-title">Users</li>');
+	$('.chats-list').html('<li class="list-title">Chats</li>');
+	$('.chats-list').append('<li class="list-item switch-chat" data-id="chat-room">Chat Room <span class="messages-count"></span></li>');
+	switches.isLogout = false;
+	createAnimatedLoadingUsers();
+	createAnimatedLoadingMessages();
+	
+	$('#callToAndroid').show();
+}
+
+function signUpFailure() {
+	$('#signup-form fieldset > input').addClass('error');
+	$('#signup-form input').prop('disabled', false);
+}
+
+function signUpSuccess() {
+	$('#signup-form').hide();
+	$('#signup-success').show();
+	setTimeout(backToLogin, 3 * 1000);
+	
+	function backToLogin() {
+		$('#signup-success').hide();
+		$('#main').show();
+		$('#login-form input').val('').removeClass('error');
+	}
+}
+
+function logoutSuccess() {
+	$('.bubbles').removeClass('bubbles_login');
+	$('.header').removeClass('header_login');
+	$('#chats-wrap, #login-form, .chats').hide();
+	$('.chat:not(#chat-room)').remove();
+	$('#main, #auth').show();
+	if (!switches.isLogout) window.location.reload();
+}
+
 function trim(str) {
 	if (str.charAt(0) == ' ')
 		str = trim(str.substring(1, str.length));
@@ -139,6 +143,22 @@ function trim(str) {
 	return str;
 }
 
+/* Spinner
+-----------------------------------------------------------------------*/
+function createAnimatedLoadingUsers() {
+	$('.users-list').append('<li class="loading_users"><div id="floatingCirclesG_users"></div></li>');
+	for (var i = 1; i < 9; i++)
+		$('#floatingCirclesG_users').append('<div class="f_circleG_users" id="frotateG_0'+i+'_users"></div>');
+}
+
+function createAnimatedLoadingMessages() {
+	$('.chat-content').append('<div class="loading_messages"><div id="floatingCirclesG_messages"></div></div>');
+	for (var i = 1; i < 9; i++)
+		$('#floatingCirclesG_messages').append('<div class="f_circleG_messages" id="frotateG_0'+i+'_messages"></div>');
+}
+
+/* Chat Module
+-----------------------------------------------------------------------*/
 function getJID(id) {
 	return id + "-" + QBAPP.appID + "@" + CHAT.server;
 }
@@ -191,16 +211,21 @@ function parser(str, time) {
 	}
 }
 
-function createAnimatedLoadingUsers() {
-	$('.users-list').append('<li class="loading_users"><div id="floatingCirclesG_users"></div></li>');
-	for (var i = 1; i < 9; i++)
-		$('#floatingCirclesG_users').append('<div class="f_circleG_users" id="frotateG_0'+i+'_users"></div>');
+function choseSelector(id) {
+	return $('#chat-room').add('#chat-' + id).find('.chat-content');
 }
 
-function createAnimatedLoadingMessages(selector) {
-	$(selector).append('<div class="loading_messages"><div id="floatingCirclesG_messages"></div></div>');
-	for (var i = 1; i < 9; i++)
-		$('#floatingCirclesG_messages').append('<div class="f_circleG_messages" id="frotateG_0'+i+'_messages"></div>');
+function scrollToMessage(selector) {
+	selector.scrollTo('*:last', 0);
+}
+
+/* Typing
+-----------------------------------------------------------------------*/
+function checkTypeChatState(jid, type) {
+	if (jid)
+		connection.chatstates[type](jid);
+	else
+		connection.chatstates[type](CHAT.roomJID, 'groupchat');
 }
 
 function addTypingMessage(obj, name) {
@@ -212,14 +237,8 @@ function removeTypingMessage(obj, name) {
 	if (obj.text().length == 0) obj.remove();
 }
 
-function choseSelector(id) {
-	return $('#chat-room').add('#chat-' + id).find('.chat-content');
-}
-
-function scrollToMessage(selector) {
-	selector.scrollTo('*:last', 0);
-}
-
+/* Private Messages
+-----------------------------------------------------------------------*/
 function editUsersCount(selector, val) {
 	selector.parent().not('#chat-room').find('.users-count').text(val);
 }
@@ -239,6 +258,15 @@ function deleteMessageCount(id) {
 	$('.switch-chat[data-id=' + id + ']').find('.messages-count').text('').css('padding', '0');
 }
 
+function addRemoveButton() {
+	if ($(this).data('id') != 'chat-room')
+		$(this).append('<span class="remove">x</span>');
+}
+
+function deleteRemoveButton() {
+	$(this).find('.remove').remove();
+}
+
 function switchСhat(event) {
 	var id, selector;
 	
@@ -251,15 +279,6 @@ function switchСhat(event) {
 		scrollToMessage(selector);
 		deleteMessageCount($(this).data('id'));
 	}
-}
-
-function addRemoveButton() {
-	if ($(this).data('id') != 'chat-room')
-		$(this).append('<span class="remove">x</span>');
-}
-
-function deleteRemoveButton() {
-	$(this).find('.remove').remove();
 }
 
 function removeChat() {
@@ -281,56 +300,87 @@ function removeChat() {
 		$('.chats').hide();
 }
 
-function checkTypeChatState(jid, type) {
-	if (jid)
-		connection.chatstates[type](jid);
+/* Video Chat Module
+-----------------------------------------------------------------------*/
+function openPopup(winName, sizes, options) {
+	var scrWidth, scrHeight, winWidth, winHeight, disWidth, disHeight;
+	var url, params;
+	
+	scrWidth = window.screen.availWidth;
+	scrHeight = window.screen.availHeight;
+	
+	if (sizes) {
+		winWidth = sizes.width;
+		winHeight = sizes.height;
+	} else {
+		winWidth = scrWidth / 2;
+		winHeight = scrHeight / 2;
+	}
+	disWidth = (scrWidth - winWidth) / 2;
+	disHeight = (scrHeight - winHeight) / 2;
+	
+	url = window.location.origin + window.location.pathname + 'popups/videochat.html';
+	params = ('width='+winWidth+', height='+winHeight+', left='+disWidth+', top='+disHeight+', ').concat(options);
+	
+	return window.open(url, winName, params);
+}
+
+function resize(win, innerWidth, innerHeight) {
+	var elem, elemWidth, elemHeight, elemLeft, elemTop;
+	var selector, footerHeight, aspectRatio;
+	
+	selector = $(win.document);
+	footerHeight = selector.find('#videochat-footer').height();
+	
+	elem = selector.find('.fullVideo:visible')[0];
+	aspectRatio = elem.videoWidth / elem.videoHeight;
+	
+	elemWidth = innerWidth < aspectRatio * win.innerHeight ?
+	             innerWidth : aspectRatio * win.innerHeight;
+	elemHeight = innerHeight < win.innerWidth / aspectRatio ?
+	              innerHeight : win.innerWidth / aspectRatio;
+	
+	elemLeft = (innerWidth - elemWidth) / 2;
+	elemTop = (innerHeight - elemHeight - footerHeight) / 2;
+	
+	if (elemTop > 0)
+		selector.find('#videochat').css('position', 'absolute');
 	else
-		connection.chatstates[type](CHAT.roomJID, 'groupchat');
+		selector.find('#videochat').css('position', 'static');
+		
+	selector.find('#videochat').css({'width': elemWidth + 'px',
+	                                 'height': elemHeight + 'px',
+	                                 'left': elemLeft + 'px',
+	                                 'top': elemTop + 'px'});
 }
 
-function setCallback(callback, name, type) {
-	connection.addHandler(callback, null, name, type, null, null);
+function htmlVideoChatBuilder(selector, qbID, name, sessionID) {
+	selector.find('title').text('Video chat with ' + name);
+	selector.find('#doCall, #stopCall').attr('data-qb', qbID);
+	selector.find('#videochat, #videochat-footer').show();
+	if (sessionID)
+		selector.find('#doCall').hide().parent().find('#stopCall').show();
 }
 
-function centerPopup(selector, isControls) {
-	var winWidth, winHeight, popupWidth, disWidth, disHeight;
-	var fixWidthRatio = isControls ? 0.25 : 0.625, fixHeightRatio = isControls ? 0.4 : 0.05;
+function htmlRemoteCallBuilder(selector, qbID, sessionDescription, sessionID, avatar, name) {
+	avatar = avatar || '../images/avatar_default.jpg';
 	
-	winWidth = $(window).width();
-	winHeight = $(window).height();
-	popupWidth = winWidth * fixWidthRatio;
-	
-	disWidth = (winWidth - popupWidth) / 2;
-	disHeight = winHeight * fixHeightRatio;
-	
-	$(selector).css({'width': popupWidth + 'px', 'top': disHeight + 'px', 'left': disWidth + 'px'});
-	
-	if (!isControls) {
-		var popupHeight = winHeight - 80 - 100;
-		$(selector).find('#remoteVideo').css({'max-height': popupHeight + 'px'});
-	}
-	
-	$('#videochat-overlay').css({'width': winWidth + 'px', 'height': winHeight + 'px'});
-	
-	return false;
+	selector.find('title').text('Remote call');
+	selector.find('.avatar').attr('src', avatar);
+	selector.find('.author').html('<b>' + name + '</b><br>is calling you');
+	selector.find('#acceptCall').attr('data-qb', qbID).attr('data-name', name).attr('data-id', sessionID).attr('data-description', sessionDescription);
+	selector.find('#remoteCall').show();
 }
 
-function closeVideoChat() {
-	$('#videochat').empty();
-	$('#videochat').hide();
-	$('#videochat-overlay').remove();
+function getRemoteStream(selector) {
+	var miniVideo = selector.find('#miniVideo')[0];
+	videoChat.reattachMediaStream(miniVideo, videoChat.localStreamElement);
+	
+	selector.find('#localVideo').hide();
+	selector.find('#remoteVideo, #miniVideo').show();
 }
 
-function closeCall(id) {
-	$('.remoteCall[data-qb=' + id + ']').remove();
-	if (!$('div').is('.remoteCall')) {
-		$('#remoteCallControls').hide();
-		$('#videochat-overlay').remove();
-		ring.pause();
-	}
-}
-
-function getRemoteStream() {
-	$('#localVideo').addClass('smallVideo').removeClass('fullVideo');
-	$('#remoteVideo').addClass('fullVideo').removeClass('smallVideo');
+function stopRing(popups) {
+	if (Object.keys(popups).length == 0 || Object.keys(popups).length == 1 && popups['videochat'])
+		audio.ring.pause();
 }

@@ -1,6 +1,6 @@
 /**
  * QB Group Chat Room (XMPP)
- * version 2.2.1
+ * version 2.3.0
  * 
  * author: Andrey Povelichenko <andrey.povelichenko@quickblox.com>
  */
@@ -34,7 +34,7 @@ body {
 	max-width: 900px;
 	height: 100%;
 	margin: 0 auto;
-	font-family: Helvetica, Arial, sans-serif;
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 a {
 	color: #0077cb;
@@ -455,7 +455,7 @@ fieldset {
 		width: 100%;
 		height: 3.4rem;
 		padding: .85rem .7rem .85rem 3.5rem;
-		font-family: Helvetica, Arial, sans-serif;
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 		font-size: 1.2rem;
 		line-height: 1.7rem;
 		border: 0;
@@ -477,7 +477,7 @@ fieldset {
 	.html-80 .smiles {top: 27%;}
 	.html-90 .smiles {top: 30%;}
 
-/* Users and Chats Lists */
+/* Chats and Users Lists */
 .users-list,
 .chats-list {
 	position: relative;
@@ -610,79 +610,6 @@ fieldset {
 					color: #000;
 				}
 				
-/* Video Chat
-----------------------------------------------------------*/
-.popup {
-	position: fixed;
-	box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
-	z-index: 2000;
-}
-	.popup .popup-close {
-		position: absolute;
-		top: 0;
-		right: 0;
-		padding: 10px;
-		font-weight: bold;
-		font-size: 20px;
-		color: #fff;
-		cursor: pointer;
-		opacity: 0.4;
-	}
-	.popup .popup-close:hover {
-		opacity: 1;
-	}
-	.popup .popup-header {
-		padding: 11px;
-		background: #0077cb;
-	}
-		.popup .popup-header h3 {
-			overflow: hidden;
-			font-size: 16px;
-			font-weight: normal;
-			color: #fff;
-			white-space: nowrap;
-			text-overflow: ellipsis;
-		}
-	.popup .popup-content {
-		position: relative;
-		font-size: 14px;
-		background: #ececec;
-		border-top: 1px solid #d4d4d4;
-	}
-		.popup .popup-content button {
-			margin: 20px;
-			cursor: pointer;
-		}
-		#videochat .popup-content button {
-			margin: 10px;
-		}
-		#videochat .fullVideo {
-			width: 100%;
-		}
-		#videochat .smallVideo {
-			position: absolute;
-			right: 10px;
-			bottom: 44px;
-			width: 25%;
-		}
-
-#remoteCallControls {
-	z-index: 3000;
-}
-	.remoteCall {
-		text-align: center;
-	}
-		
-#videochat-overlay {
-	display: none;
-	overflow: hidden;
-	position: fixed;
-	top: 0;
-	left: 0;
-	background: rgba(0, 0, 0, 0.3);
-	z-index: 1000;
-}
-
-#audio-container {
-	opacity: 0;
+#callToAndroid {
+	margin-top: 10px;
 }
