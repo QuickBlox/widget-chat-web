@@ -98,8 +98,16 @@ function QBVideoChat(constraints, iceServers, signalingService, sessionID, sessi
 	// RTCPeerConnection creation
 	this.createRTCPeerConnection = function() {
 		traceVC("RTCPeerConnection...");
-		var pcConfig = {
+		/*var pcConfig = {
 			'iceServers': createIceServers(_this.iceServers.urls, _this.iceServers.username, _this.iceServers.password)
+		};*/
+		
+		var pcConfig = {
+			iceServers: [
+				{urls: "stun:stun.l.google.com:19302"},
+				{urls: "turn:turnserver.quickblox.com:3478?transport=udp", username: "", credential: ""},
+				{urls: "turn:turnserver.quickblox.com:3478?transport=tcp", username: "", credential: ""}
+			]
 		};
 		try {
 			_this.pc = new RTCPeerConnection(pcConfig, PC_CONSTRAINTS);
