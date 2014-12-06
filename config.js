@@ -9,7 +9,7 @@ var QBAPP = {
 var CHAT = {
 	roomJID: '7232_test@muc.chat.quickblox.com', //'6566_test@muc.chat.quickblox.com',
 	server: 'chat.quickblox.com',
-	bosh: 'http://chat.quickblox.com:5280'
+	bosh: 'https://chat.quickblox.com:5291'
 };
 
 var FBAPP_ID = '368137086642884';
